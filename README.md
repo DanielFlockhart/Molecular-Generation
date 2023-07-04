@@ -1,0 +1,6 @@
+- Train Model
+- Take Smiles and Generate Images 
+- Preprocess Images - focal scaling
+- Convert images to vector Representation
+- Input to a network (GAN, VAE)
+- Generate New Potential Analogues

@@ -1,0 +1,10 @@
+ast
+numpy==1.19.5
+pubchempy
+sklearn
+pubchempy
+matplotlib
+rdkit-pypi
+Pillow
+IPython
+pandas
