@@ -16,10 +16,10 @@ class Structure:
     def __init__(self,smile):
         self.smile = smile
         self.molecule = self.build_structure()
-        self.name = self.get_name()
+        #self.name = self.get_name()
         self.data_folder = os.path.join(get_directory(),"data")
-        self.structures = os.path.join(self.data_folder,"2D-Structures")
-        self.structure_3D = os.path.join(self.data_folder,"3D-Structures")
+        self.dataset_folder = os.path.join(self.data_folder,"dataset")
+        self.test_data_folder = os.path.join(self.dataset_folder,"test-data")
         
     
     def build_structure(self):
@@ -34,7 +34,7 @@ class Structure:
         Saves the 2D structure as a png to the data folder
         """
         if self.molecule is not None:
-            Draw.MolToFile(self.molecule, self.structures+fr"\{self.name}.png")
+            Draw.MolToFile(self.molecule, self.test_data_folder+fr"\{self.smile}.png")
 
     def get_name(self):
         """
