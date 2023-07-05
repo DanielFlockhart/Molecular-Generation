@@ -1,6 +1,14 @@
 import tensorflow as tf
 from PIL import Image
-
+import os
+def folder_to_vector(folder):
+    image_paths = [os.path.join(folder, filename) for filename in os.listdir(folder)]
+    vectors = []
+    for image_path in image_paths:
+        image = Image.open(image_path)
+        vector = image_to_vector(image)
+        vectors.append(vector)
+    return vectors
 
 def image_to_vector(image,size):
     '''

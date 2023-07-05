@@ -5,6 +5,8 @@
 - Input to a network (GAN, VAE)
 - Generate New Potential Analogues
 
+- Working on finding a way of making VAE positional and scale invariant
+
 # Molecular Generation With Variational Auto Encoding and Generative Adversarial Neworks
 Developer Notes : This Project Is a work in progress, some functionality is WIP at the moment.
 

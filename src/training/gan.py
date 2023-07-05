@@ -26,6 +26,7 @@ class Generator(tf.keras.Model):
         x = tf.nn.relu(x)
         x = tf.nn.tanh(self.conv3(x))
         return x
+    
     def loss(self,fake_output):
         # Define the loss function for the generator
         return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.ones_like(fake_output), logits=fake_output))

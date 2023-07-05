@@ -2,9 +2,12 @@ import tensorflow as tf
 from tensorflow.keras import layers
 from vae import *
 from gan import * 
+import numpy as np
+sys.path.insert(0, os.path.abspath('..'))
+from preprocessing import image_manipulation as im
 
 
-def train_VAE():
+def train_VAE(train_images):
     # Create an instance of the VAE model
     latent_dim = 64  # Adjust the desired latent dimension size
     vae = VAE(latent_dim)
@@ -14,7 +17,7 @@ def train_VAE():
     vae.compile(optimizer='adam', loss=vae.loss)
 
     # Generate training data (Replace this with your actual training data)
-    train_images = tf.random.normal(shape=(1000, 128, 128, 3))
+    #train_images = tf.random.normal(shape=(1000, 128, 128, 3))
 
     # Train the VAE model
     vae.fit(train_images, train_images, batch_size=64, epochs=10)
@@ -33,13 +36,13 @@ def train_VAE():
     print("Shape of the mean:", mean.shape)
     print("Shape of the log variance:", log_var.shape)
 
-def train_GAN():
+def train_GAN(training_images):
     # Create instances of the generator and discriminator
-    generator = Generator()
-    discriminator = Discriminator()
+    #generator = Generator()
+    #discriminator = Discriminator()
 
     # Create an instance of the GAN model
-    gan = GAN(generator, discriminator)
+    gan = GAN(Generator(), Discriminator())
 
 
 
@@ -76,7 +79,8 @@ def train_GAN():
 
     # Prepare the dataset (Replace this with your actual dataset loading/preprocessing)
     BATCH_SIZE = 64
-    train_dataset = tf.data.Dataset.from_tensor_slices(train_images).batch(BATCH_SIZE)
+
+    train_dataset = tf.data.Dataset.from_tensor_slices(training_images).batch(BATCH_SIZE)
 
     # Train the GAN model
     EPOCHS = 10
@@ -84,12 +88,12 @@ def train_GAN():
         for batch in train_dataset:
             train_step(batch)
 
-    # Generate a sample image using the generator
-    noise = tf.random.normal([1, 100])
-    generated_image = generator(noise, training=False)
+    # Generate a sample image using the generator 128 pixel image
+    noise = tf.random.normal(shape=(1, 128, 128, 3))
+    generated_image = gan.generator(noise, training=False)
 
     # Pass the fake image through the discriminator
-    discriminator_output = discriminator(generated_image)
+    discriminator_output = gan.discriminator(generated_image)
 
     # Print the shape of the generated image and discriminator output
     print("Shape of the generated image:", generated_image.shape)
@@ -97,4 +101,19 @@ def train_GAN():
 
 
 if __name__ == "__main__":
-    main()
+    training_images = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\dataset"
+    training_images = im.folder_to_vector(training_images)
+    training_images = np.reshape(training_images, (len(training_images), -1))
+    train_VAE(training_images)
+
+# List to Experiment With
+
+# CVAE?
+# Transformer?
+# CNN?
+
+
+#I am currently trying to generate new images of molecular skeletons using unsupervised learning, I have a dataset of images of skeletons for training.
+#Unfortunately, the images of the skeletons are all of different scale and position. I want to use a ML network that has positional and size invariance in mind.
+#I am currently looking at other options for the network architecture. I am currently looking at potentially using a GAN or Variational auto encoder. 
+#Is there a better architecture or a different way of doing this that would work better.
