@@ -93,3 +93,19 @@ highlight_color = (255, 0, 0)  # RGB color for highlighting (red in this case)
 
 image = generate_molecule_image(smiles, highlight_atoms, highlight_color)
 image.save("highlighted_molecule.png")
+
+
+
+
+
+
+
+
+'''
+Current Ideas:
+- Keep looking for library built-in methods
+
+- If not, set scaling factor to smallest scale to fit largest molecule in. 
+    - If that scale is too small, then increase the size of the image or just don't include larger molecules.
+    - Then, resize all molecules to that scale by getting the length of carbon bonds in the molecule and approximating the bond length to the scale.
+'''

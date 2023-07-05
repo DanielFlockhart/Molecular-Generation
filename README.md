@@ -5,7 +5,7 @@
 - Input to a network (GAN, VAE)
 - Generate New Potential Analogues
 
-# Chemical Smiles Toolkit
+# Molecular Generation With Variational Auto Encoding and Generative Adversarial Neworks
 Developer Notes : This Project Is a work in progress, some functionality is WIP at the moment.
 
 This Chemical Smiles Toolkit has a variety of features including clustering chemical compounds based on their SMILES (Simplified Molecular Input Line Entry System) representation and provides a user-friendly interface to input a SMILES string and obtain a cluster of similar chemicals along with their respective SMILES. In addition, the user can input a SMILE and recieve a 2D Structure in return.
@@ -24,18 +24,25 @@ The project consists of the following main components:
 
 4. **SMILE To Structure**: This module takes a SMILE and outputs the predicted chemical.
 
+5. **Preprocessing**
+
+6. **Training**
+
+7. **New Molecules Generation**
+
+
 ## Installation
 
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/DanielFlockhart/Chemical-SMILES-toolkit.git
+   git clone https://github.com/DanielFlockhart/Molecule-Generation.git
    ```
 
 2. Navigate to the project directory:
 
    ```bash
-   cd Chemical-SMILES-toolkit
+   cd Molecule-Generation
    ```
 
 3. Install the required dependencies:
@@ -122,13 +129,9 @@ The project acknowledges the following resources for their contributions:
 
 - [PubChem](https://pubchem.ncbi.nlm.nih.gov/) - Data source for drug SMILES and names
 - [RDKit](https://www.rdkit.org/) - Converting SMILEs to 2D Structures
+- [LiverpoolUniversity](https://www.nature.com/articles/s41597-022-01142-7) - Organic materials repurposing, a data set for theoretical predictions of new applications for existing compounds
 
-Thank you for using the Chemical SMILES toolkit project! We hope it proves to be useful for your chemical analysis and research.
+
+Thank you for using the Molecular Generation project! We hope it proves to be useful for your chemical analysis and research.
 
 
-Working on:
-
-- Setting Up UI
-   - Creating Pages System
-- Create my own UI Framework built ontop of tkinter
-- Creating 3D Conformer Generator
