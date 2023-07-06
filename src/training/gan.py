@@ -68,6 +68,7 @@ class GAN(tf.keras.Model):
         self.discriminator = discriminator
 
     def call(self, inputs):
+        # Forward pass through both networks
         generated_images = self.generator(inputs)
         discriminator_output = self.discriminator(generated_images)
         return discriminator_output

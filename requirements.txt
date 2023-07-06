@@ -8,3 +8,4 @@ rdkit-pypi
 Pillow
 IPython
 pandas
+opencv-python

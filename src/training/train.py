@@ -3,38 +3,68 @@ from tensorflow.keras import layers
 from vae import *
 from gan import * 
 import numpy as np
+import sys
+import os
 sys.path.insert(0, os.path.abspath('..'))
 from preprocessing import image_manipulation as im
+from PIL import Image
 
 
 def train_VAE(train_images):
-    # Create an instance of the VAE model
+    # Define the VAE model
     latent_dim = 64  # Adjust the desired latent dimension size
     vae = VAE(latent_dim)
+    # Issue is with the images dimensions
+    
+    # Define the optimizer
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+    vae.compile(optimizer=optimizer,loss=vae.compute_loss)
 
+    # Define the training step function
+    @tf.function
+    def train_step(inputs):
+        print("training bruh " + str(inputs.shape))
+        encoded_images, mean, log_var = vae.encode(inputs)  # Encode the input images
+        with tf.GradientTape() as tape:
+            reconstructed = vae.decode(encoded_images)  # Decode the encoded images
+            total_loss = vae.compute_loss(inputs, reconstructed, mean, log_var)
+        gradients = tape.gradient(total_loss, vae.trainable_variables)
+        optimizer.apply_gradients(zip(gradients, vae.trainable_variables))
+        return total_loss
 
-    # Compile the VAE model
-    vae.compile(optimizer='adam', loss=vae.loss)
+    # Training loop
+    epochs = 2
+    batch_size = 64
 
-    # Generate training data (Replace this with your actual training data)
-    #train_images = tf.random.normal(shape=(1000, 128, 128, 3))
+    for epoch in range(epochs):
+        epoch_loss = 0.0
+        num_batches = 0
+        for i in range(0, len(train_images), batch_size):
+            batch_images = train_images[i:i+batch_size]
+            loss = train_step(batch_images)
+            epoch_loss += loss
+            num_batches += 1
+        print(f"Epoch {epoch+1}/{epochs} - Loss: {epoch_loss/num_batches:.4f}")
 
-    # Train the VAE model
-    vae.fit(train_images, train_images, batch_size=64, epochs=10)
+    # Save model architecture as JSON
+    vae_architecture = vae.to_json()
+    with open('vae_architecture.json', 'w') as json_file:
+        json_file.write(vae_architecture)
 
-
-
-
-    # Generate an input tensor from a 128x128px image
-    input_image = tf.random.normal(shape=(1, 128, 128, 3))
-
+    # Save model weights
+    vae.save_weights(r'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\models\vae\model.h5')
+    # Generate black and white noise 
+    noise_vector = np.random.normal(size=(1, 128, 128, 3))
     # Pass the input tensor through the VAE
-    reconstructed_image, mean, log_var = vae(input_image)
+    reconstructed_image, mean, log_var = vae(noise_vector)
 
-    # Print the shapes of the outputs
-    print("Shape of the reconstructed image:", reconstructed_image.shape)
-    print("Shape of the mean:", mean.shape)
-    print("Shape of the log variance:", log_var.shape)
+    # convert reconstructed image to PIL image, using numpy, PIL and tensorflow
+    reconstructed_image = im.tensor_to_image(reconstructed_image)
+
+
+    # Print the output
+    reconstructed_image.show()
+
 
 def train_GAN(training_images):
     # Create instances of the generator and discriminator
@@ -88,6 +118,11 @@ def train_GAN(training_images):
         for batch in train_dataset:
             train_step(batch)
 
+
+
+    # Save the model
+    gan.save(r'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\models\gan')
+
     # Generate a sample image using the generator 128 pixel image
     noise = tf.random.normal(shape=(1, 128, 128, 3))
     generated_image = gan.generator(noise, training=False)
@@ -101,10 +136,11 @@ def train_GAN(training_images):
 
 
 if __name__ == "__main__":
-    training_images = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\dataset"
-    training_images = im.folder_to_vector(training_images)
-    training_images = np.reshape(training_images, (len(training_images), -1))
-    train_VAE(training_images)
+    IMG_SIZE = 128
+    training_images = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\dataset\test-data"
+    imgs = im.load_images(training_images,IMG_SIZE)
+
+    train_VAE(imgs)
 
 # List to Experiment With
 

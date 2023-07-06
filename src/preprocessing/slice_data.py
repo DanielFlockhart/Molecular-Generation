@@ -31,7 +31,8 @@ class Slicer:
     def save(self):
         # Saves Slice of Dataset of Molecules to test data folder
         for molecule in self.data:
-            mol = Structure(molecule[1])
+            # Create a Structure Object and save it to image of size 128x128
+            mol = Structure(molecule[1],128)
             try:
                 mol.save_structure()
             except Exception as e:

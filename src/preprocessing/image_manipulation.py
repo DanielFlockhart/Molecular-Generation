@@ -1,29 +1,66 @@
 import tensorflow as tf
 from PIL import Image
+import numpy as np
 import os
-def folder_to_vector(folder):
-    image_paths = [os.path.join(folder, filename) for filename in os.listdir(folder)]
-    vectors = []
-    for image_path in image_paths:
-        image = Image.open(image_path)
-        vector = image_to_vector(image)
-        vectors.append(vector)
-    return vectors
+# def folder_to_vector(folder,img_size):
+#     image_paths = [os.path.join(folder, filename) for filename in os.listdir(folder)]
+#     vectors = []
+#     for image_path in image_paths:
+#         image = Image.open(image_path)
+#         vector = image_to_vector(image)
+#         vectors.append(vector)
+#     return vectors
 
-def image_to_vector(image,size):
-    '''
-    Converts Image to Input for network
-    '''
-    # Resize Image if Necessary
-    resized_image = image.resize((size,size))
+# def image_to_vector(image):
+#     '''
+#     Converts Image to Input for network
+#     '''
+#     # Resize Image if Necessary
+#     #resized_image = image.resize((size,size))
 
-    # Convert to tensor
-    image_tensor = tf.convert_to_tensor(resized_image)
+#     # Convert to image to numpy array
+#     image_array = np.asarray(image)
 
-    # Normalize the image
-    normalized_image = image_tensor / 255.0  # Normalize pixel values to range [0, 1]
+#     return image_array
 
-    # Add batch dimension if required by the model
-    normalized_image = tf.expand_dims(normalized_image, axis=0)
+# def tensor_to_image(tensor):
+#     tensor = tf.squeeze(tensor, axis=0)  # Remove unnecessary dimensions
+#     tensor = tensor.numpy() * 255.0  # Scale the tensor values to the range [0, 255]
+#     tensor = tensor.astype(np.uint8)  # Convert the tensor to unsigned 8-bit integers
+#     image = Image.fromarray(tensor)  # Create an image from the array
+#     return image
 
-    return normalized_image
+
+import os
+import cv2
+import numpy as np
+
+def load_images(directory, img_size):
+    images = []
+    for filename in os.listdir(directory):
+        if filename.endswith('.jpg') or filename.endswith('.png'):  # Add more extensions if needed
+            img_path = os.path.join(directory, filename)
+            image = cv2.imread(img_path)
+            image = cv2.resize(image, (img_size, img_size))  # Resize image to desired dimensions
+            image = image.astype(np.float32) / 255.0  # Normalize pixel values between 0 and 1
+            images.append(image)
+    return np.array(images)
+
+
+def tensor_to_image(tensor):
+    # Remove extra dimensions
+    tensor = tf.squeeze(tensor, axis=0)
+
+    # Convert tensor values to the correct range and data type
+    tensor = tf.cast(tensor * 255, tf.uint8)
+
+    # Convert tensor to NumPy array
+    array = np.array(tensor)
+
+    # Create PIL Image
+    image = Image.fromarray(array)
+
+    # Resize the image
+    image = image.resize((128, 128))
+
+    return image

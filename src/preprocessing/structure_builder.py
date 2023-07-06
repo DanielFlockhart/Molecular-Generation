@@ -13,9 +13,10 @@ from utils import *
 # Given a canonicle smile, a 2D structure can be generated using the rdkit library.
 
 class Structure:
-    def __init__(self,smile):
+    def __init__(self,smile,size=128):
         self.smile = smile
         self.molecule = self.build_structure()
+        self.size = size
         #self.name = self.get_name()
         self.data_folder = os.path.join(get_directory(),"data")
         self.dataset_folder = os.path.join(self.data_folder,"dataset")
@@ -26,6 +27,7 @@ class Structure:
         """
         Builds a 2D structure from a smile
         """
+        print(self.smile)
         m = Chem.MolFromSmiles(self.smile)
         return m
     
@@ -34,7 +36,7 @@ class Structure:
         Saves the 2D structure as a png to the data folder
         """
         if self.molecule is not None:
-            Draw.MolToFile(self.molecule, self.test_data_folder+fr"\{self.smile}.png")
+            Draw.MolToFile(self.molecule, self.test_data_folder+fr"\{self.smile}.png",size=(self.size,self.size))
 
     def get_name(self):
         """
