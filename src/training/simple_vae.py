@@ -5,6 +5,14 @@ import numpy as np
 import os
 from PIL import Image
 
+# Instead of using a variational autoencoder, we can use a simple autoencoder
+# to generate images. This is a simple autoencoder that takes in an image and
+# outputs an image. The encoder and decoder are both convolutional neural
+# networks. The encoder takes in an image and outputs a vector of size
+
+class SAE(tf.keras.Model):
+    
+
 class VAE(tf.keras.Model):
     def __init__(self, latent_dim):
         super(VAE, self).__init__()
@@ -17,19 +25,20 @@ class VAE(tf.keras.Model):
         x = layers.Conv2D(32, 3, activation='relu', strides=2, padding='same')(encoder_input)
         x = layers.Conv2D(64, 3, activation='relu', strides=2, padding='same')(x)
         x = layers.Flatten()(x)
-        mean = layers.Dense(self.latent_dim, activation='linear')(x)
-        log_var = layers.Dense(self.latent_dim, activation='linear')(x)
-        encoder_output = mean, log_var
-        return tf.keras.Model(encoder_input, encoder_output)
+        x = layers.Dense(16, activation='relu')(x)
+        z_mean = layers.Dense(self.latent_dim,name="z_mean")(x)
+        z_log_var = layers.Dense(self.latent_dim,name="z_log_var")(x)
+        encoder_output = z_mean, z_log_var
+        return tf.keras.Model(encoder_input, encoder_output,name="encoder")
 
     def build_decoder(self):
         decoder_input = tf.keras.Input(shape=(self.latent_dim,))
         x = layers.Dense(8 * 8 * 256, activation='relu')(decoder_input)
         x = layers.Reshape((8, 8, 256))(x)
         x = layers.Conv2DTranspose(128, 3, activation='relu', strides=4, padding='same')(x)
-        x = layers.Conv2DTranspose(64, 3, activation='relu', strides=4, padding='same')(x)
+        x = layers.Conv2DTranspose(32, 3, activation='relu', strides=4, padding='same')(x)
         decoder_output = layers.Conv2DTranspose(3, 3, activation='sigmoid', padding='same')(x)
-        return tf.keras.Model(decoder_input, decoder_output)
+        return tf.keras.Model(decoder_input, decoder_output,name="decoder")
 
     def encode(self, x):
         mean, log_var = self.encoder(x)
@@ -59,11 +68,11 @@ import cv2
 def load_images(directory, img_size):
     images = []
     for filename in os.listdir(directory):
-        if filename.endswith('.jpg') or filename.endswith('.png'):  # Add more extensions if needed
+        if filename.endswith('.jpg') or filename.endswith('.png'):
             img_path = os.path.join(directory, filename)
-            image = cv2.imread(img_path)
-            image = cv2.resize(image, (img_size, img_size))  # Resize image to desired dimensions
-            image = image.astype(np.float32) / 255.0  # Normalize pixel values between 0 and 1
+            image = Image.open(img_path)
+            image = image.resize((img_size, img_size))
+            image = np.array(image) / 255.0
             images.append(image)
     return np.array(images)
 
@@ -89,26 +98,30 @@ def image_to_tensor(image):
     image = tf.expand_dims(image, axis=0)
     return image
 
-# Define the VAE model
-latent_dim = 64  # Adjust the desired latent dimension size
-epochs = 2
-batch_size = 64
 
-# Generate Temporary Data for Testing (1000 image 128x128 of noise)
-train_images = np.random.normal(size=(1000, 128, 128, 3))
-# Define the MOdel
+
+# Define the VAE model
+latent_dim = 64
+epochs = 10
+IMG_SIZE = 128
+batch_size = 64
+training_images = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\dataset\test-data"
+
+# Load and preprocess training images
+train_images = load_images(training_images, IMG_SIZE)
+
+# Define the Model
 optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
 vae = VAE(latent_dim)
 vae.compile(optimizer=optimizer)
 vae.fit(train_images, epochs=epochs, batch_size=batch_size)
 
-# # Save model weights
-vae.save_weights(r'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\models\vae\model.h5')
-    
+# Save model weights
+# vae.save_weights(r'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\models\vae\model.h5')
+
 # Generate black and white noise
 noise_vector = np.random.normal(size=(1, latent_dim))
 # Pass the latent vector through the decoder
 reconstructed_image = vae.decode(noise_vector)
-print(reconstructed_image.shape)
 reconstructed_image = tensor_to_image(reconstructed_image)
 reconstructed_image.show()

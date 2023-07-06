@@ -1,85 +1,140 @@
-# import numpy as np
-# from rdkit import Chem
-# from rdkit.Chem import Draw
-# from PIL import Image
-# import random
-# def generate_molecule_image(smiles):
-#     mol = Chem.MolFromSmiles(smiles)
 
-#     # Set the desired bond length
-#     bond_length = random.randint(10,50) # Adjust this value as needed
-
-#     # Modify the bond lengths in the molecule
-#     for bond in mol.GetBonds():
-#         bond.SetBondType(Chem.rdchem.BondType.SINGLE)
-#         bond.SetBondDir(Chem.rdchem.BondDir.NONE)  # Clear bond direction
-
-#     # Generate the 2D depiction of the molecule
-#     image = Draw.MolToImage(mol, size=(128, 128), fitImage=False, wedgeBonds=False, useSVG=False)
-
-#     # Calculate the scaling factor based on bond length
-#     scaling_factor = bond_length / max(image.size)
-
-#     # Resize the image while maintaining the aspect ratio
-#     #new_size = tuple(int(dim * scaling_factor) for dim in image.size)
-#     #image = image.resize(new_size)
-
-#     # Create a blank white background image of 128x128 pixels
-#     background = Image.new('RGB', (128, 128), (255, 255, 255))
-
-#     # Paste the molecule image onto the center of the background
-#     offset = tuple((bg_dim - img_dim) // 2 for bg_dim, img_dim in zip(background.size, image.size))
-#     background.paste(image, offset)
-
-#     # Return the image object
-#     return background
-
-# # Example usage
-# smiles = ["CC(=O)OC1=CC=CC=C1C(=O)O", "c1ccccc1"]
-# max_size = 128
-# for smile in smiles:
-#     image = generate_molecule_image(smile)
-#     image.save(f"{smile}.png")
-
-
+from PIL import Image
+import os
 import numpy as np
 from rdkit import Chem
 from rdkit.Chem import Draw
+from rdkit.Chem.Draw import IPythonConsole
 from PIL import Image
 import random
+class Normalise:
+    def __init__(self,fp):
+        self.folder_path = fp
+    def load_images(self, path):
+        # Load images from path
+        pass
 
-def generate_molecule_image(smiles):
+    def resize_images(self, images):
+        pass
+
+    def black_and_white(self):
+        # Iterate over each file in the folder
+        for file_name in os.listdir(self.folder_path):
+            if file_name.endswith('.png'):
+                # Load the image
+                image_path = os.path.join(folder_path, file_name)
+                image = Image.open(image_path)
+
+                # Convert the image to grayscale
+                image = image.convert('L')
+
+                # Convert the grayscale image to binary black and white
+                threshold = 245  # Adjust the threshold value as needed
+                image = image.point(lambda x: 0 if x < threshold else 255, '1')
+
+                # Save the converted image (overwrite the original)
+                image.save(image_path)
+
+                # Close the image file
+                image.close()
+
+    def generate_molecule_image(self,smiles,mol_size):
+        mol = Chem.MolFromSmiles(smiles)
+
+        # Set the desired bond length and highlight color
+        
+
+        # Set Bond Line Width
+        # Set the bond width
+
+        # Set the bond width for all bonds in the molecule
+        for bond in mol.GetBonds():
+            bond.SetLineWidth(bond_width)
+
+
+        # Generate the 2D depiction of the molecule
+        image = Draw.MolToImage(mol,size=(mol_size, mol_size))
+        
+        # Calculate the scaling factor based on bond length
+        scaling_factor = bond_length / max(image.size)
+
+        # Resize the image while maintaining the aspect ratio
+        new_size = tuple(int(dim * scaling_factor) for dim in image.size)
+        image = image.resize(new_size)
+
+        # Create a blank white background image of 128x128 pixels
+        background = Image.new('RGB', (mol_size, mol_size), (255, 255, 255))
+
+        # Paste the molecule image onto the center of the background
+        offset = tuple((bg_dim - img_dim) // 2 for bg_dim, img_dim in zip(background.size, image.size))
+        background.paste(image, offset)
+
+        # Return the image object
+        return background
+
+
+folder_path = r'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\dataset\test-data'
+
+# norm = Normalise(folder_path)
+# for smile in smiles:
+#     image = norm.generate_molecule_image(smile,max_size)
+#     image.save(f"{smile}.png")
+# smiles = ["CC(=O)OC1=CC=CC=C1C(=O)O", "c1ccccc1"]
+# max_size = 400
+# target_size = (400, 400)
+# target_bond_length = 30
+# bond_width = 5
+# mol = Chem.MolFromSmiles(smiles[0])
+# skeleton_image = Draw.MolToImage(mol, size=target_size, fitImage=True)
+
+# mol_size = np.array(skeleton_image.size)
+# bond_lengths = np.array(mol.GetConformer().GetBondLengths())
+# mean_bond_length = np.mean(bond_lengths)
+# scaling_factor = target_bond_length / mean_bond_length
+
+# scaled_size = (mol_size * scaling_factor).astype(int)
+# scaled_image = skeleton_image.resize(scaled_size, Image.ANTIALIAS)
+# scaled_mol = Chem.MolFromSmiles(smiles[0])  # Reload the molecule for reference
+# Draw.MolToFile(scaled_mol, "scaled_molecule.png", size=scaled_size)
+
+# Define the target image size and bond length
+target_size = (400, 400)
+
+# List of SMILES strings
+smiles_list = ["CC(=O)OC1=CC=CC=C1C(=O)O", "c1ccccc1"]
+
+from rdkit import Chem
+from rdkit.Chem import Draw
+from rdkit.Chem import AllChem
+
+# Define the target bond length
+target_bond_length = 1.5  # Adjust as needed
+
+
+
+
+# Iterate through the list of SMILES
+for smiles in smiles_list:
+    # Load the molecule from SMILES
     mol = Chem.MolFromSmiles(smiles)
 
-    # Set the desired bond length and highlight color
-    bond_length = 60 # Adjust this value as needed
+    # Generate a conformer for the molecule
+    mol = Chem.AddHs(mol)
+    AllChem.EmbedMolecule(mol)
 
-    # Generate the 2D depiction of the molecule
-    image = Draw.MolToImage(mol,size=(128, 128))
-    
-    # Calculate the scaling factor based on bond length
-    #scaling_factor = bond_length / max(image.size)
+    # Generate the skeleton image
+    skeleton_image = Draw.MolToImage(mol)
 
-    # Resize the image while maintaining the aspect ratio
-    #new_size = tuple(int(dim * scaling_factor) for dim in image.size)
-    #image = image.resize(new_size)
+    # Set all bond lengths to the target bond length
+    for bond in mol.GetBonds():
+        bond.SetBondType(Chem.rdchem.BondType.SINGLE)  # Reset bond type to single bond
+        bond.SetBondTypeAsDouble(target_bond_length)  # Set bond length
 
-    # # Create a blank white background image of 128x128 pixels
-    # background = Image.new('RGB', (128, 128), (255, 255, 255))
+    # Generate the image with normalized bond lengths
+    normalized_image = Draw.MolToImage(mol)
 
-    # # Paste the molecule image onto the center of the background
-    # offset = tuple((bg_dim - img_dim) // 2 for bg_dim, img_dim in zip(background.size, image.size))
-    # background.paste(image, offset)
-
-    # Return the image object
-    #return background
-    return image
-smiles = ["CC(=O)OC1=CC=CC=C1C(=O)O", "c1ccccc1"]
-max_size = 128
-for smile in smiles:
-    image = generate_molecule_image(smile)
-    image.save(f"{smile}.png")
-
+    # Save the image
+    normalized_image.save(f"normalized_molecule_{smiles}.png")
 
 '''
 Current Ideas:
