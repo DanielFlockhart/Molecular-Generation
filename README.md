@@ -137,4 +137,35 @@ The project acknowledges the following resources for their contributions:
 Thank you for using the Molecular Generation project! We hope it proves to be useful for your chemical analysis and research.
 
 
-Issues - Colour is still taken into account in images and so is scaling and position
+
+To Do
+Admin/Documentation
+- Finish Readme and write up proper documentation
+
+Preprocessing
+- Colour
+- Rotation and Transformation optimisation
+- Simplification
+
+ML
+- Get VAE working
+- Get GAN working
+
+Postprocessing
+- Image to Smile
+
+
+Deployment
+- Get program generating new Images
+
+Evaluation
+- Evaluate if it is valid molecule
+- Docking?
+
+
+General Programming
+- Comment Code
+- Remove any try/excepts and work out why errors are there
+   - Doesn't generate smiles with incorrect amount of bonds to an atom
+   - Doesn't generate smiles with smile name that can't be a file type
+- Reshuffle File System

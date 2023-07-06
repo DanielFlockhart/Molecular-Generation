@@ -53,49 +53,78 @@ def scale(folder,scale_factor,size):
     # Use the glob module to get a list of image files in the folder
     image_files = glob.glob(os.path.join(folder, '*.png'))  # Change the file extension to match your image types
 
-    for skeleton in image_files:
+    for (i,skeleton) in enumerate(image_files):
         smile = os.path.splitext(os.path.basename(skeleton))[0]
         # Process each image file
         with Image.open(skeleton) as img:
             # Get new scaled image dimensions
-            new_width = img.width * scale_factor
-            new_height = img.height * scale_factor
+            new_width = int(img.width * scale_factor)
+            new_height = int(img.height * scale_factor)
             img = img.resize((new_width, new_height))  # Resize the image to the new dimensions
+
         # Create a blank white background
         background = Image.new('RGB', (size,size), (255, 255, 255))
 
         # Paste the molecule image onto the center of the background - Still working out if this is necessary
-        #offset = tuple((bg_dim - img_dim) // 2 for bg_dim, img_dim in zip(background.size, img.size))
-        background.paste(img)
-        background.show()
+        offset = tuple((bg_dim - img_dim) // 2 for bg_dim, img_dim in zip(background.size, img.size))
+        background.paste(img,offset)
+        #background.show()
         background.save(fr'{folder}\{smile}.png')
+        print(f"Preprocessing {(i*100)/len(image_files)}% Complete")
 
+def truncate_smile(passed_smile,chars):
+    chars = min(chars,250) 
+    # Truncate the smile to the specified number of characters as windows 11 has a file length limit of 255 characters
+    if len(passed_smile) > chars:
+        return passed_smile[:chars]
+    else:
+        return passed_smile
 
 def normalise_images(smiles,size,folder):
-    max_width = 0
-    max_height = 0
-    for smile in smiles:
-        mol = Chem.MolFromSmiles(smile)
-        rdDepictor.Compute2DCoords(mol)
-        img = generate_normalised_image(mol)
-        if img.width > max_width: max_width = img.width
-        if img.height > max_height: max_height = img.height
-        img.save(fr'{folder}\{smile}.png')
-        # Get the maximum value out of the two maximum measurements, as only that value needs to be scaled to.
-
-    max_length = max(max_height,max_width)
-    print(max_length)
-    scale_factor = size / max_length
-    scale(folder,scale_factor,size)
     
+    max_smile = ("",0)
+    for (i,smile) in enumerate(smiles):
+        smile = truncate_smile(smile,200)
+        try:
+            # if(i %1000) == 0:
+            #     print(f"{i}/{len(smiles)}") # Logging Purposes
+            mol = Chem.MolFromSmiles(smile)
+            rdDepictor.Compute2DCoords(mol)
+            img = generate_normalised_image(mol)
+            if img.width > max_smile[1] or img.height > max_smile[1]: max_smile = (smile, max(img.width,img.height))
+            img.save(fr'{folder}\{smile}.png')
+        except Exception as e:
+            print(f"Error processing smile: {smile}")
+            print(f"Exception message: {str(e)}")
+            pass
+        # Get the maximum value out of the two maximum measurements, as only that value needs to be scaled to.
+    # Possible way of angling molecules to decrease max_length?
+    scale_factor = size / max_smile[1]
+    print("Smile with the largest size : " + max_smile[0])
+    scale(folder,scale_factor,size)
+    #black_and_white(folder) # -> this effects the clarity
+
+
+
+def clear_folder(folder):
+    image_files = glob.glob(os.path.join(folder, '*.png'))  # Change the file extension to match your image types
+    for image_file in image_files:
+        os.remove(image_file)
+
+
 # Now that scaling works
 # Get the largst image required, set that as default scaling, update all the others.
 data_folder = r'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\dataset'
 if __name__ == "__main__":
+    clear_folder(data_folder+r"\test-data")
     db = Database(fr'{data_folder}\CSD_EES_DB.csv')
-    molecules = fr'{data_folder}\test-data'
+    db.load_data()
+    molecules_storage = fr'{data_folder}\test-data'
     size = 400
-    normalise_images(molecules,size,data_folder)
+    smiles = db.get_smiles()
+    normalise_images(smiles,size,molecules_storage)
+    print("Pre Processing Ended")
 
 
 # Find a way to simplify the graphics down.
+# Add more error handling for the ones that can't be processed
