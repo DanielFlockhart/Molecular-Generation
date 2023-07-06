@@ -5,13 +5,13 @@ class Generator(tf.keras.Model):
     def __init__(self):
         super(Generator, self).__init__()
         # Define the layers for the generator
-        self.dense = layers.Dense(7 * 7 * 256, input_shape=(100,))
+        self.dense = layers.Dense(7 * 7 * 256, input_shape=(128,))
         self.reshape = layers.Reshape((7, 7, 256))
         self.conv1 = layers.Conv2DTranspose(128, 5, strides=1, padding='same')
         self.bn1 = layers.BatchNormalization()
         self.conv2 = layers.Conv2DTranspose(64, 5, strides=2, padding='same')
         self.bn2 = layers.BatchNormalization()
-        self.conv3 = layers.Conv2DTranspose(1, 5, strides=2, padding='same')
+        self.conv3 = layers.Conv2DTranspose(3, 5, strides=2, padding='same')
 
     def call(self, inputs):
         # Forward pass through the generator layers
@@ -27,7 +27,7 @@ class Generator(tf.keras.Model):
         x = tf.nn.tanh(self.conv3(x))
         return x
     
-    def loss(self,fake_output):
+    def loss(self, fake_output):
         # Define the loss function for the generator
         return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.ones_like(fake_output), logits=fake_output))
 

@@ -137,3 +137,4 @@ The project acknowledges the following resources for their contributions:
 Thank you for using the Molecular Generation project! We hope it proves to be useful for your chemical analysis and research.
 
 
+Issues - Colour is still taken into account in images and so is scaling and position

@@ -27,13 +27,13 @@ class Structure:
         """
         Builds a 2D structure from a smile
         """
-        print(self.smile)
         m = Chem.MolFromSmiles(self.smile)
         return m
     
     def save_structure(self):
         """
         Saves the 2D structure as a png to the data folder
+        if bw is true, the image will be saved in black and white
         """
         if self.molecule is not None:
             Draw.MolToFile(self.molecule, self.test_data_folder+fr"\{self.smile}.png",size=(self.size,self.size))
