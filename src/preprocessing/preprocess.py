@@ -75,7 +75,7 @@ def scale(folder,scale_factor,size):
         # Create a blank white background
         background = Image.new('RGB', (size,size), (255, 255, 255))
 
-        # Paste the molecule image onto the center of the background - Still working out if this is necessary
+        # Paste the molecule image onto the center of the background
         offset = tuple((bg_dim - img_dim) // 2 for bg_dim, img_dim in zip(background.size, img.size))
         background.paste(img,offset)
         #background.show()
@@ -121,20 +121,25 @@ def normalise_images(smiles,size,folder):
     print("Uncounted: ",uncounted)
     # Calculate the upper bound of the sizes
     sizes = np.sort(sizes)
-    bound = calculate_upper_bounds(sizes,0.98)
+    bound = calculate_upper_bounds(sizes)
+    print(bound)
     plot_size_distribution(sizes)
-
+    
     scale_factor = size / bound
     scale(folder,scale_factor,size)
     #black_and_white(folder) # -> this effects the clarity
 
-def calculate_upper_bounds(numbers,percentile):
+def calculate_upper_bounds(numbers,std_dev=1.6):
     '''
-    Gets a percentile of the numbers
+    Gets the standard deviation of the numbers and returns the upper bound of the numbers
     '''
-    sorted_numbers = np.sort(numbers)
-    index = int(np.ceil(len(sorted_numbers) * percentile))
-    upper_bound = sorted_numbers[index - 1]  # Adjust for 0-based indexing
+    # Calculate the standard deviation of the numbers
+    std = np.std(numbers)
+    # Calculate the mean of the numbers
+    mean = np.mean(numbers)
+    # Calculate the upper bound of the numbers
+    upper_bound = mean + (std * std_dev)
+    # This gets the upper bound of the numbers which is the percentile of the number
     return upper_bound
 
 def plot_size_distribution(sizes):

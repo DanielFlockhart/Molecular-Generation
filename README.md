@@ -78,7 +78,8 @@ Thank you for using the Molecular Generation project! We hope it proves to be us
    - Colour
    - Rotation and Transformation optimisation
    - Simplification
-   - Fix error where program just dies
+   - Choose new Arbritrary Standard Deviation
+
 
 3. ML
    - Get VAE working
