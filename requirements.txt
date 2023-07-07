@@ -9,3 +9,5 @@ Pillow
 IPython
 pandas
 opencv-python
+tensorflow
+pandas

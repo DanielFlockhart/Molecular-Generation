@@ -1,1 +1,2 @@
-print("Intialising Package 1...")
+print("Intialising Deployment.")
+from . import *

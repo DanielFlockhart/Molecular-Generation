@@ -10,8 +10,7 @@ from PIL import Image
 # outputs an image. The encoder and decoder are both convolutional neural
 # networks. The encoder takes in an image and outputs a vector of size
 
-class SAE(tf.keras.Model):
-    
+
 
 class VAE(tf.keras.Model):
     def __init__(self, latent_dim):

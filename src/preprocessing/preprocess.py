@@ -1,3 +1,8 @@
+import rdkit
+from rdkit import RDLogger
+
+# Disable the RDKit logger
+RDLogger.DisableLog('rdApp.error')
 
 from PIL import Image
 import numpy as np
@@ -7,7 +12,7 @@ from rdkit.Chem.Draw import IPythonConsole, rdDepictor, rdMolDraw2D
 from PIL import Image
 from io import BytesIO
 import random,glob,os
-from database import *
+from preprocessing.database import *
 
 
 
@@ -33,19 +38,24 @@ def black_and_white(folder,threshold=245):
 
 
 def generate_normalised_image(mol):
+    
     # make sure the mol coordinates are normalized to the scale RDKit uses internally
     rdDepictor.NormalizeDepiction(mol)
+
     # -1, -1 means flexicanvas: the canvas will be as large as needed to display the molecule (no scaling)
     drawer = rdMolDraw2D.MolDraw2DCairo(-1, -1)
     opts = rdMolDraw2D.MolDrawOptions()
     drawer.SetDrawOptions(opts)
-    drawer.DrawMolecule(mol)
+
+    drawer.DrawMolecule(mol) # Error Is Here - Causing the program to crash on some smiles without output error
+
+    
+
     drawer.FinishDrawing()
     with BytesIO(drawer.GetDrawingText()) as hnd:
         with Image.open(hnd) as image:
             image.load()
     return image
-
 def scale(folder,scale_factor,size):
 
     # Iterate through every image in the folder and scale
@@ -70,7 +80,8 @@ def scale(folder,scale_factor,size):
         background.paste(img,offset)
         #background.show()
         background.save(fr'{folder}\{smile}.png')
-        print(f"Preprocessing {(i*100)/len(image_files)}% Complete")
+        if (i%1000) == 0:
+            print(f"{i}/{len(image_files)} Processed")
 
 def truncate_smile(passed_smile,chars):
     chars = min(chars,250) 
@@ -81,30 +92,57 @@ def truncate_smile(passed_smile,chars):
         return passed_smile
 
 def normalise_images(smiles,size,folder):
-    
-    max_smile = ("",0)
+    sizes = []
+    uncounted = 0
     for (i,smile) in enumerate(smiles):
-        smile = truncate_smile(smile,200)
+
         try:
-            # if(i %1000) == 0:
-            #     print(f"{i}/{len(smiles)}") # Logging Purposes
+            # Check if the smile is valid by removing any % characters
+            #smile = smile.replace("%","") Temp Fix - next try -> remove any non ascii
             mol = Chem.MolFromSmiles(smile)
+
             rdDepictor.Compute2DCoords(mol)
             img = generate_normalised_image(mol)
-            if img.width > max_smile[1] or img.height > max_smile[1]: max_smile = (smile, max(img.width,img.height))
+            sizes.append(img.width)
+            sizes.append(img.height)
+            
+            
+            smile = truncate_smile(smile,200)
             img.save(fr'{folder}\{smile}.png')
         except Exception as e:
-            print(f"Error processing smile: {smile}")
-            print(f"Exception message: {str(e)}")
+            uncounted += 1
+            #print(f"Error processing smile: {smile}")
+            #print(f"Exception message: {str(e)}")
             pass
+        if (i%1000) == 0:
+            print(f"{i}/{len(smiles)} Processed For Scaling")
         # Get the maximum value out of the two maximum measurements, as only that value needs to be scaled to.
     # Possible way of angling molecules to decrease max_length?
-    scale_factor = size / max_smile[1]
-    print("Smile with the largest size : " + max_smile[0])
+    print("Uncounted: ",uncounted)
+    # Calculate the upper bound of the sizes
+    sizes = np.sort(sizes)
+    bound = calculate_upper_bounds(sizes,0.98)
+    plot_size_distribution(sizes)
+
+    scale_factor = size / bound
     scale(folder,scale_factor,size)
     #black_and_white(folder) # -> this effects the clarity
 
+def calculate_upper_bounds(numbers,percentile):
+    '''
+    Gets a percentile of the numbers
+    '''
+    sorted_numbers = np.sort(numbers)
+    index = int(np.ceil(len(sorted_numbers) * percentile))
+    upper_bound = sorted_numbers[index - 1]  # Adjust for 0-based indexing
+    return upper_bound
 
+def plot_size_distribution(sizes):
+    # Using matplot lib to plot the distribution of the sizes
+    import matplotlib.pyplot as plt
+    plt.hist(sizes, bins=100)
+    plt.gca().set(title='Size Distribution of Molecules', ylabel='Frequency')
+    plt.show()
 
 def clear_folder(folder):
     image_files = glob.glob(os.path.join(folder, '*.png'))  # Change the file extension to match your image types
@@ -112,19 +150,26 @@ def clear_folder(folder):
         os.remove(image_file)
 
 
-# Now that scaling works
-# Get the largst image required, set that as default scaling, update all the others.
-data_folder = r'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\dataset'
-if __name__ == "__main__":
-    clear_folder(data_folder+r"\test-data")
-    db = Database(fr'{data_folder}\CSD_EES_DB.csv')
-    db.load_data()
-    molecules_storage = fr'{data_folder}\test-data'
-    size = 400
-    smiles = db.get_smiles()
-    normalise_images(smiles,size,molecules_storage)
-    print("Pre Processing Ended")
-
 
 # Find a way to simplify the graphics down.
 # Add more error handling for the ones that can't be processed
+
+
+
+'''
+
+Preprocessing Pipeline:
+- Load the smiles from the database
+- Normalise the smiles to the same length
+- Get the maximum dimensions of the smiles
+    - Calculate the average dimensions of the smiles
+    - Work out an upper bound for the dimensions so the 98% of smiles will fit into the images. This accounts for outliers.
+    - Choose a max dimension size to include the majority of smiles
+    - Add some checks for the outliers
+    - Calculate the scale factor
+- Scale the smiles to the same size
+- Convert the smiles to black and white
+- Save the smiles to the folder
+
+
+'''

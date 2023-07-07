@@ -1,18 +1,5 @@
-- Train Model
-- Take Smiles and Generate Images 
-- Preprocess Images - focal scaling
-- Convert images to vector Representation
-- Input to a network (GAN, VAE)
-- Generate New Potential Analogues
-
-- Working on finding a way of making VAE positional and scale invariant
-
 # Molecular Generation With Variational Auto Encoding and Generative Adversarial Neworks
 Developer Notes : This Project Is a work in progress, some functionality is WIP at the moment.
-
-This Chemical Smiles Toolkit has a variety of features including clustering chemical compounds based on their SMILES (Simplified Molecular Input Line Entry System) representation and provides a user-friendly interface to input a SMILES string and obtain a cluster of similar chemicals along with their respective SMILES. In addition, the user can input a SMILE and recieve a 2D Structure in return.
-
-There is no requirement to cluster the default data on first use, it has already been clustered using 100 clusters.
 
 ## Features
 
@@ -62,59 +49,6 @@ The project consists of the following main components:
    ```
 
 
-5. Launch the program:
-
-   ```bash
-   python main.py
-
-   ```
-6. Follow Instructions
-
-   ```console
-   ---------- Welcome chemical SMILES toolkit ----------
-
-    The Github repository comes with a pre-clustered dataset of 1411 Psychoactive Substances with 100 clusters as an example.
-    Feel free to use this dataset or cluster your own dataset.
-    Please choose from the follow options to continue:
-
-    1. Get similar SMILE to a given SMILE with current clusters
-    2. Re-cluster data with a different number of clusters
-    3. Re-cluster data with a different dataset
-    4. Convert a SMILE to a 2D structure and display it
-    5. Get the name of a chemical from a SMILE  
-   ```
-
-7. Getting Similar Chemicals
-   ```console
-   Enter a smile: CCC(CC1=CNC2=CC=CC=C21)N
-
-   Alpha-methyltryptamine       CC(CC1=CNC2=CC=CC=C21)N
-   Alpha-ethyltryptamine        CCC(CC1=CNC2=CC=CC=C21)N
-   Alpha,N-DMT                  CC(CC1=CNC2=CC=CC=C21)NC
-   5-MeO-AMT                    CC(CC1=CNC2=C1C=C(C=C2)OC)N
-   Alpha,N,O-TMS                CC(CC1=CNC2=C1C=C(C=C2)OC)NC
-   5-Fluoro-AMT                 CC(CC1=CNC2=C1C=C(C=C2)F)N
-   6-fluoro-AMT                 CC(CC1=CNC2=C1C=CC(=C2)F)N
-   MethylbenzodioxolylbutanamineCCCC(C)(C1C2=CC=CC=C2OO1)N
-   Benzodioxolylbutanamine      CCCC(C1C2=CC=CC=C2OO1)N
-   Naphthylaminopropane         CC(CC1=CC2=CC=CC=C2C=C1)N
-
-   ```
-8. Converting a SMILE to a 2D structure and display it.
-   ```console
-   Enter a smile: CCC(CC1=CNC2=CC=CC=C21)  
-   ```
-   Displayed Image (The file name of the image is the name of the Chemical)
-
-   ![Alt Text](data/2D-Structures/3-butyl-1H-indole.png)
-
-9. Getting the name of a chemical from a SMILE
-    ```console
-   Enter a smile: CCC(CC1=CNC2=CC=CC=C21)  
-   The SMILE corresponds to the chemical -> 3-butyl-1H-indole
-
-   ```
-
 ## Contribution
 
 Contributions to this project are welcome! If you have any suggestions, improvements, or new features to propose, please submit a pull request. You can also report any issues or bugs by opening an issue on the project's GitHub repository.
@@ -131,41 +65,43 @@ The project acknowledges the following resources for their contributions:
 
 - [PubChem](https://pubchem.ncbi.nlm.nih.gov/) - Data source for drug SMILES and names
 - [RDKit](https://www.rdkit.org/) - Converting SMILEs to 2D Structures
-- [LiverpoolUniversity](https://www.nature.com/articles/s41597-022-01142-7) - Organic materials repurposing, a data set for theoretical predictions of new applications for existing compounds
-
+- [LiverpoolUniversity](https://www.nature.com/articles/s41597-022-01142-7) - Dataset for theoretical predictions of new applications for existing compounds
 
 Thank you for using the Molecular Generation project! We hope it proves to be useful for your chemical analysis and research.
 
+## To Do
+
+1. Admin/Documentation
+   - Finish Readme and write up proper documentation
+
+2. Preprocessing
+   - Colour
+   - Rotation and Transformation optimisation
+   - Simplification
+   - Fix error where program just dies
+
+3. ML
+   - Get VAE working
+   - Get GAN working
+
+4. Postprocessing
+   - Image to Smile
 
 
-To Do
-Admin/Documentation
-- Finish Readme and write up proper documentation
+5. Deployment
+   - Get program generating new Images
 
-Preprocessing
-- Colour
-- Rotation and Transformation optimisation
-- Simplification
-
-ML
-- Get VAE working
-- Get GAN working
-
-Postprocessing
-- Image to Smile
+6. Evaluation
+   - Evaluate if it is valid molecule
+   - Docking?
 
 
-Deployment
-- Get program generating new Images
-
-Evaluation
-- Evaluate if it is valid molecule
-- Docking?
-
-
-General Programming
-- Comment Code
-- Remove any try/excepts and work out why errors are there
-   - Doesn't generate smiles with incorrect amount of bonds to an atom
-   - Doesn't generate smiles with smile name that can't be a file type
-- Reshuffle File System
+7. General Programming
+   - Comment Code
+   - Remove any try/excepts and work out why errors are there
+      - Doesn't generate smiles with incorrect amount of bonds to an atom
+      - Doesn't generate smiles with smile name that can't be a file type
+   - Reshuffle File System
+   - Remove Debugging Messages
+   - Fix Valence Issue
+   - Make Flow Chart
