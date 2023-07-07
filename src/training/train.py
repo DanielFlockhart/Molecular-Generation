@@ -32,6 +32,8 @@ def train_VAE(train_images):
     # Generate black and white noise
     noise_vector = np.random.normal(size=(1, latent_dim))
     # Pass the latent vector through the decoder
+
+
     reconstructed_image = vae.decode(noise_vector)
     print(reconstructed_image.shape)
     reconstructed_image = im.tensor_to_image(reconstructed_image)
@@ -76,11 +78,6 @@ if __name__ == "__main__":
 
     train_GAN(imgs)
 
-# List to Experiment With
-
-# CVAE?
-# Transformer?
-# CNN?
 
 
 #I am currently trying to generate new images of molecular skeletons using unsupervised learning, I have a dataset of images of skeletons for training.

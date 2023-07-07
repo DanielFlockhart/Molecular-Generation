@@ -25,5 +25,5 @@ def main():
     pass
 
 if __name__ == "__main__":
-    initialise()
-    #main()
+    #initialise() ! WARNING ! This will clear the test-data folder
+    main()

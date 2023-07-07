@@ -36,7 +36,7 @@ import cv2
 
 def load_images(directory, img_size):
     images = []
-    for filename in os.listdir(directory):
+    for (i,filename) in enumerate(os.listdir(directory)):
         if filename.endswith('.jpg') or filename.endswith('.png'):  # Add more extensions if needed
             img_path = os.path.join(directory, filename)
             image = cv2.imread(img_path)
