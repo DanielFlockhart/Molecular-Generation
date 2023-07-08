@@ -16,6 +16,7 @@ from preprocessing.database import *
 
 sys.path.insert(0, os.path.abspath('..'))
 from CONSTANTS import *
+from ui.terminal_ui import *
 '''
 --------------------- Preprocessing ---------------------
 
@@ -50,7 +51,7 @@ class Preprocessor:
 
         # --- Redownload the images if needed ---
         if download:
-            print("Redownloading Images")
+            print(format_title("Downloading Images"))
             self.clear_folder(self.unscaled_folder)
             self.create_skeletons()
 
@@ -58,7 +59,8 @@ class Preprocessor:
         sizes = np.sort(self.get_skeleton_sizes())
         upper_bound = self.calculate_upper_bounds(sizes,STD_DEV)
         scale_factor = IMG_SIZE / upper_bound
-        self.rescale_skeletons(scale_factor,IMG_SIZE)
+        print(format_title("Scaling Images"))
+        self.rescale_skeletons(scale_factor)
 
         print(f"Preprocessing Complete : {self.get_images(self.final_folder)}/{len(self.smiles)} smiles processed successfully")
 
@@ -124,7 +126,7 @@ class Preprocessor:
 
 
     def create_skeletons(self):
-        for (i,smile) in tqdm(enumerate(self.smiles),total=len(self.smiles)):
+        for (i,smile) in tqdm(enumerate(self.smiles),total=len(self.smiles), bar_format=LOADING_BAR, ncols=80, colour='green'):
             try:
                 mol = Chem.MolFromSmiles(smile)
                 rdDepictor.Compute2DCoords(mol)
@@ -165,7 +167,7 @@ class Preprocessor:
         # Iterate through every image in the folder and scale
         image_files = self.get_images(self.unscaled_folder)
 
-        for (i,skeleton) in tqdm(enumerate(image_files),total=len(image_files)):
+        for (i,skeleton) in tqdm(enumerate(image_files),total=len(image_files),bar_format=LOADING_BAR, ncols=80, colour='green'):
             smile = os.path.splitext(os.path.basename(skeleton))[0]
             # Process each image file
             with Image.open(skeleton) as img:
@@ -202,5 +204,6 @@ class Preprocessor:
 
                 # Close the image file
                 image.close()
+
 
     
