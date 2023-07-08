@@ -1,4 +1,4 @@
-
+from tqdm import tqdm
 from rdkit import RDLogger
 import json
 # Disable the RDKit logger
@@ -11,7 +11,7 @@ from rdkit.Chem import Draw
 from rdkit.Chem.Draw import rdDepictor, rdMolDraw2D
 from PIL import Image
 from io import BytesIO
-import random,glob,os,sys
+import random,glob,os,sys,string
 from preprocessing.database import *
 
 sys.path.insert(0, os.path.abspath('..'))
@@ -38,34 +38,37 @@ To Do:
 
 '''
 class Preprocessor:
-    def __init__(self,dataset_name,data_folder,database):
+    def __init__(self,data_folder,database):
         self.database = database
-        self.dataset_name = dataset_name
-        self.final_folder = fr"{data_folder}\data\{dataset_name}"
-        self.unscaled_folder = fr"{data_folder}\unscaled"
-        self.smiles = self.database.load_data()
+        # Create random dataset name
+        self.dataset_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+        self.final_folder = fr"{data_folder}\data\{self.dataset_name}"
+        self.unscaled_folder = fr"{data_folder}\resized"
+        self.smiles = self.database.get_smiles()
 
-    def process_molecules(self,download=True):
+    def process(self,download=True):
 
         # --- Redownload the images if needed ---
         if download:
             print("Redownloading Images")
+            self.clear_folder(self.unscaled_folder)
             self.create_skeletons()
 
         # --- Scale the images ---
-        sizes = self.get_skeleton_sizes()
-        sizes = np.sort(sizes)
-        bound = self.calculate_upper_bounds(sizes,STD_DEV)
-        scale_factor = IMG_SIZE / bound
+        sizes = np.sort(self.get_skeleton_sizes())
+        upper_bound = self.calculate_upper_bounds(sizes,STD_DEV)
+        scale_factor = IMG_SIZE / upper_bound
         self.rescale_skeletons(scale_factor,IMG_SIZE)
+
+        print(f"Preprocessing Complete : {self.get_images(self.final_folder)}/{len(self.smiles)} smiles processed successfully")
 
 
         # --- Additional Processing ---
-        self.recolour()
-        self.save_dataset_info(self.final_folder,STD_DEV,sizes)
+        #self.recolour()
+        self.save_dataset_info(sizes)
 
         # --- Visualise the dataset ---
-        print(f"Upper Bound of Scaled Images : {bound}")
+        print(f"Upper Bound of Scaled Images : {upper_bound}")
         self.plot_size_distribution(sizes)
         
 
@@ -82,13 +85,16 @@ class Preprocessor:
         plt.gca().set(title='Size Distribution of Molecules', ylabel='Frequency')
         plt.show()  
     
-    def save_dataset_info(self,folder,standard_dev,sizes):
+    def save_dataset_info(self,sizes):
         # Save the dataset info to a json file
         dataset_info = {
-            "dataset_standard_dev": standard_dev,
-            "dataset_max_size": sizes
+            "dataset_NAME": self.dataset_name,
+            "dataset_SIZE": len(self.smiles),
+            "dataset_TARGET_IMG_SIZE": IMG_SIZE,
+            "dataset_STD_DEV": STD_DEV,
+            "dataset_UNCSCALED_SIZES": sizes.tolist()
         }
-        with open(fr'{folder}\dataset_info.json', 'w') as outfile:
+        with open(fr'{self.final_folder}\dataset_info.json', 'w') as outfile:
             json.dump(dataset_info, outfile)
 
     
@@ -96,10 +102,12 @@ class Preprocessor:
         ''' 
         Clears Contents of a folder
         '''
-        image_files = glob.glob(os.path.join(folder, '*.png'))
+        image_files = self.get_images(folder)
         for image_file in image_files:
             os.remove(image_file)
 
+    def get_images(self,folder):
+        return glob.glob(os.path.join(folder, '*.png'))
     
     def calculate_upper_bounds(self,array,std_dev):
         '''
@@ -111,28 +119,21 @@ class Preprocessor:
         mean = np.mean(array)
         # Calculate the upper bound of the numbers
         upper_bound = mean + (std * std_dev)
-        # This gets the upper bound of the numbers which is the percentile of the number
         return upper_bound
     
 
 
     def create_skeletons(self):
-        for (i,smile) in enumerate(self.smiles):
-
+        for (i,smile) in tqdm(enumerate(self.smiles),total=len(self.smiles)):
             try:
                 mol = Chem.MolFromSmiles(smile)
                 rdDepictor.Compute2DCoords(mol)
                 img = self.scale_skeleton(mol)
                 smile = self.truncate_smile(smile)
                 img.save(fr'{self.unscaled_folder}\{smile}.png')
-            except Exception as e:
-                print(f"Error processing smile: {smile}")
-                print(f"Exception message: {str(e)}")
-                pass
 
-            if (i%UPDATE_FREQ) == 0:
-                print(f"{i}/{len(self.smiles)} Processed For Scaling")
-            
+            except Exception as e:
+                pass
 
     def scale_skeleton(self,mol):
     
@@ -162,11 +163,9 @@ class Preprocessor:
 
     def rescale_skeletons(self,scale_factor):
         # Iterate through every image in the folder and scale
+        image_files = self.get_images(self.unscaled_folder)
 
-        # Use the glob module to get a list of image files in the folder
-        image_files = glob.glob(os.path.join(self.unscaled_folder, '*.png'))  # Change the file extension to match your image types
-
-        for (i,skeleton) in enumerate(image_files):
+        for (i,skeleton) in tqdm(enumerate(image_files),total=len(image_files)):
             smile = os.path.splitext(os.path.basename(skeleton))[0]
             # Process each image file
             with Image.open(skeleton) as img:
@@ -182,11 +181,6 @@ class Preprocessor:
             offset = tuple((bg_dim - img_dim) // 2 for bg_dim, img_dim in zip(background.size, img.size))
             background.paste(img,offset)
             background.save(fr'{self.final_folder}\{smile}.png')
-
-            # Print progress
-
-            if (i%UPDATE_FREQ) == 0:
-                print(f"{i}/{len(image_files)} Processed")
     
 
     def recolour(self,threshold=245):

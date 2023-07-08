@@ -4,13 +4,13 @@ import random,os
 class Database:
     def __init__(self,file):
         self.file = pd.read_csv(file)
+        self.load_data()
         
     def load_data(self):
         '''
         Extract SMILE columns from the dataset
         '''
         self.data = self.file[['SMILES']].values.tolist()
-        #self.clean_data()
     
     def clean_data(self):
         '''
