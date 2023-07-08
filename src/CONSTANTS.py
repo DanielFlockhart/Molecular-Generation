@@ -1,3 +1,11 @@
+'''
+This file contains all the constants used in the project.
+
+Author: Daniel Flockhart
+Date: 08/07/2023
+
+'''
+
 colours = {
         'B': '\033[93m',  # purple
         'C': '\033[30m',  # black
@@ -18,7 +26,7 @@ colours = {
 
 # Preprocessing Constants
 IMG_SIZE = 400 # Size to save the images in the dataset
-STD_DEV = 1.8 # Standard deviation of scaling factor for the images - Higher = Images will have larger range of sizes
+STD_DEV = 2.4 # Standard deviation of scaling factor for the images - Higher = Images will have larger range of sizes
 MAX_CHARS = 250 # Maximum number of characters of smile used for file name
 
 # Training/Machine Learning Constants
@@ -26,8 +34,14 @@ BATCH_SIZE = 64 # Number of images to train on at once
 EPOCHS = 10 # Number of times to train on the entire dataset
 LATENT_DIM = 32 # Number of dimensions in the latent space
 LRN_RATE = 0.001 # Learning rate for the optimizer
+TRAIN_SUBSET_COUNT = 1000 # Number of images to test training on
 
 
 # UI Constants
 UI_TERMINAL_WIDTH = 25
 LOADING_BAR = "{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}{postfix}]" # Loading bar format for tqdm
+
+
+# Path Constants
+DATA_FOLDER = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Ai-Chem-Intership\data\datasets"
+PROCESSED_DATA = f"{DATA_FOLDER}\data"

@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers
 sys.path.insert(0, os.path.abspath('..'))
-from preprocessing import image_manipulation as im
+from preprocessing import inputify as im
 
 
 class VAE(tf.keras.Model):
@@ -55,39 +55,3 @@ class VAE(tf.keras.Model):
         return reconstructed, mean, log_var
 
 
-def train_VAE(train_images):
-    # Define the VAE model
-    latent_dim = 32 
-    epochs = 10
-    batch_size = 250
-    
-    # Generate Temporary Data for Testing (1000 image 128x128 of noise)
-    train_images = np.random.normal(size=(1000, 400, 400, 3))
-
-    # Define the Model
-    optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
-    vae = VAE(latent_dim)
-    vae.compile(optimizer=optimizer)
-    vae.fit(train_images, epochs=epochs, batch_size=batch_size)
-    
-    # # Save model weights
-    vae.save_weights(r'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\models\vae\model.h5')
-     
-    # Generate black and white noise
-    noise_vector = np.random.normal(size=(1, latent_dim))
-    # Pass the latent vector through the decoder
-
-
-    reconstructed_image = vae.decode(noise_vector)
-    print(reconstructed_image.shape)
-    reconstructed_image = im.tensor_to_image(reconstructed_image)
-    reconstructed_image.show()
-
-
-if __name__ == "__main__":
-    data_size = 1000
-    IMG_SIZE = 400
-    training_images = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\dataset\test-data"
-    imgs = im.load_images(training_images,IMG_SIZE)[:1000]
-
-    train_VAE(imgs)

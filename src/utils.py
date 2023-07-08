@@ -6,7 +6,9 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 
 def get_directory():
-    # Gets the directory of the data folder, relative to position of this file
+    '''
+    Gets the directory of the data folder, relative to position of this file
+    '''
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def colour_smile(smile):

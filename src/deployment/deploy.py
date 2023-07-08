@@ -1,3 +1,1 @@
-'''
-Module for deployment of the application.
-'''
+# Module for deployment of the application.

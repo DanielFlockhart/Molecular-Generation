@@ -3,21 +3,13 @@ Developer Notes : This Project Is a work in progress, some functionality is WIP 
 
 ## Features
 
-The project consists of the following main components:
+The project consists of the following main components (Detailed Descriptions Further Below):
 
-1. **Webscraping**: The project includes a webscraping module that fetches drug SMILES and names from reliable sources. This data will serve as the basis for chemical compound clustering.
+1. **Preprocessing** - A [dataset](https://www.nature.com/articles/s41597-022-01142-7) of smiles is sorted and processed by accessing the dataset of smiles, rescaling and normalising the molecules so trained models has less representations and relationships to learn. This will improve the learning rate.
 
-2. **Clustering**: The clustering module utilizes agglomerative clustering with levenshtein distance to cluster the chemical compounds based on their SMILES. It computes the similarity between compounds and assigns them to appropriate clusters.
+2. **Training** - Training is currently done using either a Vartiational Auto Encoder or Generative Adversaral Network.
 
-3. **Chemical Identification**: This module takes a SMILE and outputs the predicted chemical.
-
-4. **SMILE To Structure**: This module takes a SMILE and outputs the predicted chemical.
-
-5. **Preprocessing**
-
-6. **Training**
-
-7. **New Molecules Generation**
+3. **New Molecules Generation** - New molecules are generated.
 
 
 ## Installation
@@ -69,24 +61,12 @@ The project acknowledges the following resources for their contributions:
 
 Thank you for using the Molecular Generation project! We hope it proves to be useful for your chemical analysis and research.
 
-## To Do
-
-1. Admin/Documentation
-   - Finish Readme and write up proper documentation
-
-2. Preprocessing
-   - Colour
-   - Rotation and Transformation optimisation
-   - Simplification
-   - Choose new Arbritrary Standard Deviation
-   - Do preprocessing in stages so I save time
-
-3. ML
-   - Get VAE working
-   - Get GAN working
+## Current Work
+- Write More Documentation and Explanations of VAE/GANs and the training Process
+- Get VAE and GAN working
 
 4. Postprocessing
-   - Image to Smile
+   
 
 
 5. Deployment
@@ -98,11 +78,12 @@ Thank you for using the Molecular Generation project! We hope it proves to be us
 
 
 7. General Programming
-   - Comment Code
-   - Remove any try/excepts and work out why errors are there
-      - Doesn't generate smiles with incorrect amount of bonds to an atom
-      - Doesn't generate smiles with smile name that can't be a file type
-   - Reshuffle File System
-   - Remove Debugging Messages
-   - Fix Valence Issue
-   - Make Flow Chart
+   - Make Flow Chart of program pipeline
+   - Test Program on another computer
+   - Decide whether inputs to networks should be binary (black or white) or have a continuous representations.
+   - Add possible Rotation and Transformation optimisations
+   - Program possible otherways of representing molecules - E.g As a graph/matrix
+
+## Future Project Ideas
+1. Use machine learning to convert produced Image to Smile
+2. Docking/Simulation - Binding Affinity?

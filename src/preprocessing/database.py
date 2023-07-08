@@ -3,6 +3,15 @@ import random,os
 
 class Database:
     def __init__(self,file):
+        '''
+        Database class to handle the loading of the dataset from dataset file
+        
+        Parameters
+        ----------
+        file : str
+            The path to the dataset file
+        
+        '''
         self.file = pd.read_csv(file)
         self.load_data()
         
@@ -15,6 +24,8 @@ class Database:
     def clean_data(self):
         '''
         Remove any invalid smiles
+
+        Not Used as of yet (08/07/2023) - Dataset is already clean
         '''
         for (i,smile) in enumerate(self.data):
             if smile[0] == "" or all(ord(c) < 128 for c in smile[0]) or ("%" not in smile[0]):

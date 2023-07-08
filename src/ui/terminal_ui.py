@@ -4,4 +4,8 @@ from CONSTANTS import *
 
 
 def format_title(title):
-    return str(UI_TERMINAL_WIDTH*"-" + title + UI_TERMINAL_WIDTH*"-")
+    '''
+    Formats the title to be centered and have a line either side in this format:
+    ----------------- Title -----------------
+    '''
+    return str(UI_TERMINAL_WIDTH*"-" + f" {title} " + UI_TERMINAL_WIDTH*"-")
