@@ -32,12 +32,26 @@ A more detailed documentation of features will be updated soon.
    ```
 
 ## Usage
-4. In the case you want to use your own dataset please upload your txt of chemical names in this form. If you only wish to test the software, please skip to step 
- 
-   drugs.txt
-   ```
-   ["name1","name2","name3"...]
-   ```
+1. Code is not yet set up with User Interface for usage - Will update README.md at a later stage
+
+2. To Preprocess data
+   ```bash
+      cd src
+      python main.py
+
+      ------------------------- Initialising -------------------------
+      ------------------------- Preprocessing Data -------------------------
+      ------------------------- Downloading Images -------------------------
+      100%|████████████████████████████████████| 48167/48167 [06:09<00:00, 130.33it/s]
+      ------------------------- Scaling Images -------------------------
+      100%|████████████████████████████████████| 47471/47471 [04:02<00:00, 195.92it/s]
+      ------------------------- Preprocessing Summary -------------------------
+      Generated From Smiles        : 98.55502730084913%
+      Bound Used                   : 617.0
+      Amount of Images Above Bound : 902/47471
+
+      ```
+
 
 
 ## Contribution
@@ -54,7 +68,6 @@ This project is licensed under the [MIT License](LICENSE). Feel free to use, mod
 
 The project acknowledges the following resources for their contributions:
 
-- [PubChem](https://pubchem.ncbi.nlm.nih.gov/) - Data source for drug SMILES and names
 - [RDKit](https://www.rdkit.org/) - Converting SMILEs to 2D Structures
 - [LiverpoolUniversity](https://www.nature.com/articles/s41597-022-01142-7) - Dataset for theoretical predictions of new applications for existing compounds
 
