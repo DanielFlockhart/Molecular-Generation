@@ -6,11 +6,12 @@ from preprocessing import preprocess
 from training import train,vae,gan
 from postprocessing import *
 from deployment import *
+from utils import *
 from CONSTANTS import *
 from ui.terminal_ui import *
 from ui.dialogue import *
 from preprocessing import inputify as im
-from utils import *
+
 from deployment import generation
 def initialise():
     '''
@@ -21,7 +22,7 @@ def initialise():
     '''
 
     print(format_title("Initialising"))
-    if perform_checks():
+    if perform_checks(PROCESSED_DATA):
         preprocess_data()
     
     
@@ -38,7 +39,8 @@ def preprocess_data():
     '''
     print(format_title("Preprocessing Data"))
     database = preprocess.Database(fr'{DATA_FOLDER}\CSD_EES_DB.csv')
-    processor = preprocess.Preprocessor(DATA_FOLDER,database)
+    processor = preprocess.Preprocessor(DATA_FOLDER,database,"CSD_EES_DB")
+    processor.clear_folder(PROCESSED_DATA)
     processor.process()
 
     
@@ -109,11 +111,12 @@ def main(models):
         print("Choice not confirmed. Exiting...")
 
 if __name__ == "__main__":
-    print(PROCESSED_DATA)
+    
+    #initialise()
+
     vae_model = vae.VAE(LATENT_DIM)
     gan_model = gan.GAN(gan.Generator(),gan.Discriminator())
-    initialise()
-    #main(models=[vae_model,gan_model])
+    main(models=[vae_model,gan_model])
 
 
 

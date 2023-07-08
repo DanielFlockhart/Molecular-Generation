@@ -58,17 +58,25 @@ def colour_smile(smile):
     return coloured_smile
 
 
-def perform_checks():
+def perform_checks(folder):
     '''
     Check if there is a preprocessed dataset.
     '''
-    print(PROCESSED_DATA)
-    # Check if there is a dataset already downloaded
-    if len(os.listdir(PROCESSED_DATA)) == 0:
+    if len(os.listdir(folder)) == 0:
         print("No dataset found, downloading and processing...")
         return True # Need to preprocess
     
-    print("Found preprocessed data, skipping preprocessing...")
+    # If there is a preprocessed dataset, tell the user how many images there are in the folder inside the data folder
+    print(f"Found preprocessed dataset, skipping preprocessing...")
     print("To manually preprocess, delete the contents of the data folder and run the program again") # Temporary
     
     return False # No need to preprocess
+
+
+def get_upper_bound(array,percentile):
+    '''
+    Gets the upper bound of an array of numbers from a percentile
+    '''
+    array = np.array(array)
+    upper_bound = np.percentile(array, percentile)
+    return upper_bound
