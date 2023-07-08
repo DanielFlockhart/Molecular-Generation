@@ -1,5 +1,7 @@
 # Molecular Generation With Variational Auto Encoding and Generative Adversarial Neworks
-Developer Notes : This Project Is a work in progress
+Developer Notes :
+- This Project Is a work in progress
+- Data has been preprocessed for use with machine learning. It is not included in this repo as it is 500mb+
 
 ## Features
 
