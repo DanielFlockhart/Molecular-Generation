@@ -8,6 +8,7 @@ The project consists of the following main components :
 
 
 ----- Work In Progress -----
+
 2. **Training** - Training is currently done using either a Vartiational Auto Encoder or Generative Adversaral Network.
 
 3. **New Molecules Generation** - New molecules are generated.
