@@ -5,6 +5,8 @@ import tensorflow as tf
 from tensorflow.keras import layers
 sys.path.insert(0, os.path.abspath('..'))
 from preprocessing import image_manipulation as im
+
+
 class VAE(tf.keras.Model):
     def __init__(self, latent_dim):
         super(VAE, self).__init__()

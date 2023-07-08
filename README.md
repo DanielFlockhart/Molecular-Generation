@@ -79,7 +79,7 @@ Thank you for using the Molecular Generation project! We hope it proves to be us
    - Rotation and Transformation optimisation
    - Simplification
    - Choose new Arbritrary Standard Deviation
-
+   - Do preprocessing in stages so I save time
 
 3. ML
    - Get VAE working

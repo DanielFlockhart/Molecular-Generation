@@ -5,7 +5,6 @@ class Database:
     def __init__(self,file):
         self.file = pd.read_csv(file)
         
-
     def load_data(self):
         '''
         Extract SMILE columns from the dataset
@@ -55,14 +54,3 @@ class Database:
         Returns Full List of Smiles
         '''
         return [molecule[0] for molecule in self.data]
-
-
-# if __name__ == "__main__":
-#     db = Database(r'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\dataset\CSD_EES_DB.csv')
-#     db.load_data()
-#     # Return the 30 longest smiles
-#     top_30_longest = db.retrieve_longest_smiles(30)
-    
-#     # Iterate through and print the longest smiles
-#     for i, smile in enumerate(top_30_longest):
-#         print(smile[0][:50])

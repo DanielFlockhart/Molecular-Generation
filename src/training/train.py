@@ -8,34 +8,30 @@ import os
 sys.path.insert(0, os.path.abspath('..'))
 from preprocessing import image_manipulation as im
 from PIL import Image
+from CONSTANTS import *
 
 
 import random
 
 def train_VAE(train_images):
-    # Define the VAE model
-    latent_dim = 32  # Adjust the desired latent dimension size
-    epochs = 10
-    batch_size = 64
     
     # Generate Temporary Data for Testing (1000 image 128x128 of noise)
-    train_images = np.random.normal(size=(1000, 128, 128, 3))
-    # Define the MOdel
-    optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
-    vae = VAE(latent_dim)
+    train_images = np.random.normal(size=(1000, IMG_SIZE, IMG_SIZE, 3))
+    # Define the Model
+    optimizer = tf.keras.optimizers.Adam(learning_rate=LRN_RATE)
+    vae = VAE(LATENT_DIM)
     vae.compile(optimizer=optimizer)
-    vae.fit(train_images, epochs=epochs, batch_size=batch_size)
+    vae.fit(train_images, epochs=EPOCHS, batch_size=BATCH_SIZE)
     
     # # Save model weights
     vae.save_weights(r'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\models\vae\model.h5')
      
     # Generate black and white noise
-    noise_vector = np.random.normal(size=(1, latent_dim))
+    noise_vector = np.random.normal(size=(1, LATENT_DIM))
     # Pass the latent vector through the decoder
 
 
     reconstructed_image = vae.decode(noise_vector)
-    print(reconstructed_image.shape)
     reconstructed_image = im.tensor_to_image(reconstructed_image)
     reconstructed_image.show()
 
@@ -43,7 +39,7 @@ def train_VAE(train_images):
 def train_GAN(training_images):
 
     # Create an instance of the GAN model
-    training_images = np.random.normal(size=(1000, 128, 128, 3))
+    training_images = np.random.normal(size=(1000, IMG_SIZE, IMG_SIZE, 3))
     # Create an instance of the GAN model
     gan = GAN(Generator(), Discriminator())
 
@@ -72,11 +68,10 @@ def train_GAN(training_images):
 
 
 if __name__ == "__main__":
-    IMG_SIZE = 128
     training_images = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\dataset\test-data"
     imgs = im.load_images(training_images,IMG_SIZE)
 
-    train_GAN(imgs)
+    train_VAE(imgs)
 
 
 
