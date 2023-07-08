@@ -22,7 +22,7 @@ A more detailed documentation of features will be updated soon.
 2. Navigate to the project directory:
 
    ```bash
-   cd Molecule-Generation
+   cd Molecular-Generation
    ```
 
 3. Install the required dependencies:
