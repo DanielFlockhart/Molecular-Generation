@@ -329,6 +329,3 @@ class Preprocessor:
 
                 # Close the image file
                 image.close()
-
-
-    
