@@ -111,12 +111,13 @@ def main(models):
         print("Choice not confirmed. Exiting...")
 
 if __name__ == "__main__":
-    
-    #initialise()
+    # Preprocess the data
+    print("This Program is currently a work in progress - Limited functionality to just generating dataset")
+    initialise()
 
-    vae_model = vae.VAE(LATENT_DIM)
-    gan_model = gan.GAN(gan.Generator(),gan.Discriminator())
-    main(models=[vae_model,gan_model])
+    #vae_model = vae.VAE(LATENT_DIM)
+    #gan_model = gan.GAN(gan.Generator(),gan.Discriminator())
+    #main(models=[vae_model,gan_model])
 
 
 

@@ -24,7 +24,7 @@ def train_model(model,training_images,optimizer):
     optimizer : tf.keras.optimizers
         The optimizer to use
     '''
-    model.compile(optimizer=optimizer,loss=model.loss)
+    model.compile(optimizer=optimizer)
     model.fit(training_images, epochs=EPOCHS, batch_size=BATCH_SIZE)
     return model
     
