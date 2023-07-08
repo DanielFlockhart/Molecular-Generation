@@ -17,21 +17,9 @@ sys.path.insert(0, os.path.abspath('..'))
 from preprocessing import inputify as im
 
 sys.path.insert(0, os.path.abspath('../training'))
-from vae import *
+from training.vae import *
 
 from CONSTANTS import *
-
-# Load the model
-vae = VAE(LATENT_DIM)
-optimizer = tf.keras.optimizers.Adam(learning_rate=LRN_RATE)
-vae.compile(optimizer=optimizer)
-
-# Call the model once to create its variables
-vae(np.zeros((1, IMG_SIZE, IMG_SIZE, 3)))
-
-# Load the weights
-vae.load_weights(r'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\models\vae\model.h5')
-
 
 class Generator:
     def __init__(self,model_path):
@@ -66,7 +54,7 @@ class Generator:
         return image
     
     def generate_image_gan(self,noise_vector):
-        pass
+        return None
 
 
     

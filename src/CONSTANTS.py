@@ -5,7 +5,7 @@ Author: Daniel Flockhart
 Date: 08/07/2023
 
 '''
-
+from utils import get_directory
 colours = {
         'B': '\033[93m',  # purple
         'C': '\033[30m',  # black
@@ -43,5 +43,5 @@ LOADING_BAR = "{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_f
 
 
 # Path Constants
-DATA_FOLDER = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Ai-Chem-Intership\data\datasets"
-PROCESSED_DATA = f"{DATA_FOLDER}\data"
+DATA_FOLDER = fr"{get_directory()}\data\datasets" # Make this relative
+PROCESSED_DATA = f"{DATA_FOLDER}\processed"

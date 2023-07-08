@@ -1,9 +1,10 @@
-from CONSTANTS import colours
+
 import numpy as np
 import os
 import sys
-
+from CONSTANTS import *
 sys.path.insert(0, os.path.abspath('..'))
+
 
 def get_directory():
     '''
@@ -55,3 +56,19 @@ def colour_smile(smile):
         coloured_smile += f"{colour}{string}"
         coloured_smile += "\033[0m"
     return coloured_smile
+
+
+def perform_checks():
+    '''
+    Check if there is a preprocessed dataset.
+    '''
+    print(PROCESSED_DATA)
+    # Check if there is a dataset already downloaded
+    if len(os.listdir(PROCESSED_DATA)) == 0:
+        print("No dataset found, downloading and processing...")
+        return True # Need to preprocess
+    
+    print("Found preprocessed data, skipping preprocessing...")
+    print("To manually preprocess, delete the contents of the data folder and run the program again") # Temporary
+    
+    return False # No need to preprocess

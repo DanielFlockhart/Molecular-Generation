@@ -8,10 +8,26 @@ from postprocessing import *
 from deployment import *
 from CONSTANTS import *
 from ui.terminal_ui import *
+from ui.dialogue import *
 from preprocessing import inputify as im
+from utils import *
+from deployment import generation
+def initialise():
+    '''
+    Initialises the program and get it ready for training/generation
+    
+    If there is already a dataset in \resized\, then it will skip the download step
+    If there is already a preprocessed dataset in \data\, then it will skip the preprocessing step
+    '''
 
+    print(format_title("Initialising"))
+    if perform_checks():
+        preprocess_data()
+    
+    
+    
 
-def preprocess_data(download=False):
+def preprocess_data():
     '''
     Initialises the program and get it ready for training
 
@@ -23,14 +39,30 @@ def preprocess_data(download=False):
     print(format_title("Preprocessing Data"))
     database = preprocess.Database(fr'{DATA_FOLDER}\CSD_EES_DB.csv')
     processor = preprocess.Preprocessor(DATA_FOLDER,database)
-    processor.process(download=download)
+    processor.process()
 
     
 
-def train_model(model,name,imgs):
+def train_model(model,name,use_subset=False):
     '''
     Main training loop
+
+    Parameters
+    ----------
+    model : tf.keras.Model
+        The model to train
+    name : str
+        The name of the model
+    imgs : list
+        A list of images to train on
+    use_subset : bool, optional
+        Whether to use a subset of the data, by default False
     '''
+    imgs = im.load_images(PROCESSED_DATA,IMG_SIZE)
+    if use_subset:
+        print("You have selected to use subset of data for training process.")
+        imgs = imgs[:TRAIN_SUBSET_COUNT]
+    
     print(format_title(f"Training Model {name}"))
 
     # Create Default Optimizer
@@ -42,34 +74,47 @@ def train_model(model,name,imgs):
     # Save Model
     train.save_model(trained_model,name)
 
+def generate_molecule():
+    '''
+    Generates a new molecule with a previously trained model of either VAE or GAN
+    '''
+    print(format_title("Generating Molecule"))
+    gen = generation.Generator()
+    gen.generate_image_vae()
+    gen.generate_image_gan()
 
-def main():
+
+def main(models):
     '''
-    Check whether user wants to :
-    1. Train Model
-    2. Generate Images
-    3. Exit
+    Main function for the program
+
+    Parameters
+    ----------
+    models : list
+        A list of possible models to train
     '''
-    print(format_title("Main Menu"))
-    print("1. Train Model")
-    print("2. Generate Images")
-    print("3. Exit")
-    choice = input("Enter Choice: ")
-    if choice == "1":
-        train_model()
-    elif choice == "2":
-        #generate_images()
-        pass
-    elif choice == "3":
-        sys.exit(0)
+
+    user_choice = get_user_choice()
+    confirmed = confirm_choice(user_choice)
+
+    if confirmed:
+        if user_choice == '1':
+            # Will add in option to choose model type later
+            train_model(models[0],"vae",use_subset=True)
+        elif user_choice == '2':
+            # Will add in option to choose model type later
+            #generate_molecule()
+            raise NotImplementedError
+    else:
+        print("Choice not confirmed. Exiting...")
 
 if __name__ == "__main__":
-
-    imgs = im.load_images(PROCESSED_DATA,IMG_SIZE)[:TRAIN_SUBSET_COUNT] # Train on smaller subset of data
+    print(PROCESSED_DATA)
     vae_model = vae.VAE(LATENT_DIM)
     gan_model = gan.GAN(gan.Generator(),gan.Discriminator())
-    
-    
-    #preprocess_data(download=False)
-    train_model(vae_model,"vae",imgs)
-    train_model(gan_model,"gan",imgs)
+    initialise()
+    #main(models=[vae_model,gan_model])
+
+
+
+

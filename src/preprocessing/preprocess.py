@@ -37,11 +37,10 @@ class Preprocessor:
         '''
         self.database = database
         self.dataset_name = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-        self.final_folder = fr"{data_folder}\data\{self.dataset_name}"
-        self.unscaled_folder = fr"{data_folder}\resized"
+        self.processed_folder = fr"{data_folder}\processed\{self.dataset_name}"
         self.smiles = self.database.get_smiles()
 
-    def process(self,download=True):
+    def process(self):
         '''
         Preprocesses the smiles into preprocessed images
         
@@ -58,10 +57,9 @@ class Preprocessor:
         '''
 
         # --- Redownload the images if Requested ---
-        if download:
-            print(format_title("Downloading Images"))
-            self.clear_folder(self.unscaled_folder)
-            self.create_skeletons()
+        print(format_title("Downloading Images"))
+        self.clear_folder(self.processed_folder)
+        self.create_skeletons()
 
         # --- Scale the images ---
         print(format_title("Scaling Images"))
@@ -174,7 +172,7 @@ class Preprocessor:
                 img = self.scale_skeleton(mol)
                 # Truncate the smile to fit into file name length limit
                 smile = self.truncate_smile(smile)
-                img.save(fr'{self.unscaled_folder}\{smile}.png')
+                img.save(fr'{self.processed_folder}\{smile}.png')
 
             except Exception as e:
                 pass
@@ -205,8 +203,8 @@ class Preprocessor:
         Iterates through every image in the folder and returns a list of the skeleton sizes
         '''
         img_sizes = []
-        for image in os.listdir(self.unscaled_folder):
-            with Image.open(fr"{self.unscaled_folder}\{image}") as img:
+        for image in os.listdir(self.processed_folder):
+            with Image.open(fr"{self.processed_folder}\{image}") as img:
                 img_sizes.append(img.width)
                 img_sizes.append(img.height)
         return img_sizes
@@ -217,7 +215,7 @@ class Preprocessor:
 
         This function standardises the data for the model
         '''
-        image_files = self.get_images(self.unscaled_folder)
+        image_files = self.get_images(self.processed_folder)
 
         for (i,skeleton) in tqdm(enumerate(image_files),total=len(image_files),bar_format=LOADING_BAR, ncols=80, colour='green'):
             smile = os.path.splitext(os.path.basename(skeleton))[0]
@@ -246,10 +244,10 @@ class Preprocessor:
         Not yet decided whether to use this function or maintain continuous values
         '''
         # Iterate over each file in the folder
-        for file_name in os.listdir(self.unscaled_folder):
+        for file_name in os.listdir(self.processed_folder):
             if file_name.endswith('.png'):
                 # Load the image
-                image_path = os.path.join(self.unscaled_folder, file_name)
+                image_path = os.path.join(self.processed_folder, file_name)
                 image = Image.open(image_path)
 
                 # Convert the image to grayscale

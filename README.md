@@ -3,15 +3,14 @@ Developer Notes : This Project Is a work in progress, some functionality is WIP 
 
 ## Features
 
-The project consists of the following main components (Detailed Descriptions Further Below):
-
+The project consists of the following main components :
 1. **Preprocessing** - A [dataset](https://www.nature.com/articles/s41597-022-01142-7) of smiles is sorted and processed by accessing the dataset of smiles, rescaling and normalising the molecules so trained models has less representations and relationships to learn. This will improve the learning rate.
 
 2. **Training** - Training is currently done using either a Vartiational Auto Encoder or Generative Adversaral Network.
 
 3. **New Molecules Generation** - New molecules are generated.
 
-
+A more detailed documentation of features will be updated soon.
 ## Installation
 
 1. Clone the repository:
@@ -63,27 +62,15 @@ Thank you for using the Molecular Generation project! We hope it proves to be us
 
 ## Current Work
 - Write More Documentation and Explanations of VAE/GANs and the training Process
-- Get VAE and GAN working
-
-4. Postprocessing
-   
-
-
-5. Deployment
-   - Get program generating new Images
-
-6. Evaluation
-   - Evaluate if it is valid molecule
-   - Docking?
-
-
-7. General Programming
-   - Make Flow Chart of program pipeline
-   - Test Program on another computer
-   - Decide whether inputs to networks should be binary (black or white) or have a continuous representations.
-   - Add possible Rotation and Transformation optimisations
-   - Program possible otherways of representing molecules - E.g As a graph/matrix
+- Get VAE and GAN operational
+- Make Flow Chart of program pipeline
+- Decide whether inputs to networks should be binary (black or white) or have a continuous representations.
+- Add possible Rotation and Transformation optimisations
+- Add code efficiency optimisations
+- Program possible otherways of representing molecules - E.g As a graph/matrix
+- Add validity checks in for produced molecules
+- Deploy program for easy use and access
 
 ## Future Project Ideas
-1. Use machine learning to convert produced Image to Smile
-2. Docking/Simulation - Binding Affinity?
+- Convert Generated Images to back to SMILEs representation. Using Machine Learning?
+- Docking/Simulation - Binding Affinity?
