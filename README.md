@@ -16,7 +16,7 @@ A more detailed documentation of features will be updated soon.
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/DanielFlockhart/Molecule-Generation.git
+   git clone https://github.com/DanielFlockhart/Molecular-Generation.git
    ```
 
 2. Navigate to the project directory:
