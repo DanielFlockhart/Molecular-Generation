@@ -1,5 +1,5 @@
 # Molecular Generation With Variational Auto Encoding and Generative Adversarial Neworks
-Developer Notes : This Project Is a work in progress, some functionality is WIP at the moment.
+Developer Notes : This Project Is a work in progress
 
 ## Features
 
