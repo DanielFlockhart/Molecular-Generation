@@ -21,12 +21,17 @@ def load_images():
                 image = cv2.imread(img_path)
                 # Resize image to desired dimensions
                 image = cv2.resize(image, (IMG_SIZE, IMG_SIZE))
+                # Convert image variable to image
+                
+
                 # Normalize pixel values between 0 and 1
-                image = image.astype(np.float32) / 255.0  
+                image = image.astype(np.float32) / 255.0
                 images.append(image)
         except Exception as e:
             print(e)
+    
     images = np.array(images)
+    
     return images
 
 
