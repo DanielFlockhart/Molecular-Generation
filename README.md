@@ -1,10 +1,15 @@
 # Molecular Generation With Variational Auto Encoding and Generative Adversarial Neworks
-Developer Notes : This Project Is a work in progress
+Developer Notes :
+- This Project Is a work in progress
+- Data has been preprocessed for use with machine learning. It is not included in this repo as it is 500mb+
 
 ## Features
 
 The project consists of the following main components :
 1. **Preprocessing** - A [dataset](https://www.nature.com/articles/s41597-022-01142-7) of smiles is sorted and processed by accessing the dataset of smiles, rescaling and normalising the molecules so trained models has less representations and relationships to learn. This will improve the accuracy.
+
+
+----- Work In Progress -----
 
 2. **Training** - Training is currently done using either a Vartiational Auto Encoder or Generative Adversaral Network.
 
