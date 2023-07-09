@@ -31,8 +31,7 @@ class Generator:
         model_path : str
             The path to the model
         '''
-        self.model = tf.keras.models.load_model(model_path)
-
+        self.model = tf.saved_model.load(model_path)
     def build_model(self):
         '''
         Build the model from previously trained weights
@@ -49,7 +48,8 @@ class Generator:
         '''
         Generate an image from a noise vector
         '''
-        image = self.model.decode(noise_vector)
+        noise = tf.random.normal(shape=(1, LATENT_DIM), dtype=tf.float32)
+        image = self.model.decoder(noise)
         image = im.tensor_to_image(image)
         return image
     

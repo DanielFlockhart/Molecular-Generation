@@ -8,6 +8,7 @@ import os
 sys.path.insert(0, os.path.abspath('..'))
 from preprocessing import inputify as im
 from CONSTANTS import *
+from ui.terminal_ui import *
 
 
 
@@ -24,16 +25,20 @@ def train_model(model,training_images,optimizer):
     optimizer : tf.keras.optimizers
         The optimizer to use
     '''
-    model.compile(optimizer=optimizer)
-    model.fit(training_images, epochs=EPOCHS, batch_size=BATCH_SIZE)
+    #training_images = training_images.astype('float32') / 255.0
+    print(format_title("Compiling Model"))
+    model.compile(optimizer=optimizer,loss=model.vae_loss)
+    print(format_title("Training Model"))
+    model.fit(training_images,training_images, epochs=EPOCHS, batch_size=BATCH_SIZE)
     return model
-    
+
 
 def save_model(model,name):
     '''
     Saves a trained model
     '''
-    model.save_weights(fr'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\models\{name}\model.h5')
+    
+    tf.saved_model.save(model,fr'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Ai-Chem-Intership\data\models\{name}')
 
 
     

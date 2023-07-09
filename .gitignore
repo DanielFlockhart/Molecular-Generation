@@ -152,3 +152,8 @@ cython_debug/
 #.idea/
 data/dataset/CSD_EES_DB.csv
 *.png
+*.h5
+data/models/vae/fingerprint.pb
+data/models/vae/saved_model.pb
+data/models/vae/variables/variables.index
+data/models/vae/variables/variables.data-00000-of-00001

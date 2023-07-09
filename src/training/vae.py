@@ -1,57 +1,82 @@
-import sys,os
+import sys, os
 import numpy as np
 
 import tensorflow as tf
 from tensorflow.keras import layers
-sys.path.insert(0, os.path.abspath('..'))
-from preprocessing import inputify as im
 
+from tensorflow.keras import regularizers
 
-class VAE(tf.keras.Model):
-    def __init__(self, latent_dim):
-        super(VAE, self).__init__()
+class VariationalAutoencoder(tf.keras.Model):
+    def __init__(self, image_shape, latent_dim):
+        super(VariationalAutoencoder, self).__init__()
+        self.image_shape = image_shape
         self.latent_dim = latent_dim
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
 
     def build_encoder(self):
-        encoder_input = tf.keras.Input(shape=(128, 128, 3))
-        x = layers.Conv2D(32, 3, activation='relu', strides=2, padding='same')(encoder_input)
-        x = layers.Conv2D(64, 3, activation='relu', strides=2, padding='same')(x)
+        encoder_inputs = tf.keras.Input(shape=self.image_shape)
+        x = layers.Conv2D(32, kernel_size=3, activation='relu', padding='same')(encoder_inputs)
+        x = layers.MaxPooling2D(pool_size=2)(x)
+        x = layers.Conv2D(64, kernel_size=3, activation='relu', padding='same')(x)
+        x = layers.MaxPooling2D(pool_size=2)(x)
         x = layers.Flatten()(x)
-        mean = layers.Dense(self.latent_dim, activation='linear')(x)
-        log_var = layers.Dense(self.latent_dim, activation='linear')(x)
-        encoder_output = mean, log_var
-        return tf.keras.Model(encoder_input, encoder_output)
+        z_mean = layers.Dense(self.latent_dim, kernel_regularizer=regularizers.l2(0.01))(x)
+        z_log_var = layers.Dense(self.latent_dim, kernel_regularizer=regularizers.l2(0.01))(x)
+        return tf.keras.Model(encoder_inputs, [z_mean, z_log_var], name='encoder')
 
     def build_decoder(self):
-        decoder_input = tf.keras.Input(shape=(self.latent_dim,))
-        x = layers.Dense(8 * 8 * 256, activation='relu')(decoder_input)
-        x = layers.Reshape((8, 8, 256))(x)
-        x = layers.Conv2DTranspose(128, 3, activation='relu', strides=4, padding='same')(x)
-        x = layers.Conv2DTranspose(64, 3, activation='relu', strides=4, padding='same')(x)
-        decoder_output = layers.Conv2DTranspose(3, 3, activation='sigmoid', padding='same')(x)
-        return tf.keras.Model(decoder_input, decoder_output)
+        decoder_inputs = tf.keras.Input(shape=(self.latent_dim,))
+        x = layers.Dense(50*50*64, activation='relu', kernel_regularizer=regularizers.l2(0.01))(decoder_inputs)
+        x = layers.Reshape((50, 50, 64))(x)
+        x = layers.Conv2DTranspose(64, kernel_size=3, activation='relu', padding='same')(x)
+        x = layers.UpSampling2D(size=2)(x)
+        x = layers.Conv2DTranspose(32, kernel_size=3, activation='relu', padding='same')(x)
+        x = layers.UpSampling2D(size=2)(x)
+        decoder_outputs = layers.Conv2DTranspose(3, kernel_size=3, activation='sigmoid', padding='same')(x)
+        return tf.keras.Model(decoder_inputs, decoder_outputs, name='decoder')
 
-    def encode(self, x):
-        mean, log_var = self.encoder(x)
-        epsilon = tf.random.normal(shape=tf.shape(mean))
-        z = mean + tf.exp(0.5 * log_var) * epsilon
-        return z, mean, log_var
+       
+    def sampling(self, args):
+        '''
+        Samples from the latent space using the reparameterisation
+        '''
+        z_mean, z_log_var = args
+        epsilon = tf.random.normal(shape=(tf.shape(z_mean)[0], self.latent_dim), mean=0.0, stddev=1.0)
+        return z_mean + tf.exp(z_log_var / 2) * epsilon
 
-    def decode(self, z):
+    def call(self, inputs):
+        '''
+        Runs the model
+        '''
+        z_mean, z_log_var = self.encoder(inputs)
+        z = self.sampling([z_mean, z_log_var])
         reconstructed = self.decoder(z)
         return reconstructed
 
-    def call(self, x):
-        z, mean, log_var = self.encode(x)
-        reconstructed = self.decode(z)
+    def vae_loss(self, inputs, reconstructed):
+        '''
+        Calculates the loss of the model
+        
+        Parameters
+        ----------
+        inputs : tensor
+            The input images
+        reconstructed : tensor
+            The reconstructed images
+            
+        Returns
+        -------
+        loss : tensor
+            The calculated loss value
+        '''
+        z_mean, z_log_var = self.encoder(inputs)
+        reconstruction_loss = tf.keras.losses.binary_crossentropy(inputs, reconstructed)
+        reconstruction_loss = tf.reduce_mean(reconstruction_loss)
+        kl_loss = -0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
+        return reconstruction_loss + kl_loss
 
-        reconstruction_loss = tf.reduce_mean(tf.square(x - reconstructed))
-        kl_loss = -0.5 * tf.reduce_mean(1 + log_var - tf.square(mean) - tf.exp(log_var))
-        total_loss = reconstruction_loss + kl_loss
-        self.add_loss(total_loss)
 
-        return reconstructed, mean, log_var
+
 
 

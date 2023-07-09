@@ -38,7 +38,7 @@ class Preprocessor:
         self.database = database
         self.dataset_name = name
         self.processed_folder = fr"{data_folder}\processed\{self.dataset_name}"
-        self.smiles = self.database.get_smiles()
+        self.smiles = self.database.get_smiles()[:1000]
     def process(self):
         '''
         Preprocesses the smiles into preprocessed images

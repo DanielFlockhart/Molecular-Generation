@@ -60,7 +60,7 @@ def train_model(model,name,use_subset=False):
     use_subset : bool, optional
         Whether to use a subset of the data, by default False
     '''
-    imgs = im.load_images(PROCESSED_DATA,IMG_SIZE)
+    imgs = im.load_images()
     if use_subset:
         print("You have selected to use subset of data for training process.")
         imgs = imgs[:TRAIN_SUBSET_COUNT]
@@ -69,7 +69,6 @@ def train_model(model,name,use_subset=False):
 
     # Create Default Optimizer
     optimizer = tf.keras.optimizers.Adam(learning_rate=LRN_RATE)
-
     # Train Model
     trained_model = train.train_model(model,imgs,optimizer)
 
@@ -81,10 +80,10 @@ def generate_molecule():
     Generates a new molecule with a previously trained model of either VAE or GAN
     '''
     print(format_title("Generating Molecule"))
-    gen = generation.Generator()
-    gen.generate_image_vae()
-    gen.generate_image_gan()
-
+    gen = generation.Generator(fr"{MODELS_FOLDER}\vae")
+    for x in range(100):
+        gen.generate_image_vae(gen.generate_noise()).save(fr"{GENERATED_FOLDER}\vae\{x}.png")
+    #gen.generate_image_gan()
 
 def main(models):
     '''
@@ -104,20 +103,18 @@ def main(models):
             # Will add in option to choose model type later
             train_model(models[0],"vae",use_subset=True)
         elif user_choice == '2':
-            # Will add in option to choose model type later
-            #generate_molecule()
-            raise NotImplementedError
+            generate_molecule()
     else:
         print("Choice not confirmed. Exiting...")
 
 if __name__ == "__main__":
     # Preprocess the data
     print("This Program is currently a work in progress - Limited functionality to just generating dataset")
-    initialise()
+    #initialise()
 
-    #vae_model = vae.VAE(LATENT_DIM)
+    vae_model = vae.VariationalAutoencoder(INPUT_SHAPE,LATENT_DIM)
     #gan_model = gan.GAN(gan.Generator(),gan.Discriminator())
-    #main(models=[vae_model,gan_model])
+    main(models=[vae_model])
 
 
 

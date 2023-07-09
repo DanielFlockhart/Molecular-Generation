@@ -7,24 +7,27 @@ sys.path.insert(0, os.path.abspath('..'))
 from CONSTANTS import *
 from ui.terminal_ui import *
 
-def load_images(directory, img_size):
+def load_images():
     '''
     Loads images from a directory and returns them as a NumPy array for input to a model
     '''
     images = []
-    for (i,filename) in enumerate(os.listdir(directory)):
-        if filename.endswith('.png'):
-            img_path = os.path.join(directory, filename)
-            image = cv2.imread(img_path)
-            
-            # Resize image to desired dimensions
-            image = cv2.resize(image, (img_size, img_size))
-
-            # Normalize pixel values between 0 and 1
-            image = image.astype(np.float32) / 255.0  
-            images.append(image)
-
-    return np.array(images)
+    directory = os.path.join(PROCESSED_DATA, 'CSD_EES_DB')
+    print(format_title(f'Loading images from {directory}'))
+    for (i,filename) in tqdm(enumerate(os.listdir(directory)), total=len(os.listdir(directory)), bar_format=LOADING_BAR, ncols=80, colour='green'):
+        try:
+            if filename.endswith('.png'):
+                img_path = os.path.join(directory, filename)
+                image = cv2.imread(img_path)
+                # Resize image to desired dimensions
+                image = cv2.resize(image, (IMG_SIZE, IMG_SIZE))
+                # Normalize pixel values between 0 and 1
+                image = image.astype(np.float32) / 255.0  
+                images.append(image)
+        except Exception as e:
+            print(e)
+    images = np.array(images)
+    return images
 
 
 def tensor_to_image(tensor):
@@ -44,7 +47,7 @@ def tensor_to_image(tensor):
     image = Image.fromarray(array)
 
     # Resize the image
-    image = image.resize((128, 128))
+    image = image.resize((IMG_SIZE, IMG_SIZE))
 
     return image
 

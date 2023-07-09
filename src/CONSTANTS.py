@@ -25,18 +25,19 @@ colours = {
 
 
 # Preprocessing Constants
-IMG_SIZE = 400 # Size to save the images in the dataset
+IMG_SIZE = 200 # Size to save the images in the dataset
 STD_DEV = 2.2 # Standard deviation of scaling factor for the images - Higher = Images will have larger range of sizes
 MAX_CHARS = 250 # Maximum number of characters of smile used for file name
 BOUND_PERCENTILE = 99
 
+
 # Training/Machine Learning Constants
 BATCH_SIZE = 64 # Number of images to train on at once
-EPOCHS = 20 # Number of times to train on the entire dataset
-LATENT_DIM = 32 # Number of dimensions in the latent space
+EPOCHS = 10 # Number of times to train on the entire dataset
+LATENT_DIM = 64 # Number of dimensions in the latent space
 LRN_RATE = 0.001 # Learning rate for the optimizer
 TRAIN_SUBSET_COUNT = 1000 # Number of images to test training on
-
+INPUT_SHAPE = (IMG_SIZE, IMG_SIZE, 3)
 
 # UI Constants
 UI_TERMINAL_WIDTH = 25
@@ -46,3 +47,5 @@ LOADING_BAR = "{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_f
 # Path Constants
 DATA_FOLDER = fr"{get_directory()}\data\datasets" # Make this relative
 PROCESSED_DATA = fr"{DATA_FOLDER}\processed"
+MODELS_FOLDER = fr"{get_directory()}\data\models"
+GENERATED_FOLDER = fr"{get_directory()}\data\generated"
