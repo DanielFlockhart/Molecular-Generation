@@ -27,12 +27,14 @@ class VariationalAutoencoder(tf.keras.Model):
 
     def build_decoder(self):
         decoder_inputs = tf.keras.Input(shape=(self.latent_dim,))
-        x = layers.Dense(50*50*64, activation='relu')(decoder_inputs)
-        x = layers.Reshape((50, 50, 64))(x)
+        x = layers.Dense(50*50*256, activation='relu')(decoder_inputs)
+        x = layers.Reshape((50, 50, 256))(x)
         x = layers.Conv2DTranspose(64, kernel_size=(3,3), activation='relu', padding='same')(x)
         x = layers.UpSampling2D(size=(2,2))(x)
         x = layers.Conv2DTranspose(32, kernel_size=(3,3), activation='relu', padding='same')(x)
         x = layers.UpSampling2D(size=(2,2))(x)
+        x = layers.Conv2DTranspose(16, kernel_size=(3,3), activation='relu', padding='same')(x)
+        x = layers.Conv2DTranspose(8, kernel_size=(3,3), activation='relu', padding='same')(x)
         decoder_outputs = layers.Conv2DTranspose(3, kernel_size=(3,3), activation='sigmoid', padding='same')(x)
         return tf.keras.Model(decoder_inputs, decoder_outputs, name='decoder')
 
