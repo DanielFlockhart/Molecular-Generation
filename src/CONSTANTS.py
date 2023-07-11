@@ -33,10 +33,10 @@ BOUND_PERCENTILE = 99
 
 # Training/Machine Learning Constants
 BATCH_SIZE = 64 # Number of images to train on at once
-EPOCHS = 10 # Number of times to train on the entire dataset
-LATENT_DIM = 64 # Number of dimensions in the latent space
+EPOCHS = 24 # Number of times to train on the entire dataset
+LATENT_DIM = 128 # Number of dimensions in the latent space
 LRN_RATE = 0.001 # Learning rate for the optimizer
-TRAIN_SUBSET_COUNT = 1000 # Number of images to test training on
+TRAIN_SUBSET_COUNT = 200 # Number of images to test training on
 INPUT_SHAPE = (IMG_SIZE, IMG_SIZE, 3)
 
 # UI Constants
