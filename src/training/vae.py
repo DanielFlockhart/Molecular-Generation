@@ -23,6 +23,8 @@ class VariationalAutoencoder(tf.keras.Model):
         x = layers.MaxPooling2D(pool_size=2)(x)
         x = layers.Conv2D(64, kernel_size=(3,3), activation='relu', padding='same')(x)
         x = layers.MaxPooling2D(pool_size=2)(x)
+        x = layers.Conv2D(128, kernel_size=(3,3), activation='relu', padding='same')(x)
+        x = layers.MaxPooling2D(pool_size=2)(x)
         x = layers.Flatten()(x)
         z_mean = layers.Dense(self.latent_dim)(x)
         z_log_var = layers.Dense(self.latent_dim)(x)

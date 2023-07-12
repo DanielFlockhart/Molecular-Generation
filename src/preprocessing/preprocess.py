@@ -275,7 +275,7 @@ class Preprocessor:
             with Image.open(skeleton) as img:
                 # Calculates what the new dimensions would be with scaling
                 if img.width > scale_size or img.height > scale_size:
-                    #rotation = self.calculate_best_rotation(img.width,img.height,scale_factor)
+                    #rotation = self.calculate_best_rotation(img.width,img.height,scale_factor) - Works but not really necessary
                     rotated += 1
                     rotation = 45
                 
