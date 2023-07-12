@@ -28,7 +28,7 @@ def train_model(model,training_images,optimizer):
     #training_images = training_images.astype('float32') / 255.0
     print(format_title("Compiling Model"))
 
-    model.compile(optimizer=optimizer,loss=model.vae_loss)
+    model.compile(optimizer=optimizer,loss=model.compute_loss)
     print(format_title("Training Model"))
     model.fit(training_images,training_images, epochs=EPOCHS, batch_size=BATCH_SIZE)
     return model

@@ -15,6 +15,9 @@ class VariationalAutoencoder(tf.keras.Model):
         self.decoder = self.build_decoder()
 
     def build_encoder(self):
+        '''
+        Building the encoder part of the model
+        '''
         encoder_inputs = tf.keras.Input(shape=self.image_shape)
         x = layers.Conv2D(32, kernel_size=(3,3), activation='relu', padding='same')(encoder_inputs)
         x = layers.MaxPooling2D(pool_size=2)(x)
@@ -26,16 +29,17 @@ class VariationalAutoencoder(tf.keras.Model):
         return tf.keras.Model(encoder_inputs, [z_mean, z_log_var], name='encoder')
 
     def build_decoder(self):
+        '''
+        Build the decoder part of the model
+        '''
         decoder_inputs = tf.keras.Input(shape=(self.latent_dim,))
         x = layers.Dense(50*50*256, activation='relu')(decoder_inputs)
         x = layers.Reshape((50, 50, 256))(x)
-        x = layers.Conv2DTranspose(64, kernel_size=(3,3), activation='relu', padding='same')(x)
-        x = layers.UpSampling2D(size=(2,2))(x)
-        x = layers.Conv2DTranspose(32, kernel_size=(3,3), activation='relu', padding='same')(x)
-        x = layers.UpSampling2D(size=(2,2))(x)
-        x = layers.Conv2DTranspose(16, kernel_size=(3,3), activation='relu', padding='same')(x)
-        x = layers.Conv2DTranspose(8, kernel_size=(3,3), activation='relu', padding='same')(x)
-        decoder_outputs = layers.Conv2DTranspose(3, kernel_size=(3,3), activation='sigmoid', padding='same')(x)
+        x = layers.Conv2DTranspose(64, kernel_size=3, activation='relu', padding='same')(x)
+        x = layers.UpSampling2D(size=2)(x)
+        x = layers.Conv2DTranspose(32, kernel_size=3, activation='relu', padding='same')(x)
+        x = layers.UpSampling2D(size=2)(x)
+        decoder_outputs = layers.Conv2DTranspose(3, kernel_size=3, activation='sigmoid', padding='same')(x)
         return tf.keras.Model(decoder_inputs, decoder_outputs, name='decoder')
 
 
@@ -59,7 +63,7 @@ class VariationalAutoencoder(tf.keras.Model):
         reconstructed = self.decoder(z)
         return reconstructed
 
-    def vae_loss(self, inputs, reconstructed):
+    def compute_loss(self, inputs, reconstructed):
         '''
         Calculates the loss of the model
         
