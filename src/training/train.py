@@ -42,4 +42,9 @@ def save_model(model,name):
     tf.saved_model.save(model,fr'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Ai-Chem-Intership\data\models\{name}')
 
 
-    
+
+class Training:
+    def __init__(self):
+        pass
+    def create(self):
+        pass

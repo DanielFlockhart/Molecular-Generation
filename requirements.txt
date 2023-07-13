@@ -12,3 +12,5 @@ opencv-python
 tensorflow
 pandas
 tqdm
+torch
+transformers

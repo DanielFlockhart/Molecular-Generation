@@ -39,6 +39,7 @@ class Preprocessor:
         self.dataset_name = name
         self.processed_folder = fr"{data_folder}\processed\{self.dataset_name}"
         self.smiles = self.database.get_smiles()
+
     def process(self):
         '''
         Preprocesses the smiles into preprocessed images
@@ -257,6 +258,7 @@ class Preprocessor:
                 if loss == 0:
                     break
         return best_angle
+    
     def rescale_skeletons(self,scale_factor,scale_size):
         '''
         Rescales the skeleton images to the target image size without distorting the image
