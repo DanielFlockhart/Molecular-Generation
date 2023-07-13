@@ -7,12 +7,12 @@ sys.path.insert(0, os.path.abspath('..'))
 from CONSTANTS import *
 from ui.terminal_ui import *
 
-def load_images():
+def load_images(data_file):
     '''
     Loads images from a directory and returns them as a NumPy array for input to a model
     '''
     images = []
-    directory = os.path.join(PROCESSED_DATA, 'CSD_EES_DB')
+    directory = os.path.join(PROCESSED_DATA, data_file)
     print(format_title(f'Loading images from {directory}'))
     for (i,filename) in tqdm(enumerate(os.listdir(directory)), total=len(os.listdir(directory)), bar_format=LOADING_BAR, ncols=80, colour='green'):
         try:
