@@ -14,6 +14,9 @@ class Database:
         '''
         self.file = pd.read_csv(file)
         self.load_data()
+
+    def get_file(self):
+        return self.file
         
     def load_data(self):
         '''
@@ -65,3 +68,13 @@ class Database:
         Returns Full List of Smiles
         '''
         return [molecule[0] for molecule in self.data]
+    
+    def get_id(self,smile):
+        '''
+        Gets the ID of a smile from dataset by searching through smiles
+        '''
+        row = self.file[self.file['SMILES'] == smile]
+
+        # Check if a matching row was found
+        if not row.empty:
+            return row['ID'].values[0]

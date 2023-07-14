@@ -80,17 +80,6 @@ class TargetGenerator:
         self.rescale_skeletons(scale_factor,upper_bound)
         # --- Additional Processing ---
         #self.recolour() - Leave this for now
-
-
-    def save_display_info(self):
-        '''
-        Save config information for dataset into a json file and display visualisations of the dataset
-        '''
-
-        self.save_dataset_info(self.sizes)
-
-        # --- Visualise the dataset ---
-        utils.plot_distribution(self.sizes,"Skeleton Sizes","Frequency")
         
 
     def truncate_smile(self,smile):
@@ -108,7 +97,7 @@ class TargetGenerator:
     
     
     
-    def save_dataset_info(self,sizes):
+    def save_dataset_info(self):
         '''
         Saves dataset information to a json file
 
@@ -119,12 +108,15 @@ class TargetGenerator:
             -> Dataset Standard Deviation
             -> Dataset Unscaled Sizes
         '''
+         # --- Visualise the dataset ---
+        utils.plot_distribution(self.sizes,"Skeleton Sizes","Frequency")
+
         dataset_info = {
             "dataset_NAME": self.dataset_name,
             "dataset_SIZE": len(self.smiles),
             "dataset_TARGET_IMG_SIZE": preprop_constants.IMG_SIZE,
             "dataset_STD_DEV": preprop_constants.STD_DEV,
-            "dataset_UNSCALED_SIZES": sizes.tolist()
+            "dataset_UNSCALED_SIZES": self.sizes.tolist()
         }
         with open(fr'{self.processed_folder}\dataset_info.json', 'w') as outfile:
             json.dump(dataset_info, outfile)
@@ -144,8 +136,8 @@ class TargetGenerator:
                 # Scale the skeleton image
                 img = self.scale_skeleton(mol)
                 # Truncate the smile to fit into file name length limit
-                smile = self.truncate_smile(smile)
-                img.save(fr'{self.processed_folder}\{smile}.png')
+                name = self.database.get_id(smile)
+                img.save(fr'{self.processed_folder}\{name}.png')
 
             except Exception as e:
                 pass

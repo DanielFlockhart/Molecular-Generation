@@ -1,9 +1,6 @@
-from condition_to_vec import *
 
-from smiles_to_mol import *
 from smiles_to_vec import *
 
-from target_to_vec import *
 from target_generation import *
 
 import pandas as pd
@@ -21,6 +18,25 @@ class Preprocessor:
         self.database = Database(data_file)
         self.target_generator = TargetGenerator(data_file,self.database,df_name)
         self.embedding_model = embedding_model
+        self.datafile = self.database.get_file()
+
+    
+    def process(self):
+        '''
+        Main Preprocessing function
+        - Generates the target images
+        - Generates the input vectors
+        
+        '''
+        self.get_targets()
+        self.normalise_targets()
+        self.target_generator.save_dataset_info()
+        self.generate_vectors()
+
+    def generate_vectors(self):
+        self.smiles = self.database.get_smiles()
+        for smile in self.smiles:
+            self.get_input(smile)
 
     def get_input(self,smile):
         '''
@@ -34,10 +50,33 @@ class Preprocessor:
         '''
         Search throught dataset.csv to find the SMILE id, it then returns the other columns which represent the conditons
         '''
+        
         conditions = []
+        row = self.datafile[self.datafile['SMILES'] == smile]
+
+        # Check if a matching row was found
+        if not row.empty:
+            # Access the values of other columns for the matching row
+            # Making this iterable instead of manual later
+            ID = row['ID'].values[0]
+            NAts = row['NAts'].values[0]
+            HOMO = row['HOMO'].values[0]
+            LUMO = row['LUMO'].values[0]
+            es1 = row['E(S1)'].values[0]
+            fs1 = row['F(S1)'].values[0]
+            es2 = row['E(S2)'].values[0]
+            fs2 = row['F(S2)'].values[0]
+            es3 = row['E(S3)'].values[0]
+            fs3 = row['F(S3)'].values[0]
+            et1 = row['E(T1)'].values[0]
+            et2 = row['E(T2)'].values[0] 
+            et3 = row['E(T3)'].values[0]
+            conditions = [NAts, HOMO,LUMO,es1,fs1,es2,fs2,es3,fs3,et1,et2,et3]
+        else:
+            conditions = [0 for x in range(10)]
         
 
-        return conditions_to_vector(conditions)
+        return conditions
     
     def get_targets(self):
         '''
@@ -52,6 +91,5 @@ class Preprocessor:
         '''
         self.target_generator.normalise_targets()
 
-    
 
-    
+
