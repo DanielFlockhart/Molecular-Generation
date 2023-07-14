@@ -1,8 +1,7 @@
 import numpy as np
 from rdkit import Chem
 from rdkit.Chem import AllChem
-from transformers import ChemTokenizer, ChemBERTaModel
-import torch
+from transformers import AutoModel, AutoTokenizer
 
 def smile_to_vector_RDKit(smile):
     """
@@ -14,16 +13,24 @@ def smile_to_vector_RDKit(smile):
     vector = np.array(fp.ToBitString(), dtype=int)
     return vector
 
-def smile_to_vector_ChemBERTa(model,tokenizer, smile):
+def smile_to_vector_ChemBERTa(model_name, smile):
     """
     This function takes a smile string and returns a vector from a pretrained word embedding it uses the pretrained model ChemBERTa
 
     I prefer this option over the RDKit method which produces a binary representation of the smile which need scaling
     """
-    tokens = tokenizer.encode(smile, add_special_tokens=True)
-    input_ids = torch.tensor([tokens])
-    outputs = model(input_ids)
-    vector = outputs[0].squeeze().detach().numpy()
+    # Download pytorch model
+    model = AutoModel.from_pretrained(model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    # Transform input tokens
+    inputs = tokenizer(smile, return_tensors="pt")
+
+    # Model apply
+    outputs = model(**inputs)
+
+    # Extract the vector representation
+    vector = outputs.last_hidden_state.squeeze(0).mean(dim=0)
+
     return vector
 
 

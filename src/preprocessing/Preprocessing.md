@@ -34,3 +34,6 @@ By following these preprocessing steps, we can generate image representations of
 
 All of these steps are completed automatically by the program to allow for a full pipeline with minimal human interaction necessary.
 
+
+
+Manual Sorting?

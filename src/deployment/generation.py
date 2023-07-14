@@ -14,12 +14,12 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath('..'))
-from preprocessing import inputify as im
 
 sys.path.insert(0, os.path.abspath('../training'))
 from training.vae import *
 
-from CONSTANTS import *
+from Constants import ml_constants
+from utilities import img_utils
 
 class Generator:
     def __init__(self,model_path):
@@ -42,15 +42,15 @@ class Generator:
         '''
         Generate a random noise vector for input to network.
         '''
-        return np.random.normal(size=(1, LATENT_DIM))
+        return np.random.normal(size=(1, ml_constants.LATENT_DIM))
     
     def generate_image_vae(self,noise_vector):
         '''
         Generate an image from a noise vector
         '''
-        noise = tf.random.normal(shape=(1, LATENT_DIM), dtype=tf.float32)
+        noise = tf.random.normal(shape=(1, ml_constants.LATENT_DIM), dtype=tf.float32)
         image = self.model.decoder(noise)
-        image = im.tensor_to_image(image)
+        image = img_utils.tensor_to_image(image)
         return image
     
     def generate_image_gan(self,noise_vector):

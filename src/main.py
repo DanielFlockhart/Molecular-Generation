@@ -6,11 +6,10 @@ from preprocessing import preprocess
 from training import train,vae,gan
 from postprocessing import *
 from deployment import *
-from utils import *
-from CONSTANTS import *
+from utilities import utils, file_utils, img_utils
+from Constants import ui_constants, file_constants, preprop_constants, ml_constants
 from ui.terminal_ui import *
 from ui.dialogue import *
-from preprocessing import inputify as im
 
 from deployment import generation
 def initialise():
@@ -22,7 +21,7 @@ def initialise():
     '''
 
     print(format_title("Initialising"))
-    if perform_checks(PROCESSED_DATA):
+    if utils.perform_checks(file_constants.PROCESSED_DATA):
         preprocess_data()
     
     
@@ -38,9 +37,9 @@ def preprocess_data():
         Whether to redownload the data from the database, by default Falses
     '''
     print(format_title("Preprocessing Data"))
-    database = preprocess.Database(fr'{DATA_FOLDER}\CSD_EES_DB.csv')
-    processor = preprocess.Preprocessor(DATA_FOLDER,database,"CSD_EES_DB")
-    processor.clear_folder(PROCESSED_DATA)
+    database = preprocess.Database(fr'{file_constants.DATA_FOLDER}\CSD_EES_DB.csv')
+    processor = preprocess.Preprocessor(file_constants.DATA_FOLDER,database,"CSD_EES_DB")
+    processor.clear_folder(file_constants.PROCESSED_DATA)
     processor.process()
 
     
@@ -60,15 +59,15 @@ def train_model(model,name,use_subset=False):
     use_subset : bool, optional
         Whether to use a subset of the data, by default False
     '''
-    imgs = im.load_images()
+    imgs = img_utils.load_images()
     if use_subset:
         print("You have selected to use subset of data for training process.")
-        imgs = imgs[:TRAIN_SUBSET_COUNT]
+        imgs = imgs[:ml_constants.TRAIN_SUBSET_COUNT]
     
     print(format_title(f"Training Model {name}"))
 
     # Create Default Optimizer
-    optimizer = tf.keras.optimizers.Adam(learning_rate=LRN_RATE)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=ml_constants.LRN_RATE)
     # Train Model
     trained_model = train.train_model(model,imgs,optimizer)
 
@@ -80,9 +79,9 @@ def generate_molecule():
     Generates a new molecule with a previously trained model of either VAE or GAN
     '''
     print(format_title("Generating Molecule"))
-    gen = generation.Generator(fr"{MODELS_FOLDER}\vae")
+    gen = generation.Generator(fr"{file_constants.MODELS_FOLDER}\vae")
     for x in range(100):
-        gen.generate_image_vae(gen.generate_noise()).save(fr"{GENERATED_FOLDER}\vae\{x}.png")
+        gen.generate_image_vae(gen.generate_noise()).save(fr"{file_constants.GENERATED_FOLDER}\vae\{x}.png")
     #gen.generate_image_gan()
 
 def main(models):
@@ -112,8 +111,7 @@ if __name__ == "__main__":
     print("This Program is currently a work in progress - Limited functionality to just generating dataset")
     #initialise()
 
-    vae_model = vae.VariationalAutoencoder(INPUT_SHAPE,LATENT_DIM)
-    #gan_model = gan.GAN(gan.Generator(),gan.Discriminator())
+    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SHAPE,ml_constants.LATENT_DIM)
     main(models=[vae_model])
 
 

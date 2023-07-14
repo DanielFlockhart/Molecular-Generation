@@ -6,8 +6,7 @@ import numpy as np
 import sys
 import os
 sys.path.insert(0, os.path.abspath('..'))
-from preprocessing import inputify as im
-from CONSTANTS import *
+from Constants import ml_constants
 from ui.terminal_ui import *
 
 
@@ -30,7 +29,7 @@ def train_model(model,training_images,optimizer):
 
     model.compile(optimizer=optimizer,loss=model.compute_loss)
     print(format_title("Training Model"))
-    model.fit(training_images,training_images, epochs=EPOCHS, batch_size=BATCH_SIZE)
+    model.fit(training_images,training_images, epochs=ml_constants.EPOCHS, batch_size=ml_constants.BATCH_SIZE)
     return model
 
 
