@@ -2,7 +2,7 @@ import os,sys,random
 from PIL import *
 import numpy as np
 import tensorflow as tf
-from preprocessing import preprocess
+from preprocessing import preprocessing
 from training import train,vae,gan
 from postprocessing import *
 from deployment import *
@@ -37,13 +37,12 @@ def preprocess_data():
     download : bool, optional
         Whether to redownload the data from the database, by default Falses
     '''
+    embedding_model ="seyonec/ChemBERTa-zinc-base-v1"
     print(format_title("Preprocessing Data"))
-    database = preprocess.Database(fr'{file_constants.DATA_FOLDER}\CSD_EES_DB.csv')
-    processor = preprocess.Preprocessor(file_constants.DATA_FOLDER,database,"CSD_EES_DB")
+    processor = preprocessing.Preprocessor(file_constants.DATA_FOLDER + r"\db1\CSD_EES_DB",embedding_model,"CSD_EES_DB") # Working Here
     file_utils.clear_folder(file_constants.PROCESSED_DATA)
     processor.process()
 
-    
 
 def train_model(model,name,use_subset=False):
     '''

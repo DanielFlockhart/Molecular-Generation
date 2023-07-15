@@ -1,11 +1,11 @@
 
-from smiles_to_vec import *
+from preprocessing.smiles_to_vec import *
 
-from target_generation import *
+from preprocessing.target_generation import *
 
 import pandas as pd
 
-from database import *
+from preprocessing.database import *
 
 # Import generic wrappers
 from transformers import AutoModel, AutoTokenizer 
