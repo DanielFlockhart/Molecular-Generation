@@ -21,8 +21,9 @@ def initialise():
     '''
 
     print(format_title("Initialising"))
-    if utils.perform_checks(file_constants.PROCESSED_DATA):
-        preprocess_data()
+    #if utils.perform_checks(file_constants.PROCESSED_DATA):
+    
+    preprocess_data()
     
     
     
@@ -39,7 +40,7 @@ def preprocess_data():
     print(format_title("Preprocessing Data"))
     database = preprocess.Database(fr'{file_constants.DATA_FOLDER}\CSD_EES_DB.csv')
     processor = preprocess.Preprocessor(file_constants.DATA_FOLDER,database,"CSD_EES_DB")
-    processor.clear_folder(file_constants.PROCESSED_DATA)
+    file_utils.clear_folder(file_constants.PROCESSED_DATA)
     processor.process()
 
     
@@ -109,10 +110,10 @@ def main(models):
 if __name__ == "__main__":
     # Preprocess the data
     print("This Program is currently a work in progress - Limited functionality to just generating dataset")
-    #initialise()
+    initialise()
 
-    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SHAPE,ml_constants.LATENT_DIM)
-    main(models=[vae_model])
+    #vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SHAPE,ml_constants.LATENT_DIM)
+    #main(models=[vae_model])
 
 
 

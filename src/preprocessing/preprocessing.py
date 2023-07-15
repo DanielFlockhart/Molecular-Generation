@@ -18,7 +18,6 @@ class Preprocessor:
         self.database = Database(data_file)
         self.target_generator = TargetGenerator(data_file,self.database,df_name)
         self.embedding_model = embedding_model
-        self.datafile = self.database.get_file()
 
     
     def process(self):
@@ -31,12 +30,34 @@ class Preprocessor:
         self.get_targets()
         self.normalise_targets()
         self.target_generator.save_dataset_info()
-        self.generate_vectors()
+        self.generate_data_file()
 
-    def generate_vectors(self):
+    def generate_data_file(self):
+        '''
+        Currently Working Here
+        Database entry looks like this in json format:
+        {
+            "ID": "fdsfsdfsdf",
+            "SMILES": "CC(C)(C)OC(=O)N1CCN(CC1)c2ccc(cc2)c3cccnc3",
+            "conditions": { vector_here },
+            "vector": { vector_here },
+        }
+        
+        '''
+
         self.smiles = self.database.get_smiles()
         for smile in self.smiles:
-            self.get_input(smile)
+            id = self.database.get_id(smile)
+            (smiles_vec, condition_vec) = self.get_input(smile)
+            self.add_entry(id,smile,condition_vec,smiles_vec)
+            
+    def add_entry(self,id,smile,conditions,smiles_vec):
+        '''
+        Add data to inputs.csv file for storage for input to neural network
+        '''
+        df = pd.DataFrame(columns=['ID','SMILES','conditions','vector'])
+        df = df.append({'ID':id,'SMILES':smile,'conditions':conditions,'vector':smiles_vec},ignore_index=True)
+        df.to_csv('inputs.csv',mode='a',header=False,index=False)
 
     def get_input(self,smile):
         '''
@@ -44,7 +65,7 @@ class Preprocessor:
         '''
         condition_vec = self.get_conditions(smile)
         smile_vec = smile_to_vector_ChemBERTa(self.embedding_model,smile)
-        return np.concatenate((condition_vec,smile_vec), axis=0)
+        return (smile_vec,condition_vec)
     
     def get_conditions(self,smile):
         '''
