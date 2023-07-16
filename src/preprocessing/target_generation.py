@@ -35,7 +35,7 @@ class TargetGenerator:
             The database object containing the smiles
         '''
         self.database = database
-        os.mkdir(file_constants.PROCESSED_DATA)
+        
         self.smiles = self.database.get_smiles()
 
     def generate_skeletons(self):
@@ -107,7 +107,7 @@ class TargetGenerator:
             -> Dataset Unscaled Sizes
         '''
          # --- Visualise the dataset ---
-        utils.plot_distribution(self.sizes,"Skeleton Sizes","Frequency")
+        #utils.plot_distribution(self.sizes,"Skeleton Sizes","Frequency")
 
         dataset_info = {
             "dataset_SIZE": len(self.smiles),
@@ -166,9 +166,10 @@ class TargetGenerator:
         '''
         img_sizes = []
         for image in os.listdir(file_constants.PROCESSED_DATA):
-            with Image.open(fr"{file_constants.PROCESSED_DATA}\{image}") as img:
-                img_sizes.append(img.width)
-                img_sizes.append(img.height)
+            if image.endswith(".png"):
+                with Image.open(os.path.join(file_constants.PROCESSED_DATA, image)) as img:
+                    img_sizes.append(img.width)
+                    img_sizes.append(img.height)
         return img_sizes
 
     

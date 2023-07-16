@@ -19,4 +19,4 @@ def get_directory():
     '''
     Gets the directory of the data folder, relative to position of this file
     '''
-    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

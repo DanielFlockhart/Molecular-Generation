@@ -7,16 +7,22 @@ import pandas as pd
 
 from preprocessing.database import *
 
-# Import generic wrappers
-from transformers import AutoModel, AutoTokenizer 
 
+
+import sys, os
+from tqdm import tqdm
+
+sys.path.insert(0, os.path.abspath('..'))
+from Constants import file_constants,preprop_constants,ui_constants
+from ui.terminal_ui import *
 
 # Model seyonec/ChemBERTa-zinc-base-v1
 
 class Preprocessor:
-    def __init__(self,data_file,embedding_model,df_name):
-        self.database = Database(data_file)
-        self.target_generator = TargetGenerator(data_file,self.database,df_name)
+    def __init__(self,embedding_model,df_name):
+        self.csv = f"{file_constants.DATA_FOLDER}/{df_name}.csv"
+        self.database = Database(self.csv)
+        self.target_generator = TargetGenerator(self.database)
         self.embedding_model = embedding_model
 
     
@@ -44,9 +50,12 @@ class Preprocessor:
         }
         
         '''
-
+        
+        
+        print(format_title("Getting Vector Representations of Smiles and Conditions"))
         self.smiles = self.database.get_smiles()
-        for smile in self.smiles:
+        for smile in tqdm(self.smiles, bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
+            
             id = self.database.get_id(smile)
             (smiles_vec, condition_vec) = self.get_input(smile)
             self.add_entry(id,smile,condition_vec,smiles_vec)
@@ -55,9 +64,17 @@ class Preprocessor:
         '''
         Add data to inputs.csv file for storage for input to neural network
         '''
-        df = pd.DataFrame(columns=['ID','SMILES','conditions','vector'])
-        df = df.append({'ID':id,'SMILES':smile,'conditions':conditions,'vector':smiles_vec},ignore_index=True)
-        df.to_csv('inputs.csv',mode='a',header=False,index=False)
+        # Create an empty DataFrame
+        df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector'])
+
+        # Create a new row as a list
+        new_row = [id, smile, conditions, smiles_vec]
+
+        # Append the new row to the DataFrame
+        df.loc[len(df)] = new_row
+
+        # Write the DataFrame to a CSV file
+        df.to_csv(f'{file_constants.DATA_FOLDER}\db1\inputs.csv', mode='a', header=False, index=False)
 
     def get_input(self,smile):
         '''
@@ -73,7 +90,7 @@ class Preprocessor:
         '''
         
         conditions = []
-        row = self.datafile[self.datafile['SMILES'] == smile]
+        row = self.database.file[self.database.file['SMILES'] == smile]
 
         # Check if a matching row was found
         if not row.empty:
@@ -84,11 +101,11 @@ class Preprocessor:
             HOMO = row['HOMO'].values[0]
             LUMO = row['LUMO'].values[0]
             es1 = row['E(S1)'].values[0]
-            fs1 = row['F(S1)'].values[0]
+            fs1 = row['f(S1)'].values[0]
             es2 = row['E(S2)'].values[0]
-            fs2 = row['F(S2)'].values[0]
+            fs2 = row['f(S2)'].values[0]
             es3 = row['E(S3)'].values[0]
-            fs3 = row['F(S3)'].values[0]
+            fs3 = row['f(S3)'].values[0]
             et1 = row['E(T1)'].values[0]
             et2 = row['E(T2)'].values[0] 
             et3 = row['E(T3)'].values[0]
@@ -96,9 +113,9 @@ class Preprocessor:
         else:
             conditions = [0 for x in range(10)]
         
-
-        return conditions
+        return utils.normalise_vector(conditions)
     
+
     def get_targets(self):
         '''
         Using RDKit to generate molecule skeletons to use as targets for network from the dataset of smiles

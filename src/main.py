@@ -39,10 +39,9 @@ def preprocess_data():
     '''
     embedding_model ="seyonec/ChemBERTa-zinc-base-v1"
     print(format_title("Preprocessing Data"))
-    processor = preprocessing.Preprocessor(file_constants.DATA_FOLDER + r"\db1\CSD_EES_DB",embedding_model,"CSD_EES_DB") # Working Here
+    processor = preprocessing.Preprocessor(embedding_model,"CSD_EES_DB") # Working Here
     file_utils.clear_folder(file_constants.PROCESSED_DATA)
     processor.process()
-
 
 def train_model(model,name,use_subset=False):
     '''

@@ -13,12 +13,12 @@ class Database:
         
         '''
         self.file = pd.read_csv(file)
-        self.load_data()
+        self.load_smiles()
 
     def get_file(self):
         return self.file
         
-    def load_data(self):
+    def load_smiles(self):
         '''
         Extract SMILE columns from the dataset
         '''
@@ -67,7 +67,7 @@ class Database:
         '''
         Returns Full List of Smiles
         '''
-        return [molecule[0] for molecule in self.data]
+        return [molecule[0] for molecule in self.data][:2000] # Temporary
     
     def get_id(self,smile):
         '''
