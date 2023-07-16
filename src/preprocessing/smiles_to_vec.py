@@ -25,7 +25,8 @@ def smile_to_vector_ChemBERTa(model_name, smile):
     # Use GPU
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using {device} for ChemBERTa")
+    #print(f"Using {device} for ChemBERTa")
+    # I have not got CUDA on my machine so I am using CPU
     # Download pytorch model
     model = AutoModel.from_pretrained(model_name).to(device)
     tokenizer = AutoTokenizer.from_pretrained(model_name)

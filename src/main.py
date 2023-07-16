@@ -21,8 +21,7 @@ def initialise():
     '''
 
     print(format_title("Initialising"))
-    #if utils.perform_checks(file_constants.PROCESSED_DATA):
-    
+    #if utils.perform_checks(file_constants.PROCESSED_DATA): # Rework Check
     preprocess_data()
     
     
@@ -58,17 +57,17 @@ def train_model(model,name,use_subset=False):
     use_subset : bool, optional
         Whether to use a subset of the data, by default False
     '''
-    imgs = img_utils.load_images()
-    if use_subset:
-        print("You have selected to use subset of data for training process.")
-        imgs = imgs[:ml_constants.TRAIN_SUBSET_COUNT]
+    # imgs = img_utils.load_images()
+    # if use_subset:
+    #     print("You have selected to use subset of data for training process.")
+    #     imgs = imgs[:ml_constants.TRAIN_SUBSET_COUNT]
     
     print(format_title(f"Training Model {name}"))
 
     # Create Default Optimizer
     optimizer = tf.keras.optimizers.Adam(learning_rate=ml_constants.LRN_RATE)
     # Train Model
-    trained_model = train.train_model(model,imgs,optimizer)
+    trained_model = train.train_model(model,optimizer)
 
     # Save Model
     train.save_model(trained_model,name)
@@ -99,7 +98,7 @@ def main(models):
     if confirmed:
         if user_choice == '1':
             # Will add in option to choose model type later
-            train_model(models[0],"vae",use_subset=True)
+            train_model(models[0],"vae",use_subset=False)
         elif user_choice == '2':
             generate_molecule()
     else:
@@ -111,6 +110,7 @@ if __name__ == "__main__":
     initialise()
 
     #vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SHAPE,ml_constants.LATENT_DIM)
+    
     #main(models=[vae_model])
 
 

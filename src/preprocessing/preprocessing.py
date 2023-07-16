@@ -40,20 +40,18 @@ class Preprocessor:
 
     def generate_data_file(self):
         '''
-        Currently Working Here
-        Database entry looks like this in json format:
-        {
-            "ID": "fdsfsdfsdf",
-            "SMILES": "CC(C)(C)OC(=O)N1CCN(CC1)c2ccc(cc2)c3cccnc3",
-            "conditions": { vector_here },
-            "vector": { vector_here },
-        }
-        
+        Generates CSV with inputs for the neural network
         '''
         
         
         print(format_title("Getting Vector Representations of Smiles and Conditions"))
         self.smiles = self.database.get_smiles()
+        # Clear Inputs Folder
+        file_utils.clear_csv(file_constants.INPUTS_FOLDER)
+        # Add Headers
+        df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector'])
+        df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=True, index=False)
+        
         for smile in tqdm(self.smiles, bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
             
             id = self.database.get_id(smile)
@@ -65,8 +63,8 @@ class Preprocessor:
         Add data to inputs.csv file for storage for input to neural network
         '''
         # Create an empty DataFrame
+        
         df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector'])
-
         # Create a new row as a list
         new_row = [id, smile, conditions, smiles_vec]
 
@@ -74,7 +72,7 @@ class Preprocessor:
         df.loc[len(df)] = new_row
 
         # Write the DataFrame to a CSV file
-        df.to_csv(f'{file_constants.DATA_FOLDER}\db1\inputs.csv', mode='a', header=False, index=False)
+        df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=False, index=False)
 
     def get_input(self,smile):
         '''

@@ -8,10 +8,11 @@ import os
 sys.path.insert(0, os.path.abspath('..'))
 from Constants import ml_constants
 from ui.terminal_ui import *
+from training import get_inputs
 
 
 
-def train_model(model,training_images,optimizer):
+def train_model(model,optimizer):
     '''
     Train a model
 
@@ -19,17 +20,20 @@ def train_model(model,training_images,optimizer):
     ----------
     model : tf.keras.Model
         The model to train
-    training_images : list
-        A list of images to train on
+    x_train : np.array
+        The training data which is the vector form of a SMILEs string concatenated with the conditions as a Vector
+    y_train : np.array
+        The target images vectorised to a 1D array to train on.
     optimizer : tf.keras.optimizers
         The optimizer to use
     '''
-    #training_images = training_images.astype('float32') / 255.0
+    
+    # Need to Make sure the x_train and y_train are the same length and a labelled correctly
     print(format_title("Compiling Model"))
-
+    (x_train,y_train,conditions) = get_inputs.get_training_data()
     model.compile(optimizer=optimizer,loss=model.compute_loss)
     print(format_title("Training Model"))
-    model.fit(training_images,training_images, epochs=ml_constants.EPOCHS, batch_size=ml_constants.BATCH_SIZE)
+    model.fit(x_train,y_train, epochs=ml_constants.EPOCHS, batch_size=ml_constants.BATCH_SIZE)
     return model
 
 

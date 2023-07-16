@@ -65,7 +65,7 @@ def recolour(folder,threshold=245,file_type='png'):
 
 
 
-def load_images(project_path,dataset_folder_name,img_size=preprop_constants.IMG_SIZE):
+def load_images(project_path,dataset_folder_name):
     '''
     Loads images from a directory and returns them as a NumPy array for input to a model
     '''
@@ -78,7 +78,7 @@ def load_images(project_path,dataset_folder_name,img_size=preprop_constants.IMG_
                 img_path = os.path.join(directory, filename)
                 image = cv2.imread(img_path)
                 # Resize image to desired dimensions
-                image = cv2.resize(image, (img_size, img_size))
+                #image = cv2.resize(image, (preprop_constants.IMG_SIZE, preprop_constants.IMG_SIZE))
                 # Convert image variable to image
                 
 

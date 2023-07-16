@@ -13,6 +13,13 @@ def clear_folder(folder):
     files = get_files(folder)
     for file in files:
         os.remove(file)
+        
+def clear_csv(csv):
+    '''
+    Clears Contents of a Specified csv
+    '''
+    open(csv, 'w').close()
+
 
 
 def get_directory():

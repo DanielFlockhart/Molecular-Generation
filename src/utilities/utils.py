@@ -94,7 +94,7 @@ def normalise_vector(vector):
     '''
     vector = np.array(vector)
     vector = vector / np.linalg.norm(vector)
-    return vector
+    return vector.tolist()
 
 
 def plot_distribution(sizes,xlabel,ylabel):
