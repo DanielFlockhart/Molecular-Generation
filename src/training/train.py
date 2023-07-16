@@ -33,7 +33,7 @@ def train_model(model,optimizer):
     (x_train,y_train,conditions) = get_inputs.get_training_data()
     model.compile(optimizer=optimizer,loss=model.compute_loss)
     print(format_title("Training Model"))
-    model.fit(x_train,y_train, epochs=ml_constants.EPOCHS, batch_size=ml_constants.BATCH_SIZE)
+    model.fit([x_train, conditions],y_train, epochs=ml_constants.EPOCHS, batch_size=ml_constants.BATCH_SIZE)
     return model
 
 

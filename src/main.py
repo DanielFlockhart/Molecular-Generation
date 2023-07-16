@@ -109,7 +109,7 @@ if __name__ == "__main__":
     print("This Program is currently a work in progress - Limited functionality to just generating dataset")
     #initialise()
 
-    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM + ml_constants.CONDITIONS_SIZE)
+    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.CONDITIONS_SIZE,(200,200,3))
     
     main(models=[vae_model])
 

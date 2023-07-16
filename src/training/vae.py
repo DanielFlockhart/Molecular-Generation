@@ -7,9 +7,11 @@ from tensorflow.keras import layers
 from tensorflow.keras import regularizers
 
 class VariationalAutoencoder(tf.keras.Model):
-    def __init__(self, image_shape, latent_dim):
+    def __init__(self, input_dim, latent_dim, condition_dim, output_dim):
         super(VariationalAutoencoder, self).__init__()
-        self.image_shape = image_shape
+        self.condition_dim = condition_dim
+        self.output_dim= output_dim
+        self.input_dim = input_dim
         self.latent_dim = latent_dim
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
@@ -18,14 +20,10 @@ class VariationalAutoencoder(tf.keras.Model):
         '''
         Building the encoder part of the model
         '''
-        encoder_inputs = tf.keras.Input(shape=self.image_shape)
-        x = layers.Conv2D(32, kernel_size=(3,3), activation='relu', padding='same')(encoder_inputs)
-        x = layers.MaxPooling2D(pool_size=2)(x)
-        x = layers.Conv2D(64, kernel_size=(3,3), activation='relu', padding='same')(x)
-        x = layers.MaxPooling2D(pool_size=2)(x)
-        x = layers.Conv2D(128, kernel_size=(3,3), activation='relu', padding='same')(x)
-        x = layers.MaxPooling2D(pool_size=2)(x)
-        x = layers.Flatten()(x)
+        encoder_inputs = tf.keras.Input(shape=self.input_dim)
+        x = layers.Dense(512, activation='relu')(encoder_inputs)
+        x = layers.Dense(256, activation='relu')(x)
+        x = layers.Dense(128, activation='relu')(x)
         z_mean = layers.Dense(self.latent_dim)(x)
         z_log_var = layers.Dense(self.latent_dim)(x)
         return tf.keras.Model(encoder_inputs, [z_mean, z_log_var], name='encoder')
@@ -34,15 +32,13 @@ class VariationalAutoencoder(tf.keras.Model):
         '''
         Build the decoder part of the model
         '''
-        decoder_inputs = tf.keras.Input(shape=(self.latent_dim,))
-        x = layers.Dense(50*50*256, activation='relu')(decoder_inputs)
-        x = layers.Reshape((50, 50, 256))(x)
-        x = layers.Conv2DTranspose(64, kernel_size=3, activation='relu', padding='same')(x)
-        x = layers.UpSampling2D(size=2)(x)
-        x = layers.Conv2DTranspose(32, kernel_size=3, activation='relu', padding='same')(x)
-        x = layers.UpSampling2D(size=2)(x)
-        decoder_outputs = layers.Conv2DTranspose(3, kernel_size=3, activation='sigmoid', padding='same')(x)
-        return tf.keras.Model(decoder_inputs, decoder_outputs, name='decoder')
+        decoder_inputs = tf.keras.Input(shape=(self.latent_dim +self.condition_dim,))
+        x = layers.Dense(128, activation='relu')(decoder_inputs)
+        x = layers.Dense(256, activation='relu')(x)
+        x = layers.Dense(512, activation='relu')(x)
+        x = layers.Dense(self.output_dim[0] * self.output_dim[1] * self.output_dim[2], activation='relu')(x)
+        outputs = layers.Reshape(self.output_dim)(x)
+        return tf.keras.Model(decoder_inputs, outputs, name='decoder')
 
 
 
@@ -56,13 +52,16 @@ class VariationalAutoencoder(tf.keras.Model):
         epsilon = tf.random.normal(shape=(tf.shape(z_mean)[0], self.latent_dim), mean=0.0, stddev=1.0)
         return z_mean + tf.exp(z_log_var / 2) * epsilon
 
-    def call(self, inputs):
+    def call(self, inputs, condition_vector):
         '''
         Runs the model
         '''
         z_mean, z_log_var = self.encoder(inputs)
         z = self.sampling([z_mean, z_log_var])
-        reconstructed = self.decoder(z)
+        # Concatenate the condition vector with the latent variable z
+        z_condition = tf.concat([z, condition_vector], axis=1)
+        
+        reconstructed = self.decoder(z_condition)
         return reconstructed
 
     def compute_loss(self, inputs, reconstructed):
