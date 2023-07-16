@@ -1,4 +1,4 @@
-import sys,os
+import sys,os,ast
 import numpy as np
 import pandas as pd
 from PIL import Image
@@ -24,8 +24,8 @@ def get_inputs(ID):
 
     if len(row) > 0:
         # Retrieve the conditions value
-        conditions = row['conditions'].values[0]
-        vectors = row['vector'].values[0]
+        conditions = ast.literal_eval(row['conditions'].values[0])
+        vectors = ast.literal_eval(row['vector'].values[0])
     # Concatenate the conditions and vectors into a single list for input
     return np.array(conditions), np.array(vectors)
 
@@ -41,9 +41,7 @@ def concat_vectors(v1,v2):
     ''' 
     Concatenates two vectors together
     '''
-    v1 = np.expand_dims(v1, axis=0)
-    v2 = np.expand_dims(v2, axis=0)
-    return np.concatenate((v1, v2), axis=0)
+    return np.concatenate((v1.flatten(), v2.flatten()))
 
 
 def get_training_data():
@@ -62,10 +60,5 @@ def get_training_data():
 
     # Iterate through conditions and vectors and concatenate them
     inputs = [concat_vectors(conditions[i],vectors[i]) for i in range(len(conditions))]
-    print(inputs[0])
-
     # Return the inputs and targets
     return inputs,conditions,targets
-
-if __name__ == "__main__":
-    get_training_data() # Working Here
