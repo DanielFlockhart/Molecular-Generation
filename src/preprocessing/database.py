@@ -67,7 +67,7 @@ class Database:
         '''
         Returns Full List of Smiles
         '''
-        return [molecule[0] for molecule in self.data][:25] # Temporary
+        return [molecule[0] for molecule in self.data][:10] # Temporary
     
     def get_id(self,smile):
         '''

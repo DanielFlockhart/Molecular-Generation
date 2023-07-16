@@ -4,7 +4,7 @@ from PIL import Image
 import os,sys,cv2
 from tqdm import tqdm
 sys.path.insert(0, os.path.abspath('..'))
-from Constants import ui_constants,preprop_constants
+from Constants import ui_constants,preprop_constants,file_constants
 from ui.terminal_ui import *
 
 
@@ -65,16 +65,19 @@ def recolour(folder,threshold=245,file_type='png'):
 
 
 
-def load_images(project_path,dataset_folder_name):
+def load_images():
     '''
     Loads images from a directory and returns them as a NumPy array for input to a model
     '''
     images = []
-    directory = os.path.join(project_path, dataset_folder_name)
+    labels = []
+    directory = file_constants.PROCESSED_DATA
     print(format_title(f'Loading images from {directory}'))
     for (i,filename) in tqdm(enumerate(os.listdir(directory)), total=len(os.listdir(directory)), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
         try:
             if filename.endswith('.png'):
+                # Add the image name to the list without file ending
+                labels.append(filename[:-4])
                 img_path = os.path.join(directory, filename)
                 image = cv2.imread(img_path)
                 # Resize image to desired dimensions
@@ -88,4 +91,4 @@ def load_images(project_path,dataset_folder_name):
         except Exception as e:
             print(e)
     
-    return np.array(images)
+    return np.array(images),labels
