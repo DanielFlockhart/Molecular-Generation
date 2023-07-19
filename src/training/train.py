@@ -13,7 +13,7 @@ from training import get_inputs
 
 
 def train_model(model,optimizer):
-    '''
+    ''' 
     Train a model
 
     Parameters
@@ -30,10 +30,10 @@ def train_model(model,optimizer):
     
     # Need to Make sure the x_train and y_train are the same length and a labelled correctly
     print(format_title("Compiling Model"))
-    (x_train,y_train,conditions) = get_inputs.get_training_data()
+    (x_train,conditions,y_train) = get_inputs.get_training_data()
     model.compile(optimizer=optimizer,loss=model.compute_loss)
     print(format_title("Training Model"))
-    model.fit([x_train, conditions],y_train, epochs=ml_constants.EPOCHS, batch_size=ml_constants.BATCH_SIZE)
+    model.fit([np.array(x_train), np.array(conditions)], y_train,batch_size=ml_constants.BATCH_SIZE, epochs=ml_constants.EPOCHS)
     return model
 
 

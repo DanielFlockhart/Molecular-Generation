@@ -38,7 +38,7 @@ class TargetGenerator:
         
         self.smiles = self.database.get_smiles()
 
-    def generate_skeletons(self):
+    def generate_skeletons(self,count):
         '''
         Preprocesses the smiles into preprocessed images
         
@@ -53,11 +53,15 @@ class TargetGenerator:
         -> Save the smiles to the folder
 
         '''
+        if count == None:
+            count = len(self.smiles)
+        else:
+            count = min(count,len(self.smiles))
         
         # --- Redownload the images if Requested ---
         print(format_title("Downloading Skeletons"))
         file_utils.clear_folder(file_constants.PROCESSED_DATA)
-        self.create_skeletons()
+        self.create_skeletons(count)
 
     def normalise_targets(self):
         '''
@@ -118,11 +122,10 @@ class TargetGenerator:
         with open(fr'{file_constants.PROCESSED_DATA}\dataset_info.json', 'w') as outfile:
             json.dump(dataset_info, outfile)
 
-    def create_skeletons(self):
+    def create_skeletons(self,count):
         '''
         Creates the skeleton images from smiles
         '''
-
         for (i,smile) in tqdm(enumerate(self.smiles),total=len(self.smiles), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
             try:
                 # Create the skeleton image
@@ -135,6 +138,9 @@ class TargetGenerator:
                 # Truncate the smile to fit into file name length limit
                 name = self.database.get_id(smile)
                 img.save(fr'{file_constants.PROCESSED_DATA}\{name}.png')
+                count -= 1
+                if count <= 0:
+                    break
 
             except Exception as e:
                 pass
@@ -164,6 +170,8 @@ class TargetGenerator:
         '''
         Iterates through every image in the folder and returns a list of the skeleton sizes
         '''
+        
+
         img_sizes = []
         for image in os.listdir(file_constants.PROCESSED_DATA):
             if image.endswith(".png"):

@@ -40,7 +40,7 @@ def preprocess_data():
     print(format_title("Preprocessing Data"))
     processor = preprocessing.Preprocessor(embedding_model,"CSD_EES_DB") # Working Here
     file_utils.clear_folder(file_constants.PROCESSED_DATA)
-    processor.process()
+    processor.process(subset=True)
 
 def train_model(model,name,use_subset=False):
     '''
@@ -57,7 +57,6 @@ def train_model(model,name,use_subset=False):
     use_subset : bool, optional
         Whether to use a subset of the data, by default False
     '''
-    # imgs = img_utils.load_images()
     # if use_subset:
     #     print("You have selected to use subset of data for training process.")
     #     imgs = imgs[:ml_constants.TRAIN_SUBSET_COUNT]
@@ -109,7 +108,7 @@ if __name__ == "__main__":
     print("This Program is currently a work in progress - Limited functionality to just generating dataset")
     #initialise()
 
-    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.CONDITIONS_SIZE,(200,200,3))
+    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.CONDITIONS_SIZE,(preprop_constants.IMG_SIZE,preprop_constants.IMG_SIZE,3))
     
     main(models=[vae_model])
 

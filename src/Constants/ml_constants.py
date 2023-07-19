@@ -7,3 +7,4 @@ LRN_RATE = 0.001 # Learning rate for the optimizer
 TRAIN_SUBSET_COUNT = 400 # Number of images to test training on
 INPUT_SIZE = 780
 CONDITIONS_SIZE = 12
+OUTPUT_DIM = preprop_constants.IMG_SIZE * preprop_constants.IMG_SIZE 

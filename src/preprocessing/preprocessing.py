@@ -26,14 +26,17 @@ class Preprocessor:
         self.embedding_model = embedding_model
 
     
-    def process(self):
+    def process(self,subset=False):
         '''
         Main Preprocessing function
         - Generates the target images
         - Generates the input vectors
+
+        - Target Images have the right structures and IDs
+        
         
         '''
-        self.get_targets()
+        self.get_targets(preprop_constants.SUBSET_COUNT if subset else None)
         self.normalise_targets()
         self.target_generator.save_dataset_info()
         self.generate_data_file()
@@ -45,28 +48,33 @@ class Preprocessor:
         
         
         print(format_title("Getting Vector Representations of Smiles and Conditions"))
-        self.smiles = self.database.get_smiles()
+        self.smiles = self.database.get_smiles_from_ids()
+        print(len(self.smiles))
         # Clear Inputs Folder
         file_utils.clear_csv(file_constants.INPUTS_FOLDER)
         # Add Headers
-        df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector'])
+        df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector', 'target'])
         df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=True, index=False)
-        
-        for smile in tqdm(self.smiles, bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
+        print("Warning: This may take a while")
+        print("Dataset must be sorted by ID alphabetically, will make it more robust later")
+
+        target_vecs,labels = img_utils.load_images()
+
+        for (i,smile) in tqdm(enumerate(self.smiles),total=len(labels), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
             
             id = self.database.get_id(smile)
             (smiles_vec, condition_vec) = self.get_input(smile)
-            self.add_entry(id,smile,condition_vec,smiles_vec)
+            self.add_entry(id,smile,condition_vec,smiles_vec,target_vecs[i])
             
-    def add_entry(self,id,smile,conditions,smiles_vec):
+    def add_entry(self,id,smile,conditions,smiles_vec,target_vec):
         '''
         Add data to inputs.csv file for storage for input to neural network
         '''
         # Create an empty DataFrame
         
-        df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector'])
+        df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector', 'target_vector'])
         # Create a new row as a list
-        new_row = [id, smile, conditions, smiles_vec]
+        new_row = [id, smile, conditions, smiles_vec,target_vec]
 
         # Append the new row to the DataFrame
         df.loc[len(df)] = new_row
@@ -80,6 +88,7 @@ class Preprocessor:
         '''
         condition_vec = self.get_conditions(smile)
         smile_vec = smile_to_vector_ChemBERTa(self.embedding_model,smile)
+        
         return (smile_vec,condition_vec)
     
     def get_conditions(self,smile):
@@ -114,11 +123,11 @@ class Preprocessor:
         return utils.normalise_vector(conditions)
     
 
-    def get_targets(self):
+    def get_targets(self,count):
         '''
         Using RDKit to generate molecule skeletons to use as targets for network from the dataset of smiles
-        '''
-        self.target_generator.generate_skeletons()
+        ''' 
+        self.target_generator.generate_skeletons(count)
         
 
     def normalise_targets(self):

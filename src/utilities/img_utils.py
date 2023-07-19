@@ -83,11 +83,13 @@ def load_images():
                 # Resize image to desired dimensions
                 #image = cv2.resize(image, (preprop_constants.IMG_SIZE, preprop_constants.IMG_SIZE))
                 # Convert image variable to image
+                # Convert image to grayscale
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
                 
 
                 # Normalize pixel values between 0 and 1
                 image = image.astype(np.float32) / 255.0
-                images.append(image)
+                images.append(image.reshape(-1))
         except Exception as e:
             print(e)
     

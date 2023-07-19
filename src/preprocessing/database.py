@@ -1,6 +1,7 @@
 import pandas as pd
-import random,os
-
+import random,os,sys
+sys.path.insert(0, os.path.abspath('..'))
+from Constants import file_constants
 class Database:
     def __init__(self,file):
         '''
@@ -67,7 +68,7 @@ class Database:
         '''
         Returns Full List of Smiles
         '''
-        return [molecule[0] for molecule in self.data][:10] # Temporary
+        return [molecule[0] for molecule in self.data]
     
     def get_id(self,smile):
         '''
@@ -78,7 +79,26 @@ class Database:
         # Check if a matching row was found
         if not row.empty:
             return row['ID'].values[0]
-    
+        
+    def get_smiles_from_ids(self):
+        '''
+        Gets the smiles from the IDs in the dataset
+        Get the ID from every image stored in the dataset
+        '''
+        smiles=[]
+        ids=[]
+        for (i,filename) in enumerate(os.listdir(file_constants.PROCESSED_DATA)):
+            if filename.endswith('.png'):
+                ids.append(filename[:-4])
+        for id in ids:
+            row = self.file[self.file['ID'] == id]
+            # Check if a matching row was found
+            if not row.empty:
+                smiles.append(row['SMILES'].values[0])
+
+        return smiles
+
+        
     
 
 
