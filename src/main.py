@@ -40,7 +40,7 @@ def preprocess_data():
     print(format_title("Preprocessing Data"))
     processor = preprocessing.Preprocessor(embedding_model,"CSD_EES_DB") # Working Here
     file_utils.clear_folder(file_constants.PROCESSED_DATA)
-    processor.process(subset=True)
+    processor.process(subset=False)
 
 def train_model(model,name,use_subset=False):
     '''
@@ -106,11 +106,11 @@ def main(models):
 if __name__ == "__main__":
     # Preprocess the data
     print("This Program is currently a work in progress - Limited functionality to just generating dataset")
-    #initialise()
+    initialise()
 
-    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.CONDITIONS_SIZE,(preprop_constants.IMG_SIZE,preprop_constants.IMG_SIZE,3))
+    #vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.CONDITIONS_SIZE,(preprop_constants.IMG_SIZE,preprop_constants.IMG_SIZE,3))
     
-    main(models=[vae_model])
+    #main(models=[vae_model])
 
 
 

@@ -58,13 +58,14 @@ class Preprocessor:
         print("Warning: This may take a while")
         print("Dataset must be sorted by ID alphabetically, will make it more robust later")
 
-        target_vecs,labels = img_utils.load_images()
+        #target_vecs,labels = img_utils.load_images() # This line causes 30Gb of RAM to be used
 
-        for (i,smile) in tqdm(enumerate(self.smiles),total=len(labels), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
+        for (i,smile) in tqdm(enumerate(self.smiles),total=len(self.smiles), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
             
             id = self.database.get_id(smile)
+            target_vec,label = img_utils.load_image(id)
             (smiles_vec, condition_vec) = self.get_input(smile)
-            self.add_entry(id,smile,condition_vec,smiles_vec,target_vecs[i])
+            self.add_entry(id,smile,condition_vec,smiles_vec,target_vec)
             
     def add_entry(self,id,smile,conditions,smiles_vec,target_vec):
         '''

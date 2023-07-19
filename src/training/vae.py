@@ -57,24 +57,12 @@ class VariationalAutoencoder(tf.keras.Model):
         reconstructed = self.decoder(z_condition)
         return reconstructed
 
-    def compute_loss(self, inputs, reconstructed):
+    def compute_loss(self, inputs, reconstructed, sample_weight=None, *args, **kwargs):        
         '''
         Calculates the loss of the model
-        
-        Parameters
-        ----------
-        inputs : tensor
-            The input images
-        reconstructed : tensor
-            The reconstructed images
-            
-        Returns
-        -------
-        loss : tensor
-            The calculated loss value
         '''
-        encoder_inputs, _ = inputs
-        z_mean, z_log_var = self.encoder(encoder_inputs)
-        reconstruction_loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy(encoder_inputs, reconstructed))
+        encoder_inputs, y_train = inputs
+        z_mean, z_log_var = self.encoder(y_train)
+        reconstruction_loss = tf.reduce_mean(tf.square(y_train - reconstructed))  # MSE loss or other suitable loss function
         kl_loss = -0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
         return reconstruction_loss + kl_loss

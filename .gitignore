@@ -157,3 +157,7 @@ data/models/vae/fingerprint.pb
 data/models/vae/saved_model.pb
 data/models/vae/variables/variables.index
 data/models/vae/variables/variables.data-00000-of-00001
+docs/Academic_Paper.docx
+data/datasets/db1/inputs.csv
+data/datasets/db1/inputs.csv
+*.csv

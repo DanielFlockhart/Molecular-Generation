@@ -94,3 +94,23 @@ def load_images():
             print(e)
     
     return np.array(images),labels
+
+
+def load_image(id):
+    '''
+    Loads a single image from a directory and returns it as a NumPy array for input to a model
+    '''
+    directory = file_constants.PROCESSED_DATA
+    filename = f"{id}.png"
+    img_path = os.path.join(directory, filename)
+    image = cv2.imread(img_path)
+    # Resize image to desired dimensions
+    #image = cv2.resize(image, (preprop_constants.IMG_SIZE, preprop_constants.IMG_SIZE))
+    # Convert image variable to image
+    # Convert image to grayscale
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+
+    # Normalize pixel values between 0 and 1
+    image = image.astype(np.float32) / 255.0
+    return image.reshape(-1),filename[:-4]
