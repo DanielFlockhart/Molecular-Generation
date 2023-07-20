@@ -2,9 +2,7 @@ import sys, os
 import numpy as np
 
 import tensorflow as tf
-from tensorflow.keras import layers
-
-from tensorflow.keras import regularizers
+from tensorflow.keras import layers,regularizers
 
 class VariationalAutoencoder(tf.keras.Model):
     def __init__(self, input_dim, latent_dim, condition_dim, output_dim):
