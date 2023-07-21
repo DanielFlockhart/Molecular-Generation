@@ -162,3 +162,7 @@ data/datasets/db1/inputs.csv
 data/datasets/db1/inputs.csv
 *.csv
 data/datasets/db1/inputs.csv
+data/datasets/db1/inputs.csv
+*.html
+*.csv
+*.csv
