@@ -119,14 +119,14 @@ class Visualiser:
         return fig
         
 
-    def save_plot(self,plot,clusters,model_type,specific=None):
+    def save_plot(self,plot,clusters,model_type,clustering_type,specific=None):
         '''
         Save HTML File of Graph automatically
         '''
         if specific is not None:
-            plot.write_html(f"{file_constants.VISUALISATIONS_FOLDER}\\graphs\\{model_type}\\kmeans\\{clusters}\\{specific}.html")
+            plot.write_html(f"{file_constants.VISUALISATIONS_FOLDER}\\graphs\\{model_type}\\{clustering_type}\\{clusters}\\{specific}.html")
         else:
-            plot.write_html(f"{file_constants.VISUALISATIONS_FOLDER}\\graphs\\{model_type}\\kmeans\\{clusters}.html")
+            plot.write_html(f"{file_constants.VISUALISATIONS_FOLDER}\\graphs\\{model_type}\\{clustering_type}\\{clusters}.html")
 
 
 clusters = 100
@@ -138,19 +138,22 @@ if __name__ == "__main__":
     X_pca,pca = visualiser.PCA()
     X_tsne,tsne = visualiser.tSNE()
 
-    # cluster_labels_kmeans = visualiser.cluster_kmeans(clusters)
-    # fig_tsne = visualiser.plot(X_tsne,cluster_labels_kmeans)
-    # fig_pca = visualiser.plot(X_pca,cluster_labels_kmeans)
+    cluster_labels_kmeans = visualiser.cluster_kmeans(clusters)
+    fig_tsne = visualiser.plot(X_tsne,cluster_labels_kmeans)
+    fig_pca = visualiser.plot(X_pca,cluster_labels_kmeans)
 
-    # visualiser.save_plot(fig_tsne,clusters,"tsne")
-    # visualiser.save_plot(fig_pca,clusters,"pca")
+    visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans")
+    visualiser.save_plot(fig_pca,clusters,"pca",clustering_type="kmeans")
+
+
+    # Agglomerative Clustering Takes a long time to run
 
     cluster_labels_agglomerative = visualiser.cluster_agglomerative(clusters)
 
     fig_tsne = visualiser.plot(X_tsne,cluster_labels_agglomerative)
     fig_pca = visualiser.plot(X_pca,cluster_labels_agglomerative)
 
-    visualiser.save_plot(fig_tsne,clusters,"tsne")
-    visualiser.save_plot(fig_pca,clusters,"pca")
+    visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="agglomerative")
+    visualiser.save_plot(fig_pca,clusters,"pca",clustering_type="agglomerative")
 
     

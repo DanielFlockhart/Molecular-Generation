@@ -48,12 +48,12 @@ class VAE(tf.keras.Model):
         return self.decode(z, condition)
 
 # Define hyperparameters
-input_size = YOUR_INPUT_SIZE
-hidden_size = YOUR_HIDDEN_SIZE
-latent_size = YOUR_LATENT_SIZE
-condition_size = YOUR_CONDITION_SIZE
+input_size = 768
+hidden_size = 512
+latent_size = 128
+condition_size = 12
 learning_rate = 0.001
-batch_size = 32
+batch_size = 128
 num_epochs = 50
 
 # Create the VAE model
@@ -87,3 +87,6 @@ for epoch in range(num_epochs):
     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {total_loss / len(dataset)}")
 
 # Training is done!
+
+# Save the entire model (architecture + weights)
+vae.save('tensorflow_vae_model')

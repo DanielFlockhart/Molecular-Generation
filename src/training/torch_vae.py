@@ -81,12 +81,12 @@ class CustomDataset(Dataset):
         return self.input_data[index], self.condition_data[index], self.target_data[index]
 
 # Define hyperparameters
-input_size = YOUR_INPUT_SIZE
-hidden_size = YOUR_HIDDEN_SIZE
-latent_size = YOUR_LATENT_SIZE
-condition_size = YOUR_CONDITION_SIZE
+input_size = 768
+hidden_size = 512
+latent_size = 128
+condition_size = 12
 learning_rate = 0.001
-batch_size = 32
+batch_size = 128
 num_epochs = 50
 
 # Create the VAE model
@@ -130,4 +130,6 @@ for epoch in range(num_epochs):
     # Print the average loss for this epoch
     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {total_loss / len(dataloader)}")
 
+# Save the entire model (architecture + weights)
+torch.save(vae.state_dict(), 'pytorch_vae_model.pth')
 # Training is done!
