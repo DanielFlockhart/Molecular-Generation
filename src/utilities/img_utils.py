@@ -65,7 +65,7 @@ def recolour(folder,threshold=245,file_type='png'):
 
 
 
-def load_images():
+def load_images(count=None):
     '''
     Loads images from a directory and returns them as a NumPy array for input to a model
     '''
@@ -74,6 +74,8 @@ def load_images():
     directory = file_constants.PROCESSED_DATA
     print(format_title(f'Loading images from {directory}'))
     for (i,filename) in tqdm(enumerate(os.listdir(directory)), total=len(os.listdir(directory)), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
+        if count is not None and i >= count:
+            break
         try:
             if filename.endswith('.png'):
                 # Add the image name to the list without file ending
@@ -85,6 +87,7 @@ def load_images():
                 # Convert image variable to image
                 # Convert image to grayscale
                 image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                #_, image = cv2.threshold(image, 245, 1, cv2.THRESH_BINARY)
                 
 
                 # Normalize pixel values between 0 and 1

@@ -1,32 +1,44 @@
 import tensorflow as tf
-from tensorflow.keras import layers, models
+import numpy as np
+from tensorflow.keras import layers
+from training.get_inputs import get_training_data
 
-# Define the architecture of the VAE
-class VAE(tf.keras.Model):
-    def __init__(self, input_size, hidden_size, latent_size, condition_size):
-        super(VAE, self).__init__()
-        
-        # Encoder layers
-        self.encoder = tf.keras.Sequential([
-            layers.InputLayer(input_shape=(input_size + condition_size,)),
-            layers.Dense(hidden_size, activation='relu'),
-            layers.Dense(hidden_size, activation='relu'),
-            layers.Dense(latent_size * 2)  # Two times latent_size for mean and log_var
-        ])
-        
-        # Decoder layers
-        self.decoder = tf.keras.Sequential([
-            layers.InputLayer(input_shape=(latent_size + condition_size,)),
-            layers.Dense(hidden_size, activation='relu'),
-            layers.Dense(hidden_size, activation='relu'),
-            layers.Dense(input_size)
-        ])
-        
+import sys,os
+
+
+
+
+class CVAE(tf.keras.Model):
+    """Convolutional variational autoencoder."""
+    def __init__(self, latent_dim):
+        super(CVAE, self).__init__()
+        self.latent_dim = latent_dim
+        self.encoder = tf.keras.Sequential(
+            [
+                tf.keras.layers.InputLayer(input_shape=(780, 1)),
+                tf.keras.layers.Dense(512),
+                tf.keras.layers.Dense(256),
+                tf.keras.layers.Dense(latent_dim + latent_dim),
+            ]
+        )
+
+        self.decoder = tf.keras.Sequential(
+            [
+                tf.keras.layers.InputLayer(input_shape=(latent_dim,)),
+                tf.keras.layers.Dense(units=400*400*3, activation=tf.nn.relu),
+                tf.keras.layers.Reshape(target_shape=(400, 400, 3)),
+                tf.keras.layers.Conv2DTranspose(
+                    filters=64, kernel_size=3, strides=2, padding='same',
+                    activation='relu'),
+                tf.keras.layers.Conv2DTranspose(
+                    filters=32, kernel_size=3, strides=2, padding='same',
+                    activation='relu'),
+                # No activation
+                tf.keras.layers.Conv2DTranspose(
+                    filters=1, kernel_size=3, strides=1, padding='same'),
+            ]
+        )
     def encode(self, x):
-        # Split concatenated input and condition
-        input_data, condition = tf.split(x, [input_size, condition_size], axis=-1)
-        x = tf.concat([input_data, condition], axis=-1)
-        
         # Encode the input
         hidden = self.encoder(x)
         mean, log_var = tf.split(hidden, num_or_size_splits=2, axis=-1)  # Split into mean and log_var
@@ -47,17 +59,24 @@ class VAE(tf.keras.Model):
         z = self.reparameterize(mean, log_var)
         return self.decode(z, condition)
 
+
+
+
+
+
 # Define hyperparameters
-input_size = 768
+input_size = 780
 hidden_size = 512
 latent_size = 128
 condition_size = 12
 learning_rate = 0.001
 batch_size = 128
 num_epochs = 50
+count=1000
 
+labels, input_data,condition_data,target_data = get_training_data(count)
 # Create the VAE model
-vae = VAE(input_size, hidden_size, latent_size, condition_size)
+vae = CVAE(latent_size)
 
 # Define loss function and optimizer
 criterion = tf.keras.losses.MeanSquaredError()

@@ -45,4 +45,39 @@ def smile_to_vector_ChemBERTa(model_name, smile):
 
 
 
+import torch
+from transformers import AutoModel, AutoTokenizer
 
+def vector_to_smile_ChemBERTa(model_name, vector):
+    """
+    This function takes a ChemBERTa vector and returns the corresponding SMILES string.
+
+    It uses the pretrained model ChemBERTa and its tokenizer.
+
+    Note: The reconstructed SMILES string may not be an exact replica of the original input SMILES due to information loss during vectorization.
+
+    Parameters:
+    - model_name (str): Name or path of the pretrained ChemBERTa model.
+    - vector (list): The ChemBERTa vector representing the SMILES.
+
+    Returns:
+    - str: The reconstructed SMILES string.
+    """
+    # Use GPU if available
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # Download pytorch model
+    model = AutoModel.from_pretrained(model_name).to(device)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+    # Convert the vector back to tensor
+    vector_tensor = torch.tensor(vector).unsqueeze(0).to(device)
+
+    # Model apply
+    with torch.no_grad():
+        outputs = model(inputs_embeds=vector_tensor)
+
+    # Reconstruct the SMILES using the tokenizer
+    reconstructed_smile = tokenizer.decode(outputs.input_ids[0], skip_special_tokens=True)
+
+    return reconstructed_smile

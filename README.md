@@ -92,3 +92,7 @@ Thank you for using the Molecular Generation project! We hope it proves to be us
 ## Future Project Ideas
 - Convert Generated Images to back to SMILEs representation. Using Machine Learning?
 - Docking/Simulation - Binding Affinity?
+
+
+TODO 
+- Refactor Reprocess, Rethink

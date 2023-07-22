@@ -39,7 +39,7 @@ def preprocess_data():
     embedding_model ="seyonec/ChemBERTa-zinc-base-v1"
     print(format_title("Preprocessing Data"))
     processor = preprocessing.Preprocessor(embedding_model,"CSD_EES_DB") # Working Here
-    file_utils.clear_folder(file_constants.PROCESSED_DATA)
+    
     processor.process(subset=False)
 
 def train_model(model,name,use_subset=False):

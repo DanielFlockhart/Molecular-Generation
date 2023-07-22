@@ -104,3 +104,28 @@ def plot_distribution(sizes,xlabel,ylabel):
     plt.hist(sizes, bins=200)
     plt.gca().set(title=xlabel, ylabel=ylabel)
     plt.show()  
+
+
+
+
+def run_length_encode(data):
+    encoded_list = []
+    current_count = 1
+
+    for i in range(1, len(data)):
+        if data[i] == data[i - 1]:
+            current_count += 1
+        else:
+            encoded_list.append((data[i - 1], current_count))
+            current_count = 1
+
+    # Add the last element
+    encoded_list.append((data[-1], current_count))
+
+    return encoded_list
+def run_length_decode(encoded_data):
+    decoded_list = []
+    for element, count in encoded_data:
+        decoded_list.extend([element] * count)
+    return decoded_list
+    
