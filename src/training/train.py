@@ -1,7 +1,6 @@
 import tensorflow as tf
 from tensorflow.keras import layers
 from training.vae import *
-from training.gan import * 
 import numpy as np
 import sys
 import os

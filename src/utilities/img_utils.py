@@ -55,7 +55,7 @@ def recolour(folder,threshold=245,file_type='png'):
             image = image.convert('L')
 
             # Convert the grayscale image to binary black and white
-            image = image.point(lambda x: 0 if x < threshold else 255, '1')
+            image = image.point(lambda x: 0 if x < threshold else 255, 1)
 
             # Save the converted image (overwrite the original)
             image.save(f"{folder}\{file_name}.png")
@@ -112,6 +112,9 @@ def load_image(id):
     # Convert image variable to image
     # Convert image to grayscale
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    # Convert the grayscale image to binary black and white
+    # Apply binary thresholding
+    ret, image = cv2.threshold(image, 225, 255, cv2.THRESH_BINARY)
     
 
     # Normalize pixel values between 0 and 1

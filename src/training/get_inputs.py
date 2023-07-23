@@ -32,7 +32,7 @@ def get_inputs(ID,df):
         return False
 
     # Concatenate the conditions and vectors into a single list for input
-    return np.array(conditions), np.array(vectors), np.array(utils.run_length_decode(target[0]))
+    return np.array(conditions), np.array(vectors), np.array(target[0])
 
 
 
@@ -63,9 +63,10 @@ def get_training_data(count=None):
         (condition, vector,target) = get_inputs(label,df)
         conditions.append(condition)
         vectors.append(vector)
+        # Not loading from csv yet
         targets.append(target)
 
     # Iterate through conditions and vectors and concatenate them
-    inputs = [concat_vectors(conditions[i],vectors[i]) for i in range(count if count is not None else len(conditions) )]
+    #inputs = [concat_vectors(conditions[i],vectors[i]) for i in range(count if count is not None else len(conditions) )]
     # Return the inputs and targets
-    return labels,inputs,conditions,targets
+    return labels,vectors,conditions,targets

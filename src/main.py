@@ -3,7 +3,7 @@ from PIL import *
 import numpy as np
 import tensorflow as tf
 from preprocessing import preprocessing
-from training import train,vae,gan
+from training import train,vae
 from postprocessing import *
 from deployment import *
 from utilities import utils, file_utils, img_utils
@@ -106,11 +106,11 @@ def main(models):
 if __name__ == "__main__":
     # Preprocess the data
     print("This Program is currently a work in progress - Limited functionality to just generating dataset")
-    initialise()
+    #initialise()
 
-    #vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.CONDITIONS_SIZE,(preprop_constants.IMG_SIZE,preprop_constants.IMG_SIZE,3))
+    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.CONDITIONS_SIZE,(preprop_constants.IMG_SIZE,preprop_constants.IMG_SIZE,3))
     
-    #main(models=[vae_model])
+    main(models=[vae_model])
 
 
 

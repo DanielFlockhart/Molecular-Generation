@@ -45,14 +45,12 @@ class Preprocessor:
         '''
         Generates CSV with inputs for the neural network
         '''
-        
-        
         print(format_title("Getting Vector Representations of Smiles and Conditions"))
         self.smiles = self.database.get_smiles_from_ids()
         # Clear Inputs Folder
         file_utils.clear_csv(file_constants.INPUTS_FOLDER)
         # Add Headers
-        df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector', 'target'])
+        df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector', 'target_vector'])
         df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=True, index=False)
         print("Warning: This may take a while")
         print("Dataset must be sorted by ID alphabetically, will make it more robust later")
@@ -62,14 +60,11 @@ class Preprocessor:
         for (i,smile) in tqdm(enumerate(self.smiles),total=len(self.smiles), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
             
             id = self.database.get_id(smile)
-            target_vec,label = img_utils.load_image(id) # It doesnt load the image it just gets some of it.
-            target_vec = utils.run_length_encode(target_vec.flatten().tolist()) # Compress data for csv
-            print("Warning, do not load target from inputs.csv as it is not the full image")
+            target_vec,label = img_utils.load_image(id)# It doesnt load the image it just gets some of it.
+            #print("Warning, do not load target from inputs.csv as it is not the full image")
             
             (smiles_vec, condition_vec) = self.get_input(smile)
-            self.add_entry(id,smile,condition_vec,smiles_vec,target_vec)
-            if i == 3:
-                break
+            self.add_entry(id,smile,condition_vec,smiles_vec,utils.run_length_encode(target_vec))
             
     def add_entry(self,id,smile,conditions,smiles_vec,target_vec):
         '''
