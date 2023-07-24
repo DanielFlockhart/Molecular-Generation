@@ -86,7 +86,7 @@ def load_images(count=None):
                 #image = cv2.resize(image, (preprop_constants.IMG_SIZE, preprop_constants.IMG_SIZE))
                 # Convert image variable to image
                 # Convert image to grayscale
-                image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
                 #_, image = cv2.threshold(image, 245, 1, cv2.THRESH_BINARY)
                 
 
@@ -114,7 +114,7 @@ def load_image(id):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # Convert the grayscale image to binary black and white
     # Apply binary thresholding
-    ret, image = cv2.threshold(image, 225, 255, cv2.THRESH_BINARY)
+    #ret, image = cv2.threshold(image, 225, 255, cv2.THRESH_BINARY)
     
 
     # Normalize pixel values between 0 and 1

@@ -78,7 +78,9 @@ def generate_molecule():
     print(format_title("Generating Molecule"))
     gen = generation.Generator(fr"{file_constants.MODELS_FOLDER}\vae")
     for x in range(100):
-        gen.generate_image_vae(gen.generate_noise()).save(fr"{file_constants.GENERATED_FOLDER}\vae\{x}.png")
+        noise = gen.generate_noise()
+        img = gen.generate_image_vae(noise)
+        img.save(fr"{file_constants.GENERATED_FOLDER}\vae\{x}.png")
     #gen.generate_image_gan()
 
 def main(models):
@@ -108,7 +110,7 @@ if __name__ == "__main__":
     print("This Program is currently a work in progress - Limited functionality to just generating dataset")
     #initialise()
 
-    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.CONDITIONS_SIZE,(preprop_constants.IMG_SIZE,preprop_constants.IMG_SIZE,3))
+    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM)
     
     main(models=[vae_model])
 

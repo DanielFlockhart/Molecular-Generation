@@ -5,93 +5,78 @@ from tensorflow.keras import layers,Model
 sys.path.insert(0, os.path.abspath('..'))
 
 from training.get_inputs import get_training_data
-
-
 from Constants import preprop_constants
 
-
-
-# Define the sizes of input and output vectors
-input_size = 768
-output_size = 100 * 100  # 100x100 pixels
-
-class Encoder(Model):
-    def __init__(self, input_shape, latent_dim):
-        super(Encoder, self).__init__()
-        self.input_layer = layers.Input(shape=input_shape)
-        # Add your custom encoder layers here
-        # ...
-        self.mean = layers.Dense(latent_dim)
-        self.log_variance = layers.Dense(latent_dim)
-
-    def call(self, x):
-        x = self.input_layer(x)
-        mean = self.mean(x)
-        log_variance = self.log_variance(x)
-        return mean, log_variance
-
-class Decoder(Model):
-    def __init__(self, latent_dim, output_shape):
-        super(Decoder, self).__init__()
-        self.input_layer = layers.Input(shape=(latent_dim,))
-        # Add your custom decoder layers here
-        # ...
-        self.outputs = layers.Dense(output_size, activation='sigmoid')
-        self.reshape = layers.Reshape((100, 100))
-
-    def call(self, z):
-        x = self.input_layer(z)
-        outputs = self.outputs(x)
-        outputs = self.reshape(outputs)
-        return outputs
-
-class Sampling(layers.Layer):
-    def call(self, inputs):
-        mean, log_variance = inputs
-        epsilon = tf.random.normal(shape=tf.shape(mean))
-        return mean + tf.exp(0.5 * log_variance) * epsilon
-
-class VariationalAutoencoder(Model):
-    def __init__(self, encoder, decoder):
+class VariationalAutoencoder(tf.keras.Model):
+    def __init__(self, input_dim, latent_dim, output_dim,temperature=1.0):
         super(VariationalAutoencoder, self).__init__()
-        self.encoder = encoder
-        self.decoder = decoder
+        self.output_dim = output_dim
+        self.temperature = temperature
+        self.encoder = self.build_encoder(input_dim, latent_dim)
+        self.decoder = self.build_decoder(latent_dim, self.output_dim)
 
-    def call(self, x):
-        mean, log_variance = self.encoder(x)
-        z = Sampling()([mean, log_variance])
-        output_layer = self.decoder(z)
-        return output_layer
+    def build_encoder(self, input_dim, latent_dim):
+        '''
+        Building the encoder part of the model
+        '''
+        encoder_inputs = tf.keras.Input(shape=input_dim)
+        x = layers.Dense(512, activation='relu')(encoder_inputs)
+        x = layers.Dense(256, activation='relu')(x)
+        x = layers.Dense(128, activation='relu')(x)
+        z_mean = layers.Dense(latent_dim)(x)
+        z_log_var = layers.Dense(latent_dim)(x)
+        return tf.keras.Model(encoder_inputs, [z_mean, z_log_var], name='encoder')
 
-def vae_loss(targets, predictions, mean, log_variance):
-    # Calculate reconstruction loss
-    reconstruction_loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy(targets, predictions))
-    # Calculate KL divergence loss
-    kl_loss = -0.5 * tf.reduce_mean(1 + log_variance - tf.square(mean) - tf.exp(log_variance))
-    # Combine the losses
-    return reconstruction_loss + kl_loss
+    def build_decoder(self, latent_dim, output_dim):
+        '''
+        Build the decoder part of the model
+        '''
+        # Define the input layer for the latent vector
+        latent_inputs = tf.keras.Input(shape=(latent_dim,), name='latent_inputs')
+        
+        # Reshape the latent vector to match the input shape for the convolutional layers
+        x = layers.Dense(units=output_dim[0]* output_dim[1] * output_dim[2], activation='relu')(latent_inputs)
+        x = layers.Reshape(target_shape=(output_dim[0],output_dim[1],output_dim[2]))(x)
 
-labels,vectors,conditions,targets = get_training_data(1000)
-X_train = vectors
-Y_train = targets
+        x = layers.Conv2DTranspose(filters=64, kernel_size=4, strides=2, padding='same', activation='relu')(x)
+        x = layers.Conv2DTranspose(filters=32, kernel_size=4, strides=2, padding='same', activation='relu')(x)
+        x = layers.Conv2DTranspose(filters=16, kernel_size=3, strides=2, padding='same', activation='relu')(x)
+        x = layers.Conv2DTranspose(filters=8, kernel_size=3, strides=2, padding='same', activation='relu')(x)
 
+        
+        # # Output layer with relu activation instead of sigmoid
+        outputs = layers.Conv2DTranspose(filters=1, kernel_size=4, strides=1, padding='same', activation='relu')(x)
+        outputs = layers.Flatten()(outputs)
+        outputs = layers.Dense(units=output_dim[0]* output_dim[1] * output_dim[2], activation='sigmoid')(outputs)
 
+        # Define the decoder model
+        decoder = tf.keras.Model(latent_inputs, outputs, name='decoder')
+        
+        return decoder
 
-latent_dim = 64  # Adjust this based on your needs
-encoder = Encoder(input_shape=(input_size,), latent_dim=latent_dim)
-decoder = Decoder(latent_dim=latent_dim, output_shape=(100, 100))
-vae = VariationalAutoencoder(encoder, decoder)
-vae.compile(optimizer='adam', loss=lambda targets, predictions: vae_loss(targets, predictions, encoder.output[0], encoder.output[1]))
+    def sampling(self, args):
+        '''
+        Samples from the latent space using the reparameterisation
+        '''
+        z_mean, z_log_var = args
+        epsilon = tf.random.normal(shape=tf.shape(z_mean), mean=0.0, stddev=1.0)
+        scaled_epsilon = epsilon * self.temperature
+        return z_mean + tf.exp(0.5 * z_log_var) * scaled_epsilon
 
-print(len(X_train))
-print(len(Y_train))
-# Train the VAE model
-vae.fit(X_train, Y_train, batch_size=32, epochs=50)
+    def call(self, inputs):
+        '''
+        Runs the model
+        '''
+        z_mean, z_log_var = self.encoder(inputs)
+        z = self.sampling([z_mean, z_log_var])
+        reconstructed = self.decoder(z)
+        return reconstructed
 
-# Generate images using the trained VAE
-# Sample from the latent space and decode the samples to get images
-num_samples = 10
-latent_samples = np.random.normal(size=(num_samples, latent_dim))
-generated_images = decoder.predict(latent_samples)
-
-
+    def compute_loss(self, inputs, targets, reconstructed, sample_weight=None, training=False):
+        '''
+        Calculates the loss of the model
+        '''
+        z_mean, z_log_var = self.encoder(inputs)
+        reconstruction_loss = tf.reduce_mean(tf.square(targets - reconstructed))  # Use MSE for reconstruction loss
+        kl_loss = -0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
+        return reconstruction_loss + kl_loss

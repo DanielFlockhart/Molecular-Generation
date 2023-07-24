@@ -42,16 +42,25 @@ class Generator:
         '''
         Generate a random noise vector for input to network.
         '''
-        return np.random.normal(size=(1, ml_constants.LATENT_DIM))
+        return np.random.normal(size=(ml_constants.LATENT_DIM,)).astype(np.float32)    
     
-    def generate_image_vae(self,noise_vector):
+    def generate_image_vae(self,noise):
         '''
         Generate an image from a noise vector
         '''
-        noise = tf.random.normal(shape=(1, ml_constants.LATENT_DIM), dtype=tf.float32)
+        noise = np.expand_dims(noise, axis=0)
         image = self.model.decoder(noise)
-        image = img_utils.tensor_to_image(image)
-        return image
+        # Reshape the image to 100x100
+        image = tf.reshape(image,ml_constants.OUTPUT_DIM)
+        image = np.squeeze(image)
+
+        # Convert the image to a NumPy array and cast to uint8
+        image = (image * 255).astype(np.uint8)
+        # Create a PIL Image from the NumPy array
+        # Image shape is (100,100,1)
+        pil_image = Image.fromarray(image, mode='L')
+        
+        return pil_image
     
     def generate_image_gan(self,noise_vector):
         return None
