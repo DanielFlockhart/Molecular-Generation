@@ -64,7 +64,12 @@ def train_model(model,name,use_subset=False):
     print(format_title(f"Training Model {name}"))
 
     # Create Default Optimizer
-    optimizer = tf.keras.optimizers.Adam(learning_rate=ml_constants.LRN_RATE)
+
+    # Define the initial learning rate and decay rate
+    initial_learning_rate = ml_constants.LRN_RATE
+    
+    # Initialize the optimizer with the learning rate schedule
+    optimizer = tf.keras.optimizers.Adam(learning_rate=initial_learning_rate)
     # Train Model
     trained_model = train.train_model(model,optimizer)
 

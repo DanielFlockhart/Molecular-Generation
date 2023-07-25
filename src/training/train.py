@@ -7,6 +7,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath('..'))
 from Constants import ml_constants
+from utilities import utils
 from ui.terminal_ui import *
 from training import get_inputs
 

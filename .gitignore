@@ -166,3 +166,6 @@ data/datasets/db1/inputs.csv
 *.html
 *.csv
 *.csv
+*.pb
+*.data-00000-of-00001
+*.index
