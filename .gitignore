@@ -169,3 +169,6 @@ data/datasets/db1/inputs.csv
 *.pb
 *.data-00000-of-00001
 *.index
+*.csv
+*.json
+*.json

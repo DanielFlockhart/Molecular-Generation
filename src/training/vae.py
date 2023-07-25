@@ -22,6 +22,7 @@ class VariationalAutoencoder(tf.keras.Model):
         encoder_inputs = tf.keras.Input(shape=input_dim)
         x = layers.Dense(512, activation='relu',kernel_regularizer=regularizers.l2(0.01))(encoder_inputs)
         x = layers.Dense(256, activation='relu',kernel_regularizer=regularizers.l2(0.01))(x)
+        x = layers.Dense(128, activation='relu',kernel_regularizer=regularizers.l2(0.01))(x)
         z_mean = layers.Dense(latent_dim)(x)
         z_log_var = layers.Dense(latent_dim)(x)
         return tf.keras.Model(encoder_inputs, [z_mean, z_log_var], name='encoder')
@@ -36,14 +37,15 @@ class VariationalAutoencoder(tf.keras.Model):
         # Reshape the latent vector to match the input shape for the convolutional layers
         x = layers.Dense(units=output_dim[0]* output_dim[1] * output_dim[2], activation='relu')(latent_inputs)
         x = layers.Reshape(target_shape=(output_dim[0],output_dim[1],output_dim[2]))(x)
-        x = layers.Conv2DTranspose(64, kernel_size=(3,3), activation='relu', padding='same')(x)
+        x = layers.Conv2DTranspose(128, kernel_size=(4,4), activation='relu', padding='same')(x)
+        x = layers.Conv2DTranspose(64, kernel_size=(4,4), activation='relu', padding='same')(x)
         x = layers.Conv2DTranspose(32, kernel_size=(3,3), activation='relu', padding='same')(x)
         x = layers.Conv2DTranspose(16, kernel_size=(3,3), activation='relu', padding='same')(x)
         #x = layers.UpSampling2D(size=(2,2))(x)
 
         
         # # Output layer with relu activation instead of sigmoid
-        outputs = layers.Conv2DTranspose(filters=3, kernel_size=(3,3), padding='same', activation='relu')(x)
+        outputs = layers.Conv2DTranspose(filters=1, kernel_size=(3,3), padding='same', activation='relu')(x)
         #outputs = layers.UpSampling2D(size=(2,2))(outputs)
         outputs = layers.Flatten()(outputs)
         outputs = layers.Dense(units=output_dim[0] * output_dim[1] * output_dim[2], activation='sigmoid')(outputs)

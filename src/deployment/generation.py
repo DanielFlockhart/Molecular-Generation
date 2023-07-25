@@ -42,13 +42,13 @@ class Generator:
         '''
         Generate a random noise vector for input to network.
         '''
-        return np.random.normal(size=(ml_constants.LATENT_DIM,)).astype(np.float32)    
+        return np.random.normal(size=(ml_constants.LATENT_DIM,)).astype(np.float32)  
     
     def generate_image_vae(self,noise):
         '''
         Generate an image from a noise vector
         '''
-        noise = np.expand_dims(noise, axis=0)
+        noise = np.expand_dims(np.random.normal(size=(ml_constants.LATENT_DIM,)).astype(np.float32), axis=0)
         image = self.model.decoder(noise)
         # Reshape the image to 100x100
         image = tf.reshape(image,ml_constants.OUTPUT_DIM)
