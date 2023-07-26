@@ -31,22 +31,9 @@ def train_model(model,optimizer):
     
     # Need to Make sure the x_train and y_train are the same length and a labelled correctly
     print(format_title("Compiling Model"))
-    labels,vectors,conditions,targets = get_training_data()
+    labels,vectors,conditions,targets = get_training_data(ml_constants.TRAIN_SUBSET_COUNT)
     model.compile(optimizer=optimizer,loss=model.compute_loss)
     print(format_title("Training Model"))
-    # # Train the model with the defined callback
-    
-    # width = 100  # Width of the image
-    # height = 100  # Height of the image
-
-    # # Example 1D array of pixel values (grayscale image)
-    # pixels = np.array(targets[100])
-    # image = pixels.reshape((height, width))
-    # plt.imshow(image, cmap='gray')  # If it's a grayscale image
-    # plt.axis('off')  # Remove axes ticks and labels
-    # plt.show()
-
-    # sys.exit()
     model.fit(np.array(vectors), np.array(targets), batch_size=ml_constants.BATCH_SIZE, 
             epochs=ml_constants.EPOCHS)
 

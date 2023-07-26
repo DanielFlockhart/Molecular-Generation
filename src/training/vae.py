@@ -8,7 +8,7 @@ from training.get_inputs import get_training_data
 from Constants import preprop_constants
 
 class VariationalAutoencoder(tf.keras.Model):
-    def __init__(self, input_dim, latent_dim, output_dim,temperature=1.0):
+    def __init__(self, input_dim, latent_dim, output_dim,temperature=0.5):
         super(VariationalAutoencoder, self).__init__()
         self.output_dim = output_dim
         self.temperature = temperature
