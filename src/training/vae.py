@@ -5,10 +5,10 @@ from tensorflow.keras import layers,Model,regularizers
 sys.path.insert(0, os.path.abspath('..'))
 
 from training.get_inputs import get_training_data
-from Constants import preprop_constants
-
+from Constants import preprop_constants,ml_constants
+from PIL import Image
 class VariationalAutoencoder(tf.keras.Model):
-    def __init__(self, input_dim, latent_dim, output_dim,temperature=0.5):
+    def __init__(self, input_dim, latent_dim, output_dim,temperature=1.0):
         super(VariationalAutoencoder, self).__init__()
         self.output_dim = output_dim
         self.temperature = temperature
@@ -23,6 +23,7 @@ class VariationalAutoencoder(tf.keras.Model):
         x = layers.Dense(512, activation='relu',kernel_regularizer=regularizers.l2(0.01))(encoder_inputs)
         x = layers.Dense(256, activation='relu',kernel_regularizer=regularizers.l2(0.01))(x)
         x = layers.Dense(128, activation='relu',kernel_regularizer=regularizers.l2(0.01))(x)
+
         z_mean = layers.Dense(latent_dim)(x)
         z_log_var = layers.Dense(latent_dim)(x)
         return tf.keras.Model(encoder_inputs, [z_mean, z_log_var], name='encoder')
@@ -39,8 +40,8 @@ class VariationalAutoencoder(tf.keras.Model):
         x = layers.Reshape(target_shape=(output_dim[0],output_dim[1],output_dim[2]))(x)
         x = layers.Conv2DTranspose(128, kernel_size=(4,4), activation='relu', padding='same')(x)
         x = layers.Conv2DTranspose(64, kernel_size=(4,4), activation='relu', padding='same')(x)
-        x = layers.Conv2DTranspose(32, kernel_size=(3,3), activation='relu', padding='same')(x)
-        x = layers.Conv2DTranspose(16, kernel_size=(3,3), activation='relu', padding='same')(x)
+        x = layers.Conv2DTranspose(32, kernel_size=(4,4), activation='relu', padding='same')(x)
+
         #x = layers.UpSampling2D(size=(2,2))(x)
 
         
@@ -77,11 +78,16 @@ class VariationalAutoencoder(tf.keras.Model):
     def compute_loss(self, inputs, targets, reconstructed, sample_weight=None, training=False):
         '''
         Calculates the loss of the model
+
+        IT HAS TO DO WITH THE LOSS FUNCTION 
         '''
         z_mean, z_log_var = self.encoder(inputs)
-        reconstruction_loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy(targets, reconstructed))
+
+        reconstruction_loss = tf.reduce_mean(tf.keras.losses.mean_squared_error(targets, reconstructed))
+        tf.print(" - reconstruction_loss:", reconstruction_loss)
         kl_loss = -0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
         loss = reconstruction_loss + kl_loss
+
         #tf.print(" - total_loss:", loss, " - Learning Rate:", self.optimizer.lr)
 
         return loss

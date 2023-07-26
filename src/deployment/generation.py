@@ -48,7 +48,9 @@ class Generator:
         '''
         Generate an image from a noise vector
         '''
-        noise = np.expand_dims(np.random.normal(size=(ml_constants.LATENT_DIM,)).astype(np.float32), axis=0)
+        noise = np.expand_dims(self.generate_noise(), axis=0)
+        #noise = np.expand_dims(np.array([-1]).astype(np.float32), axis=0)
+
         image = self.model.decoder(noise)
         # Reshape the image to 100x100
         image = tf.reshape(image,ml_constants.OUTPUT_DIM)
@@ -59,7 +61,7 @@ class Generator:
         # Create a PIL Image from the NumPy array
         # Image shape is (100,100,1)
         pil_image = Image.fromarray(image, mode='L')
-        
+
         return pil_image
     
     def generate_image_gan(self,noise_vector):
