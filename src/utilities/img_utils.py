@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from PIL import Image
-import os,sys,cv2
+import os,sys,cv2,time
 from tqdm import tqdm
 sys.path.insert(0, os.path.abspath('..'))
 from Constants import ui_constants,preprop_constants,file_constants
@@ -52,10 +52,10 @@ def recolour(folder,threshold=245,file_type='png'):
             image = Image.open(image_path)
 
             # Convert the image to grayscale
-            image = image.convert('L')
+            #image = image.convert('L')
 
             # Convert the grayscale image to binary black and white
-            image = image.point(lambda x: 0 if x < threshold else 255, 1)
+            #image = image.point(lambda x: 0 if x < threshold else 255, 1)
 
             # Save the converted image (overwrite the original)
             image.save(f"{folder}\{file_name}.png")
@@ -116,7 +116,6 @@ def load_image(id):
     # Apply binary thresholding
     #ret, image = cv2.threshold(image, 225, 255, cv2.THRESH_BINARY)
     
-
     # Normalize pixel values between 0 and 1
     image = image.astype(np.float32) / 255.0
     return image.reshape(-1),filename[:-4]

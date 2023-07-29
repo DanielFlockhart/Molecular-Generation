@@ -12,30 +12,9 @@ from ui.terminal_ui import *
 from training import get_inputs
 from tensorflow.keras.callbacks import Callback
 from PIL import Image
-
-class GenerateImageCallback(Callback):
-    def __init__(self, vae_model, num_samples=1):
-        self.vae_model = vae_model
-        self.num_samples = num_samples
-
-    def on_epoch_end(self, epoch, logs=None):
-        # Function to generate and visualize images
-        def generate_images():
-            random_latent_vectors = np.random.normal(size=(self.num_samples, 128))
-            generated_images = self.vae_model.decoder(random_latent_vectors)
-
-            return generated_images
-
-        print("\nGenerating Example Image after Epoch", epoch+1)
-        generated_images = generate_images()
-        for i in range(self.num_samples):
-            image = generated_images[i]
-            image = tf.reshape(image,ml_constants.OUTPUT_DIM)
-            image = np.squeeze(image)
-            image = (image * 255).astype(np.uint8)
-            pil_image = Image.fromarray(image, mode='L')
-            pil_image.show()
-            pil_image.save("generated_image.png")
+import torch
+import torch.nn as nn
+import torch.optim as optim
 
 
 def train_model(model,optimizer):
@@ -59,28 +38,96 @@ def train_model(model,optimizer):
     labels,vectors,conditions,targets = get_training_data(ml_constants.TRAIN_SUBSET_COUNT)
     model.compile(optimizer=optimizer,loss=model.compute_loss)
     print(format_title("Training Model"))
-    generate_image_callback = GenerateImageCallback(model, num_samples=1)
 
-    # Train the model with the callback
-    model.fit(
-        np.array(vectors),
-        np.array(targets),
-        batch_size=ml_constants.BATCH_SIZE,
-        epochs=ml_constants.EPOCHS,
-        #callbacks=[generate_image_callback]
-    )
+    # # Train the model with the callback
+    # model.fit(
+    #     np.array(vectors),
+    #     np.array(targets),
+    #     batch_size=ml_constants.BATCH_SIZE,
+    #     epochs=ml_constants.EPOCHS,
+    # )
+    @tf.function
+    def train_step(inputs_batch, targets_batch):
+        with tf.GradientTape() as tape:
+            # Reshape the inputs_batch to have shape (batch_size, 768)
+            inputs_batch = tf.reshape(inputs_batch, (tf.shape(inputs_batch)[0], 768))
 
-    # num_samples = 10
-    # latent_samples = np.random.normal(size=(num_samples, latent_dim))
-    # generated_images = decoder.predict(latent_samples)
-    # generated_images = generated_images.reshape(num_samples, 100, 100)
+            # Forward pass through the model
+            reconstructed = model(inputs_batch, training=True)
 
+            # Compute the loss
+            loss = model.compute_loss(inputs_batch, targets_batch, reconstructed)
 
+        # Compute gradients and update weights
+        gradients = tape.gradient(loss, model.trainable_variables)
+        optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+        return loss
 
-    # Test by Printing output of reconstructed image
-    # Test by setting latent vector to 1
-    # Could be an issue that the training data just isnt enough, and batch size int enough to approximate it just generalises
+    # Training loop
+    for epoch in range(ml_constants.EPOCHS):
+        total_loss = 0.0
+        num_batches = len(vectors) // ml_constants.BATCH_SIZE
+        for step in range(num_batches):
+            start_idx = step * ml_constants.BATCH_SIZE
+            end_idx = (step + 1) * ml_constants.BATCH_SIZE
+            inputs_batch = vectors[start_idx:end_idx]
+            targets_batch = targets[start_idx:end_idx]
+
+            loss = train_step(inputs_batch, targets_batch)
+            total_loss += loss
+
+        average_loss = total_loss / num_batches
+        print(f"Epoch {epoch + 1}/{ml_constants.EPOCHS}, Loss: {average_loss:.4f}")
+
     return model
+
+def train_model2(model,optimizer):
+    print(format_title("Compiling Model"))
+    labels,vectors,conditions,targets = get_training_data(ml_constants.TRAIN_SUBSET_COUNT)
+    # Define the loss function
+    loss_function = nn.BCELoss()  # Binary Cross Entropy loss for reconstruction
+
+    # Define the optimizer
+    optimizer = optim.Adam(model.parameters())
+
+    # Define the training data and targets (vectors and targets) as NumPy arrays
+
+    # Convert the data and targets to PyTorch tensors
+    train_data = torch.from_numpy(np.array(vectors)).float()
+    train_targets = torch.from_numpy(np.array(targets)).float()
+
+    # Training loop
+    print(format_title("Training Model"))
+    num_samples = 1
+    for epoch in range(ml_constants.EPOCHS):
+        model.train()  # Set the model to training mode
+        total_loss = 0.0
+
+        # Loop through batches
+        for batch_start in range(0, len(train_data), ml_constants.BATCH_SIZE):
+            batch_data = train_data[batch_start:batch_start + ml_constants.BATCH_SIZE]
+            batch_targets = train_targets[batch_start:batch_start + ml_constants.BATCH_SIZE]
+
+            # Zero the gradients
+            optimizer.zero_grad()
+
+            # Forward pass
+            reconstructed = model(batch_data)
+
+            # Calculate the loss
+            loss = model.compute_loss(batch_data, batch_targets, reconstructed)
+            total_loss += loss.item()
+
+            # Backpropagation and optimization
+            loss.backward()
+            optimizer.step()
+
+        # Calculate and print the average loss for the epoch
+        avg_loss = total_loss / (len(train_data) / ml_constants.BATCH_SIZE)
+        print(f"Epoch [{epoch+1}/{ml_constants.EPOCHS}], Loss: {avg_loss:.4f}")
+
+    # The model is now trained.
+
 
 
 def save_model(model,name):
@@ -89,11 +136,3 @@ def save_model(model,name):
     '''
     
     tf.saved_model.save(model,fr'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Ai-Chem-Intership\data\models\{name}')
-
-
-
-class Training:
-    def __init__(self):
-        pass
-    def create(self):
-        pass

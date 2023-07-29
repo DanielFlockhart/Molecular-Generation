@@ -3,14 +3,17 @@ from PIL import *
 import numpy as np
 import tensorflow as tf
 from preprocessing import preprocessing
-from training import train,vae
+from training import train,vae,vae2
 from postprocessing import *
 from deployment import *
 from utilities import utils, file_utils, img_utils
 from Constants import ui_constants, file_constants, preprop_constants, ml_constants
 from ui.terminal_ui import *
 from ui.dialogue import *
+sys.path.insert(0, os.path.abspath('..'))
 
+sys.path.insert(0, os.path.abspath('../training'))
+from training.vae import *
 from deployment import generation
 def initialise():
     '''
@@ -71,12 +74,13 @@ def train_model(model,name,use_subset=False):
     # Initialize the optimizer with the learning rate schedule
     optimizer = tf.keras.optimizers.Adam(learning_rate=initial_learning_rate)
     # Train Model
+    model.training = True  # Set training to True before training
     trained_model = train.train_model(model,optimizer)
 
     # Save Model
     train.save_model(trained_model,name)
 
-def generate_molecule():
+def generate_molecule_from_noise():
     '''
     Generates a new molecule with a previously trained model of either VAE or GAN
     '''
@@ -87,6 +91,17 @@ def generate_molecule():
         img = gen.generate_image_vae(noise)
         img.save(fr"{file_constants.GENERATED_FOLDER}\vae\{x}.png")
     #gen.generate_image_gan()
+
+def generate_molecules_from_vae():
+    labels,vectors,conditions,targets = get_training_data(ml_constants.TRAIN_SUBSET_COUNT)
+    print(format_title("Generating Molecule"))
+    gen = generation.Generator(fr"{file_constants.MODELS_FOLDER}\vae")
+    
+    for x in range(len(vectors)):
+        img = gen.generate_through_vae(vectors[x])
+        img.save(fr"{file_constants.GENERATED_FOLDER}\vae\{x}.png")
+    #img = gen.generate_through_vae(vectors[1],1)
+    #img.save(fr"{file_constants.GENERATED_FOLDER}\vae\1.png")
 
 def main(models):
     '''
@@ -106,7 +121,7 @@ def main(models):
             # Will add in option to choose model type later
             train_model(models[0],"vae",use_subset=False)
         elif user_choice == '2':
-            generate_molecule()
+            generate_molecules_from_vae()
     else:
         print("Choice not confirmed. Exiting...")
 
@@ -116,7 +131,7 @@ if __name__ == "__main__":
     #initialise()
 
     vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM)
-    
+    vae2_model = vae2.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM)
     main(models=[vae_model])
 
 
