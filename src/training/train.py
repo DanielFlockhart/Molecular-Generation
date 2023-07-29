@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import sys
 import os
 sys.path.insert(0, os.path.abspath('..'))
-from Constants import ml_constants
+from Constants import ml_constants,ui_constants
 from utilities import utils
 from ui.terminal_ui import *
 from training import get_inputs
@@ -15,7 +15,7 @@ from PIL import Image
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
+from tqdm import tqdm
 
 def train_model(model,optimizer):
     ''' 
@@ -64,7 +64,7 @@ def train_model(model,optimizer):
         return loss
 
     # Training loop
-    for epoch in range(ml_constants.EPOCHS):
+    for epoch in tqdm(range(ml_constants.EPOCHS), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'): 
         total_loss = 0.0
         num_batches = len(vectors) // ml_constants.BATCH_SIZE
         for step in range(num_batches):
@@ -75,59 +75,9 @@ def train_model(model,optimizer):
 
             loss = train_step(inputs_batch, targets_batch)
             total_loss += loss
-
         average_loss = total_loss / num_batches
-        print(f"Epoch {epoch + 1}/{ml_constants.EPOCHS}, Loss: {average_loss:.4f}")
-
+        print(f"Loss: {average_loss:.4f}")
     return model
-
-def train_model2(model,optimizer):
-    print(format_title("Compiling Model"))
-    labels,vectors,conditions,targets = get_training_data(ml_constants.TRAIN_SUBSET_COUNT)
-    # Define the loss function
-    loss_function = nn.BCELoss()  # Binary Cross Entropy loss for reconstruction
-
-    # Define the optimizer
-    optimizer = optim.Adam(model.parameters())
-
-    # Define the training data and targets (vectors and targets) as NumPy arrays
-
-    # Convert the data and targets to PyTorch tensors
-    train_data = torch.from_numpy(np.array(vectors)).float()
-    train_targets = torch.from_numpy(np.array(targets)).float()
-
-    # Training loop
-    print(format_title("Training Model"))
-    num_samples = 1
-    for epoch in range(ml_constants.EPOCHS):
-        model.train()  # Set the model to training mode
-        total_loss = 0.0
-
-        # Loop through batches
-        for batch_start in range(0, len(train_data), ml_constants.BATCH_SIZE):
-            batch_data = train_data[batch_start:batch_start + ml_constants.BATCH_SIZE]
-            batch_targets = train_targets[batch_start:batch_start + ml_constants.BATCH_SIZE]
-
-            # Zero the gradients
-            optimizer.zero_grad()
-
-            # Forward pass
-            reconstructed = model(batch_data)
-
-            # Calculate the loss
-            loss = model.compute_loss(batch_data, batch_targets, reconstructed)
-            total_loss += loss.item()
-
-            # Backpropagation and optimization
-            loss.backward()
-            optimizer.step()
-
-        # Calculate and print the average loss for the epoch
-        avg_loss = total_loss / (len(train_data) / ml_constants.BATCH_SIZE)
-        print(f"Epoch [{epoch+1}/{ml_constants.EPOCHS}], Loss: {avg_loss:.4f}")
-
-    # The model is now trained.
-
 
 
 def save_model(model,name):

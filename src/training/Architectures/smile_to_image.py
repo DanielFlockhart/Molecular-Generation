@@ -78,7 +78,7 @@ class VariationalAutoencoder(tf.keras.Model):
             z = self.sampling([z_mean, z_log_var])
         else:
             z = z_mean
-        reconstructed = self.decoder(z_mean) # Editted so its not variational for testing
+        reconstructed = self.decoder(z) # Editted so its not variational for testing
 
 
 

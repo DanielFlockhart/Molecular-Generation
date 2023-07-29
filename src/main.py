@@ -3,7 +3,7 @@ from PIL import *
 import numpy as np
 import tensorflow as tf
 from preprocessing import preprocessing
-from training import train,vae,vae2
+from training import train,vae
 from postprocessing import *
 from deployment import *
 from utilities import utils, file_utils, img_utils
@@ -45,7 +45,7 @@ def preprocess_data():
     
     processor.process(subset=False)
 
-def train_model(model,name,use_subset=False):
+def train_model(model,name):
     '''
     Main training loop
 
@@ -86,7 +86,7 @@ def generate_molecule_from_noise():
     '''
     print(format_title("Generating Molecule"))
     gen = generation.Generator(fr"{file_constants.MODELS_FOLDER}\vae")
-    for x in range(100):
+    for x in range(1000):
         noise = gen.generate_noise()
         img = gen.generate_image_vae(noise)
         img.save(fr"{file_constants.GENERATED_FOLDER}\vae\{x}.png")
@@ -119,9 +119,9 @@ def main(models):
     if confirmed:
         if user_choice == '1':
             # Will add in option to choose model type later
-            train_model(models[0],"vae",use_subset=False)
+            train_model(models[0],"vae")
         elif user_choice == '2':
-            generate_molecules_from_vae()
+            generate_molecule_from_noise()
     else:
         print("Choice not confirmed. Exiting...")
 
@@ -131,7 +131,6 @@ if __name__ == "__main__":
     #initialise()
 
     vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM)
-    vae2_model = vae2.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM)
     main(models=[vae_model])
 
 
