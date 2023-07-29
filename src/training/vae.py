@@ -81,7 +81,7 @@ class VariationalAutoencoder(tf.keras.Model):
             z = self.sampling([z_mean, z_log_var])
         else:
             z = z_mean
-        reconstructed = self.decoder(z)
+        reconstructed = self.decoder(z_mean) # Editted so its not variational for testing
 
 
 
@@ -103,9 +103,9 @@ class VariationalAutoencoder(tf.keras.Model):
         # tf.print("\n")
         # tf.print(" - inputs:", tf.reduce_sum(inputs[1]))
         # tf.print(" - targets:", tf.reduce_sum(targets[1]))
-        num = random.randint(0,len(targets)-1)
-        self.show_image(targets[num],"target")
-        self.show_image(reconstructed[num],"reconstructed")
+        #num = random.randint(0,len(targets)-1)
+        #self.show_image(targets[num],"target")
+        #self.show_image(reconstructed[num],"reconstructed")
 
         bce_loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy(targets, reconstructed))
 
@@ -123,7 +123,7 @@ class VariationalAutoencoder(tf.keras.Model):
         reconstruction_loss =  bce_loss
 
 
-        tf.print(" - total_loss:", reconstruction_loss)
+        #tf.print(" - total_loss:", reconstruction_loss)
         return reconstruction_loss
     
     def show_image(self, tensor,name):
