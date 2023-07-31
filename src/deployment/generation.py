@@ -18,9 +18,9 @@ sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('../training'))
 from training.vae import *
 
-
 from Constants import ml_constants
 from utilities import img_utils
+
 
 class Generator:
     def __init__(self,model_path):
@@ -32,7 +32,9 @@ class Generator:
         model_path : str
             The path to the model
         '''
-        self.model = tf.saved_model.load(model_path)
+        with tf.keras.utils.custom_object_scope({'VariationalAutoencoder': VariationalAutoencoder}):
+            self.model = tf.keras.models.load_model(model_path)
+
         self.model.training = False
     def build_model(self):
         '''
@@ -40,44 +42,41 @@ class Generator:
         '''
         pass
 
-    def generate_noise(self):
+    def generate_noise(self,x=ml_constants.LATENT_DIM+12):
         '''
         Generate a random noise vector for input to network.
         '''
         np.random.seed(random.randint(0,1000))
-        return np.random.uniform(size=(ml_constants.LATENT_DIM,)).astype(np.float32)  
+        return np.random.uniform(size=(x)).astype(np.float32)  
     
-    def generate_image_vae(self,noise):
+    def generate_image_vae(self,conditions=None):
         '''
         Generate an image from a noise vector
         '''
         noise = np.expand_dims(self.generate_noise(), axis=0)
-        
-        image = self.model.decoder(noise)
-        #noise = np.expand_dims(np.array([-1]).astype(np.float32), axis=0)
+        if conditions is not None:
+            conditions = np.expand_dims(conditions, axis=0)
+            noise = tf.concat([noise,conditions],axis=1)
 
-        #image = self.model.decoder(noise)
-        # Reshape the image to 100x100
+        image = self.model.decoder(noise)
+
         image = tf.reshape(image,ml_constants.OUTPUT_DIM)
         image = np.squeeze(image)
 
-        # Convert the image to a NumPy array and cast to uint8
         image = (image * 255).astype(np.uint8)
-        # Create a PIL Image from the NumPy array
-        # Image shape is (100,100,1)
         pil_image = Image.fromarray(image, mode='L')
 
         return pil_image
 
-    def generate_through_vae(self,vector):
-        #ector = np.expand_dims(vector.astype(np.float32), axis=0)
+    def generate_through_vae(self, vector, condition):
         vector = np.expand_dims(vector, axis=0)
+        condition = np.expand_dims(condition, axis=0)
+        vector = tf.concat([vector, tf.cast(condition, tf.float32)], axis=1)
 
-        # Convert the vector to a tensor
-        vector = tf.convert_to_tensor(vector, dtype=tf.float32)
+        # Call the decoder to generate the image
+        image = self.model.predict([vector,condition])
 
-        # Call the model with the reshaped vector
-        image = self.model(vector)
+
         image = tf.reshape(image, ml_constants.OUTPUT_DIM)
         image = np.squeeze(image)
 

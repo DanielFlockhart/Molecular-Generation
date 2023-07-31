@@ -37,23 +37,18 @@ def train_model(model,optimizer):
     print(format_title("Compiling Model"))
     labels,vectors,conditions,targets = get_training_data(ml_constants.TRAIN_SUBSET_COUNT)
     model.compile(optimizer=optimizer,loss=model.compute_loss)
+    
     print(format_title("Training Model"))
 
-    # # Train the model with the callback
-    # model.fit(
-    #     np.array(vectors),
-    #     np.array(targets),
-    #     batch_size=ml_constants.BATCH_SIZE,
-    #     epochs=ml_constants.EPOCHS,
-    # )
     @tf.function
-    def train_step(inputs_batch, targets_batch):
+    def train_step(inputs_batch,conditions_batch, targets_batch):
         with tf.GradientTape() as tape:
             # Reshape the inputs_batch to have shape (batch_size, 768)
-            inputs_batch = tf.reshape(inputs_batch, (tf.shape(inputs_batch)[0], 768))
+            combined_batch = tf.concat([inputs_batch, conditions_batch], axis=1)
+            inputs_batch = tf.reshape(combined_batch, (tf.shape(inputs_batch)[0], ml_constants.INPUT_SIZE +ml_constants.CONDITIONS_SIZE))
 
             # Forward pass through the model
-            reconstructed = model(inputs_batch, training=True)
+            reconstructed = model(inputs_batch,conditions_batch, training=True)
 
             # Compute the loss
             loss = model.compute_loss(inputs_batch, targets_batch, reconstructed)
@@ -71,9 +66,10 @@ def train_model(model,optimizer):
             start_idx = step * ml_constants.BATCH_SIZE
             end_idx = (step + 1) * ml_constants.BATCH_SIZE
             inputs_batch = vectors[start_idx:end_idx]
+            conditions_batch = conditions[start_idx:end_idx]
             targets_batch = targets[start_idx:end_idx]
 
-            loss = train_step(inputs_batch, targets_batch)
+            loss = train_step(inputs_batch,conditions_batch, targets_batch)
             total_loss += loss
         average_loss = total_loss / num_batches
         print(f"Loss: {average_loss:.4f}")
@@ -84,5 +80,15 @@ def save_model(model,name):
     '''
     Saves a trained model
     '''
-    
-    tf.saved_model.save(model,fr'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Ai-Chem-Intership\data\models\{name}')
+    # Save the subclassed model's weights (this is required for HDF5 format)
+    model_weights_path = fr'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Ai-Chem-Intership\data\models\{name}\weights.h5'
+    model.save_weights(model_weights_path)
+
+    # Convert the subclassed model to a functional model using the same input tensors
+    inputs = model.encoder.inputs[0]
+    condition_vector = tf.keras.Input(shape=(ml_constants.CONDITIONS_SIZE,))
+    outputs = model(inputs, condition_vector)
+    vae_functional_model = tf.keras.Model(inputs=[inputs, condition_vector], outputs=outputs)
+
+    # Save the functional model in the HDF5 format
+    vae_functional_model.save(fr'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Ai-Chem-Intership\data\models\{name}\model.h5')

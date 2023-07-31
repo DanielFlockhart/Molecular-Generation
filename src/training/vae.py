@@ -10,12 +10,13 @@ from PIL import Image
 
 import matplotlib.pyplot as plt
 class VariationalAutoencoder(tf.keras.Model):
-    def __init__(self, input_dim, latent_dim, output_dim,temperature=1):
+    def __init__(self, input_dim, latent_dim, output_dim,conditions_size,temperature=1):
         super(VariationalAutoencoder, self).__init__()
         self.output_dim = output_dim
         self.temperature = temperature
-        self.encoder = self.build_encoder(input_dim, latent_dim)
-        self.decoder = self.build_decoder(latent_dim, self.output_dim)
+        self.condition_size = conditions_size
+        self.encoder = self.build_encoder(input_dim+self.condition_size, latent_dim)
+        self.decoder = self.build_decoder(latent_dim+self.condition_size, self.output_dim)
         self.training = True  # Set the training attribute to True initially
     def build_encoder(self, input_dim, latent_dim):
         '''
@@ -28,7 +29,6 @@ class VariationalAutoencoder(tf.keras.Model):
         x = layers.BatchNormalization()(x)  # Add batch normalization
         x = layers.Dense(256, activation="relu")(x)
         x = layers.BatchNormalization()(x)  # Add batch normalization
-
         z_mean = layers.Dense(latent_dim, activation="relu")(encoder_inputs)
         z_log_var = layers.Dense(latent_dim, activation="relu")(encoder_inputs)
         return tf.keras.Model(encoder_inputs,[z_mean,z_log_var], name='encoder')#[z_mean, z_log_var], name='encoder')
@@ -66,7 +66,7 @@ class VariationalAutoencoder(tf.keras.Model):
         res = z_mean + tf.exp(0.5 * z_log_var) #* scaled_epsilon
         return res
 
-    def call(self, inputs):
+    def call(self, inputs,condition_vector):
         '''
         Runs the model
 
@@ -78,7 +78,8 @@ class VariationalAutoencoder(tf.keras.Model):
             z = self.sampling([z_mean, z_log_var])
         else:
             z = z_mean
-        reconstructed = self.decoder(z_mean) # Editted so its not variational for testing
+        z_condition = tf.concat([z, condition_vector], axis=1)
+        reconstructed = self.decoder(z_condition) # Editted so its not variational for testing
 
 
 
@@ -92,30 +93,18 @@ class VariationalAutoencoder(tf.keras.Model):
         # Calculate the SSIM loss between the targets and the reconstructed images
         #ssim_loss = tf.reduce_mean(1 - tf.image.ssim(targets, reconstructed, max_val=1.0))
 
-        # Print the summation of values in targets
-        # tf.print("\n")
-        # tf.print(" - inputs:", tf.reduce_sum(inputs[0]))
-        # tf.print(" - targets:", tf.reduce_sum(targets[0]))
-
-        # tf.print("\n")
-        # tf.print(" - inputs:", tf.reduce_sum(inputs[1]))
-        # tf.print(" - targets:", tf.reduce_sum(targets[1]))
-        #num = random.randint(0,len(targets)-1)
-        #self.show_image(targets[num],"target")
-        #self.show_image(reconstructed[num],"reconstructed")
-
         bce_loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy(targets, reconstructed))
 
-        mse_loss = tf.reduce_mean(tf.keras.losses.mean_squared_error(targets, reconstructed))
+        # mse_loss = tf.reduce_mean(tf.keras.losses.mean_squared_error(targets, reconstructed))
 
         # Compute the mean SSIM loss over the batch
 
         # You can also include the KL divergence loss if you want
-        z_mean, z_log_var = self.encoder(inputs)
+        # z_mean, z_log_var = self.encoder(inputs)
 
         
-        kl_loss = -0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
-        kl_weighted_loss = 0.1 * kl_loss
+        # kl_loss = -0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
+        # kl_weighted_loss = 0.1 * kl_loss
 
         reconstruction_loss =  bce_loss
 
@@ -134,7 +123,7 @@ class VariationalAutoencoder(tf.keras.Model):
             tensor = tensor  # Use the tensor as is
 
         def show_image_from_np(tensor_np):
-            tensor_reshaped = tf.reshape(tensor_np, (100, 100))
+            tensor_reshaped = tf.reshape(tensor_np, (preprop_constants.IMG_SIZE, (preprop_constants.IMG_SIZE)))
             # Convert the tensor to a NumPy array
             tensor_rescaled = tf.cast(tensor_reshaped * 255, tf.uint8)
 
@@ -144,10 +133,3 @@ class VariationalAutoencoder(tf.keras.Model):
 
         # Use tf.py_function to call the Python function within the graph function
         tf.py_function(show_image_from_np, [tensor], [])
-
-
-
-
-
-        
-        

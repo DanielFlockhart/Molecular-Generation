@@ -80,28 +80,20 @@ def train_model(model,name):
     # Save Model
     train.save_model(trained_model,name)
 
-def generate_molecule_from_noise():
+def generate_molecule_from_noise(gen,vectors,conditions):
     '''
     Generates a new molecule with a previously trained model of either VAE or GAN
     '''
-    print(format_title("Generating Molecule"))
-    gen = generation.Generator(fr"{file_constants.MODELS_FOLDER}\vae")
     for x in range(1000):
-        noise = gen.generate_noise()
-        img = gen.generate_image_vae(noise)
+        img = gen.generate_image_vae()
         img.save(fr"{file_constants.GENERATED_FOLDER}\vae\{x}.png")
     #gen.generate_image_gan()
 
-def generate_molecules_from_vae():
-    labels,vectors,conditions,targets = get_training_data(ml_constants.TRAIN_SUBSET_COUNT)
-    print(format_title("Generating Molecule"))
-    gen = generation.Generator(fr"{file_constants.MODELS_FOLDER}\vae")
+def generate_molecules_from_vae(gen,vectors,conditions):
     
     for x in range(len(vectors)):
-        img = gen.generate_through_vae(vectors[x])
+        img = gen.generate_through_vae(np.array(vectors[x]),np.array(conditions[x]))
         img.save(fr"{file_constants.GENERATED_FOLDER}\vae\{x}.png")
-    #img = gen.generate_through_vae(vectors[1],1)
-    #img.save(fr"{file_constants.GENERATED_FOLDER}\vae\1.png")
 
 def main(models):
     '''
@@ -119,9 +111,15 @@ def main(models):
     if confirmed:
         if user_choice == '1':
             # Will add in option to choose model type later
+            vae_model.training = True
             train_model(models[0],"vae")
+
         elif user_choice == '2':
-            generate_molecule_from_noise()
+            vae_model.training = False
+            labels,vectors,conditions,targets = get_training_data(ml_constants.TRAIN_SUBSET_COUNT)
+            print(format_title("Generating Molecule"))
+            gen = generation.Generator(fr"{file_constants.MODELS_FOLDER}\vae\model.h5")
+            generate_molecules_from_vae(gen,vectors,conditions)
     else:
         print("Choice not confirmed. Exiting...")
 
@@ -130,7 +128,7 @@ if __name__ == "__main__":
     print("This Program is currently a work in progress - Limited functionality to just generating dataset")
     #initialise()
 
-    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM)
+    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
     main(models=[vae_model])
 
 

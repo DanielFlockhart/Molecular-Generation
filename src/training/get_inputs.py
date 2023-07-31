@@ -10,6 +10,7 @@ from tqdm import tqdm
 # Gets the inputs for the training data
 def numpy_array_converter(s):
     return np.fromstring(s[1:-1], sep=' ')
+
 def get_inputs(ID,df):
     '''
     Gets the inputs for the training data
