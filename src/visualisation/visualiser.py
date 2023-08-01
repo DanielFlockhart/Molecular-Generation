@@ -36,12 +36,10 @@ class Visualiser:
             
             # Create a tqdm object to display progress bar
             tqdm_instance = tqdm(total=num_rows, desc="Reading CSV data",bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green')
-            
             for row in reader:
                 vectors.append(np.array(ast.literal_eval(row['vector'])))
                 labels.append(row['SMILES'])
                 tqdm_instance.update(1)  # Update progress bar
-                
         tqdm_instance.close()  # Close tqdm after the loop
 
         return np.array(vectors), labels
@@ -100,7 +98,7 @@ class Visualiser:
         print(format_title("Plotting Data"))
 
         # Create a DataFrame with the t-SNE results and labels
-        df = pd.DataFrame(X_model, columns=["Component 1", "Component 2"])
+        df = pd.DataFrame(X_model, columns=["Component 1", "Component 2","Component 3"])
         df["Label"] = self.labels
         df["Cluster"] = cluster_labels
 
@@ -109,10 +107,10 @@ class Visualiser:
             specific_df = df[df["Cluster"] == specific_cluster]
 
             # Create an interactive scatter plot with colors for the specific cluster and hover labels using Plotly
-            fig = px.scatter(specific_df, x="Component 1", y="Component 2", color="Cluster", hover_data=["Label"])
+            fig = px.scatter_3d(specific_df, x="Component 1", y="Component 2",z="Component 3", color="Cluster", hover_data=["Label"])
         else:
             # Create an interactive scatter plot with colors for clusters and hover labels using Plotly
-            fig = px.scatter(df, x="Component 1", y="Component 2", color="Cluster", hover_data=["Label"])
+            fig = px.scatter_3d(df, x="Component 1", y="Component 2",z="Component 3", color="Cluster", hover_data=["Label"])
 
         # Show the plot
         fig.show()
@@ -128,8 +126,15 @@ class Visualiser:
         else:
             plot.write_html(f"{file_constants.VISUALISATIONS_FOLDER}\\graphs\\{model_type}\\{clustering_type}\\{clusters}.html")
 
-
-clusters = 100
+    def load_html(self,name):
+        '''
+        Load HTML File of Graph automatically
+        '''
+        return open(f"{file_constants.VISUALISATIONS_FOLDER}\\graphs\\{name}.html")
+    
+    def load_html_specific(self,model_type,clustering_type,clusters,specific):
+        pass
+clusters = 400
 
 if __name__ == "__main__":
     dataset = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Ai-Chem-Intership\data\datasets\db1\inputs.csv"
@@ -143,6 +148,11 @@ if __name__ == "__main__":
     #fig_pca = visualiser.plot(X_pca,cluster_labels_kmeans)
 
     visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans")
+    visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans",specific=0)
+    visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans",specific=1)
+    visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans",specific=5)
+
+
     #visualiser.save_plot(fig_pca,clusters,"pca",clustering_type="kmeans")
 
 

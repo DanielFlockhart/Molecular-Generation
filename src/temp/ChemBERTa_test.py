@@ -1,3 +1,8 @@
+'''
+Tests for the ChemBERTa model to see how it generates vectors from SMILES strings
+'''
+
+
 from transformers import AutoModel, AutoTokenizer
 import torch.nn as nn
 # Define the model repo

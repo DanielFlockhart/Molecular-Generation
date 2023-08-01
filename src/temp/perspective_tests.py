@@ -1,3 +1,7 @@
+'''
+Testing Generation of Conformers from SMILES in different angles
+'''
+
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem.Draw import rdMolDraw2D

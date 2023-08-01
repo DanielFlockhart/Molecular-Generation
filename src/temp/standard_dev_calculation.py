@@ -1,3 +1,10 @@
+'''
+Used for calculating the standard deviation of the dataset sizes to decide on a cutoff point at which to ignore outliers scale.
+
+I have implemented an automatic version of this taking the 99th percentile of the dataset sizes as the cutoff point for outliers.
+
+'''
+
 import json
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,21 +17,25 @@ def get_distributions(file):
     return data["dataset_UNCSCALED_SIZES"]
     
 def calculate_upper_bounds(array,std_dev):
-        '''
-        Gets the standard deviation of the numbers and returns the upper bound of the numbers
-        '''
+    '''
+    Gets the standard deviation of the numbers and returns the upper bound of the numbers
+    '''
 
-        # Calculate the standard deviation of the numbers
-        std = np.std(array)
-        # Calculate the mean of the numbers
-        mean = np.mean(array)
-        # Calculate the upper bound of the numbers
-        upper_bound = mean + (std * std_dev)
+    # Calculate the standard deviation of the numbers
+    std = np.std(array)
+    # Calculate the mean of the numbers
+    mean = np.mean(array)
+    # Calculate the upper bound of the numbers
+    upper_bound = mean + (std * std_dev)
 
-        return upper_bound
+    return upper_bound
 
 
 def plot_frequency_graph(numbers, upper_bound):
+    '''
+    Plots a graph of the frequency of the sizes
+    '''
+    
     # Convert numbers to a NumPy array
     numbers = np.array(numbers)
 

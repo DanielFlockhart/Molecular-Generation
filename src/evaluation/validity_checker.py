@@ -1,1 +1,3 @@
-# Checks that molecule is valid
+'''
+Checks a molecule is valid
+'''

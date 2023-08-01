@@ -1,1 +1,3 @@
-# Checks that the output of the Network is not 100% related to another of the chemical Skeletons
+'''
+Gets other similar molecules
+'''

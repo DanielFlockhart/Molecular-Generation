@@ -16,5 +16,4 @@ colours = {
         '(': '\033[37m',  # white
         ')': '\033[37m',  # white
         'Other': '\033[37m' # White
-        # Add more letters and their color codes as needed
     }

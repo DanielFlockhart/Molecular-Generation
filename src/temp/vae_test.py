@@ -1,3 +1,6 @@
+''' This file is used to test the VAE model. It is not used in the final product.'''
+
+
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers

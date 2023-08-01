@@ -1,7 +1,17 @@
+'''
+Generator and Discriminator classes for GAN training and generation.
+
+Dev Notes:
+- I have decided to not use GANs for the time being due to the artifacts that are produced.
+
+'''
 import tensorflow as tf
 from tensorflow.keras import layers
 
 class Generator(tf.keras.Model):
+    '''
+    GAN Generator class - This class has not been used yet and does not yet have the correct architecture.
+    '''
     def __init__(self):
         super(Generator, self).__init__()
         self.dense = layers.Dense(7 * 7 * 256, input_shape=(128,))
@@ -13,6 +23,9 @@ class Generator(tf.keras.Model):
         self.conv3 = layers.Conv2DTranspose(3, 5, strides=2, padding='same')
 
     def call(self, inputs):
+        '''
+        Call function for the generator.
+        '''
         x = self.dense(inputs)
         x = self.reshape(x)
         x = tf.nn.relu(x)
@@ -26,10 +39,16 @@ class Generator(tf.keras.Model):
         return x
     
     def compute_loss(self, fake_output):
+        '''
+        Computes the loss for the generator.
+        '''
         return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.ones_like(fake_output), logits=fake_output))
 
 
 class Discriminator(tf.keras.Model):
+    '''
+    GAN Discriminator class - This class has not been used yet and does not yet have the correct architecture.
+    '''
     def __init__(self):
         super(Discriminator, self).__init__()
         self.conv1 = layers.Conv2D(64, 5, strides=2, padding='same', input_shape=[28, 28, 1])
@@ -40,6 +59,10 @@ class Discriminator(tf.keras.Model):
         self.dense = layers.Dense(1)
 
     def call(self, inputs):
+        '''
+        Call function for the discriminator.
+        '''
+
         x = tf.nn.leaky_relu(self.conv1(inputs))
         x = self.dropout1(x)
         x = tf.nn.leaky_relu(self.conv2(x))
@@ -49,6 +72,9 @@ class Discriminator(tf.keras.Model):
         return x
     
     def loss(self, real_output, fake_output):
+        '''
+        Computes the loss for the discriminator.
+        '''
         real_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.ones_like(real_output), logits=real_output))
         fake_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=tf.zeros_like(fake_output), logits=fake_output))
         total_loss = real_loss + fake_loss
@@ -56,6 +82,10 @@ class Discriminator(tf.keras.Model):
     
 
 class GAN(tf.keras.Model):
+    '''
+    GAN class - This class has not been used yet and does not yet have the correct architecture.
+    '''
+    
     def __init__(self, generator, discriminator):
         super(GAN, self).__init__()
         self.generator = generator

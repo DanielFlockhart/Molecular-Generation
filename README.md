@@ -78,21 +78,8 @@ The project acknowledges the following resources for their contributions:
 
 Thank you for using the Molecular Generation project! We hope it proves to be useful for your chemical analysis and research.
 
-## Current Work
-- Write More Documentation and Explanations of VAE/GANs and the training Process
-- Get VAE and GAN operational
-- Make Flow Chart of program pipeline
-- Decide whether inputs to networks should be binary (black or white) or have a continuous representations.
-- Add possible Rotation and Transformation optimisations
-- Add code efficiency optimisations
-- Program possible otherways of representing molecules - E.g As a graph/matrix
-- Add validity checks in for produced molecules
-- Deploy program for easy use and access
 
 ## Future Project Ideas
 - Convert Generated Images to back to SMILEs representation. Using Machine Learning?
 - Docking/Simulation - Binding Affinity?
 
-
-TODO 
-- Refactor Reprocess, Rethink
