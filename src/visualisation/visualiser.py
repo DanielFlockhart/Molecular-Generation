@@ -46,15 +46,15 @@ class Visualiser:
 
         return np.array(vectors), labels
     
-    def tSNE(self,perplexity=49):
+    def tSNE(self,perplexity=49,n_components=3):
         # Initialize t-SNE object with desired parameters
-        tsne = TSNE(n_components=2, perplexity=perplexity, random_state=42)  # Reduce perplexity to a suitable value
+        tsne = TSNE(n_components=n_components, perplexity=perplexity, random_state=42)  # Reduce perplexity to a suitable value
 
         # Create a tqdm object to display progress bar
         tqdm_instance = tqdm(total=self.data.shape[0], desc="Performing t-SNE",bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green')
 
         # Perform t-SNE dimensionality reduction
-        X_tsne = np.zeros((self.n_samples, 2))  # Placeholder for t-SNE results
+        X_tsne = np.zeros((self.n_samples, n_components))  # Placeholder for t-SNE results
         batch_size = 240
         for i in range(0, self.n_samples, batch_size):
             current_batch = self.data[i:i + batch_size]
@@ -135,25 +135,25 @@ if __name__ == "__main__":
     dataset = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Ai-Chem-Intership\data\datasets\db1\inputs.csv"
 
     visualiser = Visualiser(dataset)
-    X_pca,pca = visualiser.PCA()
+    #X_pca,pca = visualiser.PCA()
     X_tsne,tsne = visualiser.tSNE()
 
     cluster_labels_kmeans = visualiser.cluster_kmeans(clusters)
     fig_tsne = visualiser.plot(X_tsne,cluster_labels_kmeans)
-    fig_pca = visualiser.plot(X_pca,cluster_labels_kmeans)
+    #fig_pca = visualiser.plot(X_pca,cluster_labels_kmeans)
 
     visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans")
-    visualiser.save_plot(fig_pca,clusters,"pca",clustering_type="kmeans")
+    #visualiser.save_plot(fig_pca,clusters,"pca",clustering_type="kmeans")
 
 
     # Agglomerative Clustering Takes a long time to run
 
-    cluster_labels_agglomerative = visualiser.cluster_agglomerative(clusters)
+    #cluster_labels_agglomerative = visualiser.cluster_agglomerative(clusters)
 
-    fig_tsne = visualiser.plot(X_tsne,cluster_labels_agglomerative)
-    fig_pca = visualiser.plot(X_pca,cluster_labels_agglomerative)
+    #fig_tsne = visualiser.plot(X_tsne,cluster_labels_agglomerative)
+    #fig_pca = visualiser.plot(X_pca,cluster_labels_agglomerative)
 
-    visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="agglomerative")
-    visualiser.save_plot(fig_pca,clusters,"pca",clustering_type="agglomerative")
+    #visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="agglomerative")
+    #visualiser.save_plot(fig_pca,clusters,"pca",clustering_type="agglomerative")
 
     

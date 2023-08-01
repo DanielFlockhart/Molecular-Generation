@@ -58,7 +58,7 @@ def get_training_data(count=None):
     # Get all the IDs 
     labels = df['ID'].values[:count if count is not None else len(df)]
     print(format_title("Loading inputs"))
-    for (i,label) in enumerate(labels):
+    for (i,label) in tqdm(enumerate(labels),total=len(labels), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
         if count is not None and i >= count:
             break
         (condition, vector,target) = get_inputs(label,df)

@@ -36,6 +36,7 @@ class Generator:
             self.model = tf.keras.models.load_model(model_path)
 
         self.model.training = False
+        self.model.compile()
     def build_model(self):
         '''
         Build the model from previously trained weights
@@ -56,9 +57,11 @@ class Generator:
         noise = np.expand_dims(self.generate_noise(), axis=0)
         if conditions is not None:
             conditions = np.expand_dims(conditions, axis=0)
-            noise = tf.concat([noise,conditions],axis=1)
+            noise = tf.concat([noise, conditions], axis=1)
 
-        image = self.model.decoder(noise)
+        # Use the model's layers to access the decoder
+        decoder = self.model.get_layer('variational_autoencoder_1')
+        image = decoder([noise, conditions])
 
         image = tf.reshape(image,ml_constants.OUTPUT_DIM)
         image = np.squeeze(image)
