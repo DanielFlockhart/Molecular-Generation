@@ -21,12 +21,15 @@ class App:
         Generates a molecule from the model with a starting vector and condition.
         '''
         img = self.gen.generate_molecule(np.array(vector),np.array(condition))
-        img.save(fr"{file_constants.GENERATED_FOLDER}\new_molcules\{name}.png")
+        img.save(fr"{file_constants.GENERATED_FOLDER}\new_molecules\mol{name}.png")
 
-    def get_input(self,prompt):
+    def get_prompt(self):
         '''
         Gets input from the user.
         '''
+        illness = input("Enter a illness: ")
+        condition = input("Enter a condition: ")
+        
         return None
     
     def get_test_molecules(self,num_molecules=3):
@@ -38,5 +41,5 @@ class App:
         # Iterate through the csv and get the 1st (num_molecules) molecules
         for i in range(num_molecules):
             row = df.iloc[i]
-            mols.append((ast.literal_eval(row['vector']),ast.literal_eval(row['conditions'])))
+            mols.append([ast.literal_eval(row['vector']),ast.literal_eval(row['conditions'])])
         return mols

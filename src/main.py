@@ -63,8 +63,8 @@ def main(models):
             print(format_title("Generating Molecule"))
             vae_model.training = False
             app = deploy.App(fr"{file_constants.MODELS_FOLDER}\vae\model.h5")
-            test_molecules = app.get_test_molecules(num_molecules=3)
-            for (index,mol) in test_molecules:
+            test_molecules = app.get_test_molecules(num_molecules=15)
+            for (index,mol) in enumerate(test_molecules):
                 (vector,condition) = mol
                 app.generate_molecule(vector,condition,index)
     else:
@@ -72,14 +72,11 @@ def main(models):
 
 if __name__ == "__main__":
     
-    preprocess_data()
+    #preprocess_data()
     
 
 
     vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
 
     main(models=[vae_model])
-
-
-
 
