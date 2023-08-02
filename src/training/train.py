@@ -6,17 +6,17 @@ import matplotlib.pyplot as plt
 import sys
 import os
 sys.path.insert(0, os.path.abspath('..'))
-from Constants import ml_constants,ui_constants
+from Constants import ml_constants,ui_constants,file_constants
 from utilities import utils
 from ui.terminal_ui import *
 from training import get_inputs
-from tensorflow.keras.callbacks import Callback
+from tensorflow.keras.callbacks import Callback,ModelCheckpoint
 from PIL import Image
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
-
+import matplotlib.pyplot as plt
 def train_model(model,optimizer):
     ''' 
     Train a model
@@ -57,11 +57,15 @@ def train_model(model,optimizer):
         gradients = tape.gradient(loss, model.trainable_variables)
         optimizer.apply_gradients(zip(gradients, model.trainable_variables))
         return loss
+    # Create a ModelCheckpoint callback to save the model weights
+    checkpoint_path = os.path.join(file_constants.CHECKPOINTS_FOLDER, "model_checkpoint")
 
     # Training loop
+    epoch_losses = []
     for epoch in tqdm(range(ml_constants.EPOCHS), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'): 
         total_loss = 0.0
         num_batches = len(vectors) // ml_constants.BATCH_SIZE
+        
         for step in range(num_batches):
             start_idx = step * ml_constants.BATCH_SIZE
             end_idx = (step + 1) * ml_constants.BATCH_SIZE
@@ -71,10 +75,27 @@ def train_model(model,optimizer):
 
             loss = train_step(inputs_batch,conditions_batch, targets_batch)
             total_loss += loss
+            
         average_loss = total_loss / num_batches
+        epoch_losses.append(average_loss.numpy())
         print(f"Loss: {average_loss:.4f}")
+        if epoch % 10 == 0:
+            model.save_weights(checkpoint_path)
+
+    graph_loss(epoch_losses)
+
     return model
 
+def graph_loss(epoch_losses):
+    print(epoch_losses)
+    plt.plot(range(1, len(epoch_losses) + 1), epoch_losses)
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title('Training Loss')
+
+    loss_plot_path = f"{file_constants.VISUALISATIONS_FOLDER}\Graphs\Loss\loss.png"
+    plt.savefig(loss_plot_path)
+    plt.show()  
 
 def save_model(model,name):
     '''
