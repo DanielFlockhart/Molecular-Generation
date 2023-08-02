@@ -81,7 +81,7 @@ def save_model(model,name):
     Saves a trained model
     '''
     # Save the subclassed model's weights (this is required for HDF5 format)
-    model_weights_path = fr'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Ai-Chem-Intership\data\models\{name}\weights.h5'
+    model_weights_path = fr'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\models\{name}\weights.h5'
     model.save_weights(model_weights_path)
 
     # Convert the subclassed model to a functional model using the same input tensors
@@ -91,4 +91,4 @@ def save_model(model,name):
     vae_functional_model = tf.keras.Model(inputs=[inputs, condition_vector], outputs=outputs)
 
     # Save the functional model in the HDF5 format
-    vae_functional_model.save(fr'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Ai-Chem-Intership\data\models\{name}\model.h5')
+    vae_functional_model.save(fr'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\models\{name}\model.h5')

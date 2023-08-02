@@ -63,7 +63,7 @@ def main(models):
             print(format_title("Generating Molecule"))
             vae_model.training = False
             app = deploy.App(fr"{file_constants.MODELS_FOLDER}\vae\model.h5")
-            test_molecules = app.get_test_molecules(num_molecules=15)
+            test_molecules = app.get_test_molecules(num_molecules=99)
             for (index,mol) in enumerate(test_molecules):
                 (vector,condition) = mol
                 app.generate_molecule(vector,condition,index)

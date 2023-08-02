@@ -4,7 +4,7 @@ Developer Notes :
 - Data has been preprocessed for use with machine learning. It is not included in this repo as it is 500mb+
 
 ## Features
-
+![Project Pipeline](image.png)
 The project consists of the following main components :
 1. **Preprocessing** - A [dataset](https://www.nature.com/articles/s41597-022-01142-7) of smiles is sorted and processed by accessing the dataset of smiles, rescaling and normalising the molecules so trained models has less representations and relationships to learn. This will improve the accuracy.
 

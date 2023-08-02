@@ -137,7 +137,7 @@ class Visualiser:
 clusters = 400
 
 if __name__ == "__main__":
-    dataset = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Ai-Chem-Intership\data\datasets\db1\inputs.csv"
+    dataset = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\datasets\db1\inputs.csv"
 
     visualiser = Visualiser(dataset)
     #X_pca,pca = visualiser.PCA()
