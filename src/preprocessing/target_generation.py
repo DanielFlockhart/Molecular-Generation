@@ -53,6 +53,7 @@ class TargetGenerator:
         -> Save the smiles to the folder
 
         '''
+        
         if count == None:
             count = len(self.smiles)
         else:
@@ -62,6 +63,7 @@ class TargetGenerator:
         print(format_title("Downloading Skeletons"))
         file_utils.clear_folder(file_constants.PROCESSED_DATA)
         self.create_skeletons(count)
+        
 
     def normalise_targets(self):
         '''
@@ -143,7 +145,9 @@ class TargetGenerator:
                     break
 
             except Exception as e:
-                pass
+                print(e)
+
+   
 
     def scale_skeleton(self,mol):
         '''

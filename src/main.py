@@ -16,13 +16,13 @@ from training.vae import *
 from deployment import generation,deploy
 
     
-def preprocess_data():
+def preprocess_data(name="CSD_EES_DB.csv"):
     '''
     Initialises the program and get it ready for training
     '''
     embedding_model ="seyonec/ChemBERTa-zinc-base-v1"
     print(format_title("Preprocessing Data"))
-    processor = preprocessing.Preprocessor(embedding_model,"CSD_EES_DB")
+    processor = preprocessing.Preprocessor(embedding_model,name)
     processor.process(subset=False)
 
 def train_model(model,name):
@@ -45,7 +45,7 @@ def train_model(model,name):
     train.save_model(trained_model,name)
 
 
-def main(models):
+def main(model):
     '''
     Main Entrance for the program
     '''
@@ -56,12 +56,12 @@ def main(models):
 
     if confirmed:
         if user_choice == '1':
-            vae_model.training = True
-            train_model(models[0],"vae")
+            model.training = True
+            train_model(model[0],"vae")
 
         elif user_choice == '2':
             print(format_title("Generating Molecule"))
-            vae_model.training = False
+            model.training = False
             app = deploy.App(fr"{file_constants.MODELS_FOLDER}\vae\model.h5")
             test_molecules = app.get_test_molecules(num_molecules=99)
             for (index,mol) in enumerate(test_molecules):
@@ -72,11 +72,11 @@ def main(models):
 
 if __name__ == "__main__":
     
-    #preprocess_data()
+    preprocess_data(r"db2-pas\names_and_smiles.csv")
     
 
 
-    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
+    #vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
 
-    main(models=[vae_model])
+    #main(models=[vae_model])
 

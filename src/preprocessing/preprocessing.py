@@ -20,7 +20,7 @@ from ui.terminal_ui import *
 
 class Preprocessor:
     def __init__(self,embedding_model,df_name):
-        self.csv = f"{file_constants.DATA_FOLDER}/{df_name}.csv"
+        self.csv = f"{file_constants.DATA_FOLDER}/{df_name}"
         self.database = Database(self.csv)
         self.target_generator = TargetGenerator(self.database)
         self.embedding_model = embedding_model
@@ -36,9 +36,9 @@ class Preprocessor:
         
         
         '''
-        #self.get_targets(preprop_constants.SUBSET_COUNT if subset else None)
-        #self.normalise_targets()
-        #self.target_generator.save_dataset_info()
+        self.get_targets(preprop_constants.SUBSET_COUNT if subset else None)
+        self.normalise_targets()
+        self.target_generator.save_dataset_info()
         self.generate_data_file()
 
     def generate_data_file(self):
@@ -50,7 +50,7 @@ class Preprocessor:
         # Clear Inputs Folder
         file_utils.clear_csv(file_constants.INPUTS_FOLDER)
         # Add Headers
-        df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector', 'target_vector'])
+        df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector'])
         df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=True, index=False)
         print("Warning: This may take a while")
         print("Dataset must be sorted by ID alphabetically, will make it more robust later")
@@ -60,21 +60,20 @@ class Preprocessor:
         for (i,smile) in tqdm(enumerate(self.smiles),total=len(self.smiles), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
             
             id = self.database.get_id(smile)
-            target_vec,label = img_utils.load_image(id)# It doesnt load the image it just gets some of it.
             #print("Warning, do not load target from inputs.csv as it is not the full image")
             
             (smiles_vec, condition_vec) = self.get_input(smile)
-            self.add_entry(id,smile,condition_vec,smiles_vec,utils.run_length_encode(target_vec))
+            self.add_entry(id,smile,condition_vec,smiles_vec)
             
-    def add_entry(self,id,smile,conditions,smiles_vec,target_vec):
+    def add_entry(self,id,smile,conditions,smiles_vec):
         '''
         Add data to inputs.csv file for storage for input to neural network
         '''
         # Create an empty DataFrame
         
-        df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector', 'target_vector'])
+        df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector'])
         # Create a new row as a list
-        new_row = [id, smile, conditions, smiles_vec,target_vec]
+        new_row = [id, smile, conditions, smiles_vec]
         # Append the new row to the DataFrame
         df.loc[len(df)] = new_row
 
@@ -103,21 +102,22 @@ class Preprocessor:
             # Access the values of other columns for the matching row
             # Making this iterable instead of manual later
             ID = row['ID'].values[0]
-            NAts = row['NAts'].values[0]
-            HOMO = row['HOMO'].values[0]
-            LUMO = row['LUMO'].values[0]
-            es1 = row['E(S1)'].values[0]
-            fs1 = row['f(S1)'].values[0]
-            es2 = row['E(S2)'].values[0]
-            fs2 = row['f(S2)'].values[0]
-            es3 = row['E(S3)'].values[0]
-            fs3 = row['f(S3)'].values[0]
-            et1 = row['E(T1)'].values[0]
-            et2 = row['E(T2)'].values[0] 
-            et3 = row['E(T3)'].values[0]
-            conditions = [NAts, HOMO,LUMO,es1,fs1,es2,fs2,es3,fs3,et1,et2,et3]
+            # NAts = row['NAts'].values[0]
+            # HOMO = row['HOMO'].values[0]
+            # LUMO = row['LUMO'].values[0]
+            # es1 = row['E(S1)'].values[0]
+            # fs1 = row['f(S1)'].values[0]
+            # es2 = row['E(S2)'].values[0]
+            # fs2 = row['f(S2)'].values[0]
+            # es3 = row['E(S3)'].values[0]
+            # fs3 = row['f(S3)'].values[0]
+            # et1 = row['E(T1)'].values[0]
+            # et2 = row['E(T2)'].values[0] 
+            # et3 = row['E(T3)'].values[0]
+            # conditions = [NAts, HOMO,LUMO,es1,fs1,es2,fs2,es3,fs3,et1,et2,et3]
+            conditions = [1]
         else:
-            conditions = [0 for x in range(10)]
+            conditions = [1 for x in range(10)]
         
         return utils.normalise_vector(conditions)
     
