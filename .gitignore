@@ -172,3 +172,4 @@ data/datasets/db1/inputs.csv
 *.csv
 *.json
 *.json
+*.csv

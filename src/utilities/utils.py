@@ -6,6 +6,12 @@ from matplotlib import pyplot as plt
 sys.path.insert(0, os.path.abspath('..'))
 from Constants import ui_constants
 
+def normalize_data(data):
+    min_val = np.min(data)
+    max_val = np.max(data)
+    normalized_data = (data - min_val) / (max_val - min_val)
+    return normalized_data
+
 def colour_smile(smile):
     '''
     Colours a smile string based on the colours dictionary
