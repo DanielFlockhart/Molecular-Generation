@@ -35,7 +35,7 @@ def train_model(model,optimizer):
     
     # Need to Make sure the x_train and y_train are the same length and a labelled correctly
     print(format_title("Compiling Model"))
-    labels,vectors,conditions,targets = get_training_data(ml_constants.TRAIN_SUBSET_COUNT)
+    labels,vectors,conditions,targets = get_training_data()
     model.compile(optimizer=optimizer,loss=model.compute_loss)
     
     print(format_title("Training Model"))
@@ -78,7 +78,7 @@ def train_model(model,optimizer):
             
         average_loss = total_loss / num_batches
         epoch_losses.append(average_loss.numpy())
-        print(f"Loss: {average_loss:.4f}")
+        print(f" - Loss: {average_loss:.4f}")
         if epoch % 10 == 0:
             model.save_weights(checkpoint_path)
 

@@ -36,7 +36,7 @@ class App:
         '''
         Gets a test molecule from the user.
         '''
-        df = pd.read_csv(file_constants.TEST_DATA_FOLDER)
+        df = pd.read_csv(file_constants.INPUTS_FOLDER)
         mols = []
         # Iterate through the csv and get the 1st (num_molecules) molecules
         for i in range(num_molecules):

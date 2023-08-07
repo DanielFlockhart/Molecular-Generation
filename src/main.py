@@ -57,7 +57,7 @@ def main(model):
     if confirmed:
         if user_choice == '1':
             model.training = True
-            train_model(model[0],"vae")
+            train_model(model,"vae")
 
         elif user_choice == '2':
             print(format_title("Generating Molecule"))
@@ -78,5 +78,5 @@ if __name__ == "__main__":
 
     vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
 
-    main(model=[vae_model])
+    main(vae_model)
 
