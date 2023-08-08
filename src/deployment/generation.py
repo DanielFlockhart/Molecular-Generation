@@ -24,7 +24,7 @@ class Generator:
         self.model.training = False
         self.model.compile()
 
-    def generate_noise(self,x=ml_constants.LATENT_DIM+ml_constants.CONDITIONS_SIZE):
+    def generate_noise(self,x=ml_constants.LATENT_DIM):
         '''
         Generate a random noise vector for input to network.
         '''
@@ -38,7 +38,6 @@ class Generator:
         '''
         vector = np.expand_dims(vector, axis=0)
         condition = np.expand_dims(condition, axis=0)
-        vector = tf.concat([vector, tf.cast(condition, tf.float32)], axis=1)
         # Call the decoder to generate the image
         image = self.model.predict([vector,condition])
 

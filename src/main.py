@@ -72,11 +72,11 @@ def main(model):
 
 if __name__ == "__main__":
     
-    #preprocess_data(r"db2-pas\dataset.csv")
+    preprocess_data(r"db2-pas\inputs.csv")
     
 
 
-    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
+    #vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
 
-    main(vae_model)
+    #main(vae_model)
 

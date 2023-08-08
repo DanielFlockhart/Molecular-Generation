@@ -15,7 +15,7 @@ class VariationalAutoencoder(tf.keras.Model):
         self.output_dim = output_dim
         self.temperature = temperature
         self.condition_size = conditions_size
-        self.encoder = self.build_encoder(input_dim+self.condition_size, latent_dim)
+        self.encoder = self.build_encoder(input_dim, latent_dim)
         self.decoder = self.build_decoder(latent_dim+self.condition_size, self.output_dim)
         self.training = True  # Set the training attribute to True initially
     def build_encoder(self, input_dim, latent_dim):
@@ -63,7 +63,7 @@ class VariationalAutoencoder(tf.keras.Model):
         z_mean, z_log_var = args
         epsilon = tf.random.normal(shape=tf.shape(z_mean))
         scaled_epsilon = epsilon * self.temperature
-        res = z_mean + tf.exp(0.5 * z_log_var) #* scaled_epsilon
+        res = z_mean + tf.exp(0.5 * z_log_var) * scaled_epsilon
         return res
 
     def call(self, inputs,condition_vector):
@@ -95,18 +95,20 @@ class VariationalAutoencoder(tf.keras.Model):
 
         bce_loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy(targets, reconstructed))
 
-        # mse_loss = tf.reduce_mean(tf.keras.losses.mean_squared_error(targets, reconstructed))
+        mse_loss = tf.reduce_mean(tf.keras.losses.mean_squared_error(targets, reconstructed))
 
         # Compute the mean SSIM loss over the batch
 
         # You can also include the KL divergence loss if you want
-        # z_mean, z_log_var = self.encoder(inputs)
+        z_mean, z_log_var = self.encoder(inputs)
 
         
-        # kl_loss = -0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
-        # kl_weighted_loss = 0.1 * kl_loss
+        kl_loss = -0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
 
-        reconstruction_loss =  bce_loss
+        reconstruction_loss =  mse_loss+ kl_loss #BCE or MSE
+
+        # Changes 07/07/2023
+        # Re added VAE PART - changed loss to mse and kl
 
 
         #tf.print(" - total_loss:", reconstruction_loss)

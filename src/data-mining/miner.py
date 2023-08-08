@@ -91,8 +91,7 @@ class Miner:
         df.loc[len(df)] = props
         df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=False, index=False)
 
-    def get_smiles(self):
-        file = file_constants.DATA_FOLDER+"/db2-pas/names_and_smiles.csv"
+    def get_smiles(self,file):
         df = pd.read_csv(file)
         smiles = df['SMILES'].tolist()
         return smiles
@@ -101,6 +100,7 @@ class Miner:
 keys = ['Molecule', 'SMILES', 'Molecular Weight', 'TPSA', 'H-bond Donor Count', 'H-bond Acceptor Count', 'Rotatable Bond Count', 'Charge', 'Atom Stereo Count', 'Bond Stereo Count', 'Conformer Count 3D', 'Feature Acceptor Count 3D', 'Feature Donor Count 3D', 'Feature Cation Count 3D', 'Feature Ring Count 3D', 'Feature Hydrophobe Count 3D']
 if __name__ == '__main__':
     miner = Miner()
+    file = file_constants.DATA_FOLDER+"/db2-pas/names_and_smiles.csv"
     smiles = miner.get_smiles()
     
     miner.create_database(keys)

@@ -10,13 +10,17 @@ import sys,os,csv,ast
 sys.path.insert(0, os.path.abspath('..'))
 from Constants import ui_constants,file_constants
 from ui.terminal_ui import *
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+import seaborn as sns  # Import Seaborn for custom color palettes
 
 class Visualiser:
     def __init__(self,data):
         self.load_data(data)
 
     def load_data(self,data):
-        self.data, self.labels = self.get_dataset(data)
+        self.data, self.labels,self.names = self.get_dataset(data)
         self.n_samples, self.n_features = self.data.shape
 
     def get_dataset(self,dataset):
@@ -25,6 +29,7 @@ class Visualiser:
         '''
         vectors = []
         labels = []
+        names = []
         
         # Count the total number of rows in the CSV file
         with open(dataset, newline='') as csvfile:
@@ -39,12 +44,13 @@ class Visualiser:
             for row in reader:
                 vectors.append(np.array(ast.literal_eval(row['vector'])))
                 labels.append(row['SMILES'])
+                names.append(row['ID'])
                 tqdm_instance.update(1)  # Update progress bar
         tqdm_instance.close()  # Close tqdm after the loop
 
-        return np.array(vectors), labels
+        return np.array(vectors), labels,names
     
-    def tSNE(self,perplexity=49,n_components=3):
+    def tSNE(self,perplexity=49,n_components=2):
         # Initialize t-SNE object with desired parameters
         tsne = TSNE(n_components=n_components, perplexity=perplexity, random_state=42)  # Reduce perplexity to a suitable value
 
@@ -82,11 +88,45 @@ class Visualiser:
         tqdm_instance.close()  # Close tqdm after the loop
         return X_pca, pca
     
-    def cluster_kmeans(self,clusters):
+    def cluster_once_kmeans(self,clusters):
         print(format_title("Clustering"))
         clusters = KMeans(n_clusters=clusters, random_state=42)
         cluster_labels = clusters.fit_predict(self.data)
         return cluster_labels
+
+    def cluster_kmeans(self, max_clusters):
+        print(format_title("Clustering - Using Elbow Method"))
+        
+        # Calculate the variance for different numbers of clusters
+        distortions = []
+        for clusters in tqdm(range(1, max_clusters + 1),bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
+            kmeans = KMeans(n_clusters=clusters, random_state=42)
+            kmeans.fit(self.data)
+            distortions.append(kmeans.inertia_)
+        
+        # Plot the elbow curve
+        plt.plot(range(1, max_clusters + 1), distortions, marker='o')
+        plt.xlabel('Number of clusters')
+        plt.ylabel('Distortion (Variance)')
+        plt.title('Elbow Method for Optimal Clusters')
+        plt.grid()
+        plt.show()
+
+        # Calculate percentage change in distortions
+        percentage_change = [100 * ((distortions[i] - distortions[i-1]) / distortions[i-1]) for i in range(1, len(distortions))]
+
+        # Find the elbow point as the index with the maximum percentage change
+        elbow_point_index = np.argmax(percentage_change)
+        optimal_clusters = elbow_point_index + 1
+
+        print("Optimal number of clusters:", optimal_clusters)
+
+        # Perform KMeans clustering with the optimal number of clusters
+        kmeans = KMeans(n_clusters=optimal_clusters, random_state=42)
+        cluster_labels = kmeans.fit_predict(self.data)
+        
+        return cluster_labels
+
 
     def cluster_agglomerative(self,clusters):
         print(format_title("Agglomerative Clustering"))
@@ -94,23 +134,27 @@ class Visualiser:
         cluster_labels = cluster_model.fit_predict(self.data)
         return cluster_labels
 
-    def plot(self,X_model, cluster_labels, specific_cluster=None):
+    def plot(self,X_model, cluster_labels, specific_cluster=None,dimension=2):
         print(format_title("Plotting Data"))
 
         # Create a DataFrame with the t-SNE results and labels
-        df = pd.DataFrame(X_model, columns=["Component 1", "Component 2","Component 3"])
+        columns = ["Component 1", "Component 2"]
+        if dimension == 3:
+            columns.append("Component 3")
+        df = pd.DataFrame(X_model, columns=columns)
         df["Label"] = self.labels
         df["Cluster"] = cluster_labels
+        df["Name"] = self.names
 
+        
         if specific_cluster is not None:
             # Filter DataFrame for the specific cluster
-            specific_df = df[df["Cluster"] == specific_cluster]
-
-            # Create an interactive scatter plot with colors for the specific cluster and hover labels using Plotly
-            fig = px.scatter_3d(specific_df, x="Component 1", y="Component 2",z="Component 3", color="Cluster", hover_data=["Label"])
+            df = df[df["Cluster"] == specific_cluster]
+        colours = ['red', 'blue', 'green', 'purple', 'orange', 'pink', 'cyan', 'brown', 'gray', 'olive']
+        if dimension == 3:
+            fig = px.scatter_3d(df, x="Component 1", y="Component 2",z="Component 3", color="Cluster", hover_data=["Label","Name"],color_continuous_scale=colours)
         else:
-            # Create an interactive scatter plot with colors for clusters and hover labels using Plotly
-            fig = px.scatter_3d(df, x="Component 1", y="Component 2",z="Component 3", color="Cluster", hover_data=["Label"])
+            fig = px.scatter(df, x="Component 1", y="Component 2", color="Cluster", hover_data=["Label","Name"],color_continuous_scale=colours)
 
         # Show the plot
         fig.show()
@@ -134,7 +178,7 @@ class Visualiser:
     
     def load_html_specific(self,model_type,clustering_type,clusters,specific):
         pass
-clusters = 400
+clusters = 10
 
 if __name__ == "__main__":
     dataset = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\datasets\db1\inputs.csv"
@@ -143,14 +187,14 @@ if __name__ == "__main__":
     #X_pca,pca = visualiser.PCA()
     X_tsne,tsne = visualiser.tSNE()
 
-    cluster_labels_kmeans = visualiser.cluster_kmeans(clusters)
+    cluster_labels_kmeans = visualiser.cluster_once_kmeans(clusters)
     fig_tsne = visualiser.plot(X_tsne,cluster_labels_kmeans)
     #fig_pca = visualiser.plot(X_pca,cluster_labels_kmeans)
 
     visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans")
-    visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans",specific=0)
-    visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans",specific=1)
-    visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans",specific=5)
+    #visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans",specific=0)
+    #visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans",specific=1)
+    #visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans",specific=5)
 
 
     #visualiser.save_plot(fig_pca,clusters,"pca",clustering_type="kmeans")
@@ -158,7 +202,7 @@ if __name__ == "__main__":
 
     # Agglomerative Clustering Takes a long time to run
 
-    #cluster_labels_agglomerative = visualiser.cluster_agglomerative(clusters)
+    #cluster_labels_agglomerative = visualiser.cluster_agglomerative(clusters=44)
 
     #fig_tsne = visualiser.plot(X_tsne,cluster_labels_agglomerative)
     #fig_pca = visualiser.plot(X_pca,cluster_labels_agglomerative)

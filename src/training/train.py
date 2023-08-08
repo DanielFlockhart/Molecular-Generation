@@ -35,7 +35,7 @@ def train_model(model,optimizer):
     
     # Need to Make sure the x_train and y_train are the same length and a labelled correctly
     print(format_title("Compiling Model"))
-    labels,vectors,conditions,targets = get_training_data()
+    labels,vectors,conditions,targets = get_training_data(ml_constants.TRAIN_SUBSET_COUNT)
     model.compile(optimizer=optimizer,loss=model.compute_loss)
     
     print(format_title("Training Model"))
@@ -44,8 +44,7 @@ def train_model(model,optimizer):
     def train_step(inputs_batch,conditions_batch, targets_batch):
         with tf.GradientTape() as tape:
             # Reshape the inputs_batch to have shape (batch_size, 768)
-            combined_batch = tf.concat([inputs_batch, conditions_batch], axis=1)
-            inputs_batch = tf.reshape(combined_batch, (tf.shape(inputs_batch)[0], ml_constants.INPUT_SIZE +ml_constants.CONDITIONS_SIZE))
+            inputs_batch = tf.reshape(inputs_batch, (tf.shape(inputs_batch)[0], ml_constants.INPUT_SIZE))
 
             # Forward pass through the model
             reconstructed = model(inputs_batch,conditions_batch, training=True)
