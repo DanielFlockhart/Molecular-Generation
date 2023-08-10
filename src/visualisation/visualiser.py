@@ -50,7 +50,7 @@ class Visualiser:
 
         return np.array(vectors), labels,names
     
-    def tSNE(self,perplexity=49,n_components=2):
+    def tSNE(self,perplexity=25,n_components=2):
         # Initialize t-SNE object with desired parameters
         tsne = TSNE(n_components=n_components, perplexity=perplexity, random_state=42)  # Reduce perplexity to a suitable value
 
@@ -134,7 +134,7 @@ class Visualiser:
         cluster_labels = cluster_model.fit_predict(self.data)
         return cluster_labels
 
-    def plot(self,X_model, cluster_labels, specific_cluster=None,dimension=2):
+    def plot(self,X_model, cluster_labels,perp_label="0",specific_cluster=None,dimension=2):
         print(format_title("Plotting Data"))
 
         # Create a DataFrame with the t-SNE results and labels
@@ -152,9 +152,9 @@ class Visualiser:
             df = df[df["Cluster"] == specific_cluster]
         colours = ['red', 'blue', 'green', 'purple', 'orange', 'pink', 'cyan', 'brown', 'gray', 'olive']
         if dimension == 3:
-            fig = px.scatter_3d(df, x="Component 1", y="Component 2",z="Component 3", color="Cluster", hover_data=["Label","Name"],color_continuous_scale=colours)
+            fig = px.scatter_3d(df, x="Component 1", y="Component 2",z="Component 3", color="Cluster", hover_data=["Label","Name"],color_continuous_scale=colours, title=f"t-SNE Plot of Dataset with {perp_label} Perplexity and {specific_cluster} Clusters in {dimension}D")
         else:
-            fig = px.scatter(df, x="Component 1", y="Component 2", color="Cluster", hover_data=["Label","Name"],color_continuous_scale=colours)
+            fig = px.scatter(df, x="Component 1", y="Component 2", color="Cluster", hover_data=["Label","Name"],color_continuous_scale=colours, title=f"t-SNE Plot of Dataset with {perp_label} Perplexity and {specific_cluster} Clusters in {dimension}D")
 
         # Show the plot
         fig.show()
@@ -184,19 +184,24 @@ if __name__ == "__main__":
     dataset = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\datasets\db1\inputs.csv"
 
     visualiser = Visualiser(dataset)
-    #X_pca,pca = visualiser.PCA()
-    X_tsne,tsne = visualiser.tSNE()
+    visualiser.cluster_kmeans(50)
+    # perps = [35]#[5,15,25,35,45]
+    # clusters = [200]#[2,3,6,10,20]
+    # for perp in perps:
+    #     X_tsne,tsne = visualiser.tSNE(perp)
+    #     for cluster in clusters:
+    #         print(f"Perplexity: {perp} Clusters: {cluster}")
+    #         cluster_labels_kmeans = visualiser.cluster_once_kmeans(cluster)
+    #         fig_tsne = visualiser.plot(X_tsne,cluster_labels_kmeans,perp_label=perp)
+    #         visualiser.save_plot(fig_tsne,clusters,"tsne", clustering_type="kmeans")
 
-    cluster_labels_kmeans = visualiser.cluster_once_kmeans(clusters)
-    fig_tsne = visualiser.plot(X_tsne,cluster_labels_kmeans)
-    #fig_pca = visualiser.plot(X_pca,cluster_labels_kmeans)
 
-    visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans")
     #visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans",specific=0)
     #visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans",specific=1)
     #visualiser.save_plot(fig_tsne,clusters,"tsne",clustering_type="kmeans",specific=5)
 
-
+    #X_pca,pca = visualiser.PCA()
+    #fig_pca = visualiser.plot(X_pca,cluster_labels_kmeans)
     #visualiser.save_plot(fig_pca,clusters,"pca",clustering_type="kmeans")
 
 

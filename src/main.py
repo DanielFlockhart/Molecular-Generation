@@ -39,7 +39,7 @@ def train_model(model,name):
     optimizer = tf.keras.optimizers.Adam(learning_rate=initial_learning_rate)
     # Train Model
     model.training = True  # Set training to True before training
-    trained_model = train.train_model(model,optimizer)
+    trained_model = train.train_model(model,optimizer,use_subset=False)
 
     # Save Model
     train.save_model(trained_model,name)
@@ -72,11 +72,11 @@ def main(model):
 
 if __name__ == "__main__":
     
-    preprocess_data(r"db2-pas\inputs.csv")
+    #preprocess_data(r"db2-pas\dataset.csv")
     
 
 
-    #vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
+    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
 
-    #main(vae_model)
+    main(vae_model)
 

@@ -97,9 +97,6 @@ class VariationalAutoencoder(tf.keras.Model):
 
         mse_loss = tf.reduce_mean(tf.keras.losses.mean_squared_error(targets, reconstructed))
 
-        # Compute the mean SSIM loss over the batch
-
-        # You can also include the KL divergence loss if you want
         z_mean, z_log_var = self.encoder(inputs)
 
         

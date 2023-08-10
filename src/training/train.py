@@ -17,7 +17,7 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-def train_model(model,optimizer):
+def train_model(model,optimizer,use_subset=False):
     ''' 
     Train a model
 
@@ -35,7 +35,7 @@ def train_model(model,optimizer):
     
     # Need to Make sure the x_train and y_train are the same length and a labelled correctly
     print(format_title("Compiling Model"))
-    labels,vectors,conditions,targets = get_training_data(ml_constants.TRAIN_SUBSET_COUNT)
+    labels,vectors,conditions,targets = get_training_data(ml_constants.TRAIN_SUBSET_COUNT if use_subset else None)
     model.compile(optimizer=optimizer,loss=model.compute_loss)
     
     print(format_title("Training Model"))
