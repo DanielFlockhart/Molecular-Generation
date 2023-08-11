@@ -8,6 +8,7 @@ import os
 sys.path.insert(0, os.path.abspath('..'))
 from Constants import ml_constants,ui_constants,file_constants
 from utilities import utils
+from visualisation import visualiser
 from ui.terminal_ui import *
 from training import get_inputs
 from tensorflow.keras.callbacks import Callback,ModelCheckpoint
@@ -45,10 +46,8 @@ def train_model(model,optimizer,use_subset=False):
         with tf.GradientTape() as tape:
             # Reshape the inputs_batch to have shape (batch_size, 768)
             inputs_batch = tf.reshape(inputs_batch, (tf.shape(inputs_batch)[0], ml_constants.INPUT_SIZE))
-
             # Forward pass through the model
             reconstructed = model(inputs_batch,conditions_batch, training=True)
-
             # Compute the loss
             loss = model.compute_loss(inputs_batch, targets_batch, reconstructed)
 
@@ -74,7 +73,6 @@ def train_model(model,optimizer,use_subset=False):
 
             loss = train_step(inputs_batch,conditions_batch, targets_batch)
             total_loss += loss
-            
         average_loss = total_loss / num_batches
         epoch_losses.append(average_loss.numpy())
         print(f" - Loss: {average_loss:.4f}")
@@ -82,6 +80,7 @@ def train_model(model,optimizer,use_subset=False):
             model.save_weights(checkpoint_path)
 
     graph_loss(epoch_losses)
+
 
     return model
 
@@ -94,8 +93,10 @@ def graph_loss(epoch_losses):
 
     loss_plot_path = f"{file_constants.VISUALISATIONS_FOLDER}\Graphs\Loss\loss.png"
     plt.savefig(loss_plot_path)
-    plt.show()  
+    plt.show()
 
+
+    
 def save_model(model,name):
     '''
     Saves a trained model

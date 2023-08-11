@@ -18,6 +18,7 @@ class VariationalAutoencoder(tf.keras.Model):
         self.encoder = self.build_encoder(input_dim, latent_dim)
         self.decoder = self.build_decoder(latent_dim+self.condition_size, self.output_dim)
         self.training = True  # Set the training attribute to True initially
+        self.latent_stores = []
     def build_encoder(self, input_dim, latent_dim):
         '''
         Building the encoder part of the model
@@ -78,6 +79,7 @@ class VariationalAutoencoder(tf.keras.Model):
             z = self.sampling([z_mean, z_log_var])
         else:
             z = z_mean
+        
         z_condition = tf.concat([z, condition_vector], axis=1)
         reconstructed = self.decoder(z_condition) # Editted so its not variational for testing
 
