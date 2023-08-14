@@ -81,7 +81,7 @@ class VariationalAutoencoder(tf.keras.Model):
             z = z_mean
         
         z_condition = tf.concat([z, condition_vector], axis=1)
-        reconstructed = self.decoder(z_condition) # Editted so its not variational for testing
+        reconstructed = self.decoder(z_condition)
 
 
 
