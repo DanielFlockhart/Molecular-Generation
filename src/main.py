@@ -20,9 +20,8 @@ def preprocess_data(name="CSD_EES_DB.csv"):
     '''
     Initialises the program and get it ready for training
     '''
-    embedding_model ="seyonec/ChemBERTa-zinc-base-v1"
     print(format_title("Preprocessing Data"))
-    processor = preprocessing.Preprocessor(embedding_model,name)
+    processor = preprocessing.Preprocessor(preprop_constants.EMBEDDING_MODEL,name)
     processor.process(subset=False)
 
 def train_model(model,name):
@@ -44,6 +43,9 @@ def train_model(model,name):
     # Save Model
     train.save_model(trained_model,name)
 
+def generate_molecule(model):
+    app = deploy.App(fr"{file_constants.MODELS_FOLDER}\vae\model.h5")
+    mol = app.get_mols()
 
 def main(model):
     '''
@@ -52,7 +54,7 @@ def main(model):
 
     user_choice = get_user_choice()
     confirmed = confirm_choice(user_choice)
-    
+
 
     if confirmed:
         if user_choice == '1':
@@ -62,17 +64,14 @@ def main(model):
         elif user_choice == '2':
             print(format_title("Generating Molecule"))
             model.training = False
-            app = deploy.App(fr"{file_constants.MODELS_FOLDER}\vae\model.h5")
-            test_molecules = app.get_test_molecules(num_molecules=99)
-            for (index,mol) in enumerate(test_molecules):
-                (vector,condition) = mol
-                app.generate_molecule(vector,condition,index)
+            generate_molecule(model)
+            
     else:
         print("Choice not confirmed. Exiting...")
 
 if __name__ == "__main__":
     
-    #preprocess_data(r"db2-pas\dataset.csv")
+    #preprocess_data(fr"{file_constants.DATASET}\dataset.csv")
     
 
 

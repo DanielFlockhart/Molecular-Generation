@@ -2,11 +2,13 @@
 import os,sys
 from PIL import *
 import numpy as np
-from Constants import file_constants
+from Constants import file_constants,preprop_constants
 sys.path.insert(0, os.path.abspath('..'))
 from deployment import generation
 import pandas as pd
 import ast
+
+from preprocessing.smiles_to_vec import *
 class App:
     '''
     Main class for deployment of the application.
@@ -23,14 +25,15 @@ class App:
         img = self.gen.generate_molecule(np.array(vector),np.array(condition))
         img.save(fr"{file_constants.GENERATED_FOLDER}\new_molecules\mol{name}.png")
 
-    def get_prompt(self):
+    def get_mols(self):
         '''
         Gets input from the user.
         '''
-        illness = input("Enter a illness: ")
-        condition = input("Enter a condition: ")
+        SMILE = input("Enter a starting Molecule SMILE: ")
+        SMILE = smile_to_vector_ChemBERTa(preprop_constants.EMBEDDING_MODEL,SMILE)
+        condition = self.gen.create_condition()
         
-        return None
+        return self.gen.generate_molecule(SMILE,condition)
     
     def get_test_molecules(self,num_molecules=3):
         '''

@@ -38,8 +38,8 @@ class Preprocessor:
         '''
         self.get_targets(preprop_constants.SUBSET_COUNT if subset else None)
         self.normalise_targets()
-        #self.target_generator.save_dataset_info()
-        #self.generate_data_file()
+        self.target_generator.save_dataset_info()
+        self.generate_data_file()
 
     def generate_data_file(self):
         '''
@@ -110,6 +110,7 @@ class Preprocessor:
         else:
             print("Error: No matching row found for smile: ", smile)
         
+        print(conditions)
         return utils.normalise_vector(conditions) # Test With Removing This
     
     def normalise_condition(self,condition,mins,maxs):

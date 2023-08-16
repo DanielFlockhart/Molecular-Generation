@@ -3,14 +3,14 @@ from PIL import Image
 import numpy as np
 import os
 import sys
-
+import pandas as pd
 sys.path.insert(0, os.path.abspath('..'))
 
 sys.path.insert(0, os.path.abspath('../training'))
 from training.vae import *
 
-from Constants import ml_constants
-from utilities import img_utils
+from Constants import ml_constants,file_constants,preprop_constants
+from utilities import img_utils,utils
 
 
 class Generator:
@@ -23,6 +23,7 @@ class Generator:
 
         self.model.training = False
         self.model.compile()
+        self.database = pd.read_csv(f"{file_constants.DATA_FOLDER + file_constants.DATASET}/dataset.csv")
 
     def generate_noise(self,x=ml_constants.LATENT_DIM):
         '''
@@ -59,3 +60,31 @@ class Generator:
         '''
         image.save(path)
         image.show()
+
+    def create_condition(self):
+        (min_values,max_values) = self.preprocess_conditions()
+        condition = self.get_conditions(min_values,max_values)
+        return condition
+
+
+    def get_conditions(self,mins,maxs):
+        
+        conditions = []
+        for key in preprop_constants.keys:
+            condition = self.normalise_condition(float(input("Enter a value for " + key + ": ")),mins[key],maxs[key])
+            conditions.append(condition)
+        
+
+        return utils.normalise_vector(conditions) # Test With Removing This
+    
+    def normalise_condition(self,condition,mins,maxs):
+        '''
+        Normalise the conditions to be between 0 and 1
+        '''
+        return  (condition - mins) / (maxs - mins)
+
+    def preprocess_conditions(self):
+
+        min_values = self.database[preprop_constants.keys].min()
+        max_values = self.database[preprop_constants.keys].max()
+        return (min_values,max_values)
