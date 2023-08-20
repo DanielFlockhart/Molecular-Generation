@@ -10,7 +10,7 @@ from PIL import Image
 
 import matplotlib.pyplot as plt
 class VariationalAutoencoder(tf.keras.Model):
-    def __init__(self, input_dim, latent_dim, output_dim,conditions_size,temperature=1):
+    def __init__(self, input_dim, latent_dim, output_dim,conditions_size,temperature=0):
         super(VariationalAutoencoder, self).__init__()
         self.output_dim = output_dim
         self.temperature = temperature
@@ -47,7 +47,8 @@ class VariationalAutoencoder(tf.keras.Model):
         x = layers.Conv2DTranspose(128, kernel_size=(4, 4), padding='same',activation="relu")(x)
         x = layers.Conv2DTranspose(64, kernel_size=(4, 4), padding='same',activation="relu")(x)
         x = layers.Conv2DTranspose(32, kernel_size=(4, 4), padding='same',activation="relu")(x)
-        x = layers.Conv2DTranspose(16, kernel_size=(3, 3), padding='same',activation="relu")(x)
+        x = layers.UpSampling2D(size=(2, 2))(x)
+        x = layers.Conv2DTranspose(16, kernel_size=(3, 3), padding='same', activation="relu")(x)
         # Output layer with tanh activation instead of relu
         outputs = layers.Conv2DTranspose(filters=1, kernel_size=(3, 3), padding='same',activation="relu")(x)
         outputs = layers.Flatten()(outputs)

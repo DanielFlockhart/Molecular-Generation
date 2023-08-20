@@ -1,9 +1,9 @@
 from Constants import preprop_constants
 # Training/Machine Learning Constants
-BATCH_SIZE = 5 # Number of images to train on at once
-EPOCHS = 500# Number of times to train on the entire dataset
+BATCH_SIZE = 10 # Number of images to train on at once
+EPOCHS = 16000# Number of times to train on the entire dataset
 # Number of dimensions in the latent space
-LRN_RATE = 0.001 # Learning rate for the optimizer
+LRN_RATE = 0.1 # Learning rate for the optimizer
 TRAIN_SUBSET_COUNT = 0# Number of images to test training on
 CONDITIONS_SIZE = 9
 INPUT_SIZE = 768

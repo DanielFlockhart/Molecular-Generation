@@ -46,6 +46,7 @@ def train_model(model,name):
 def generate_molecule(model):
     app = deploy.App(fr"{file_constants.MODELS_FOLDER}\vae\model.h5")
     mol = app.get_mols()
+    mol.show()
 
 def main(model):
     '''
