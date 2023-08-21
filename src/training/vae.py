@@ -10,7 +10,7 @@ from PIL import Image
 
 import matplotlib.pyplot as plt
 class VariationalAutoencoder(tf.keras.Model):
-    def __init__(self, input_dim, latent_dim, output_dim,conditions_size,temperature=0):
+    def __init__(self, input_dim, latent_dim, output_dim,conditions_size,temperature=1):
         super(VariationalAutoencoder, self).__init__()
         self.output_dim = output_dim
         self.temperature = temperature
@@ -79,7 +79,7 @@ class VariationalAutoencoder(tf.keras.Model):
         if self.training:
             z = self.sampling([z_mean, z_log_var])
         else:
-            z = z_mean
+            z = self.sampling([z_mean, z_log_var])
         
         z_condition = tf.concat([z, condition_vector], axis=1)
         reconstructed = self.decoder(z_condition)

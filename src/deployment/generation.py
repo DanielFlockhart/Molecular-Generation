@@ -32,6 +32,15 @@ class Generator:
         np.random.seed(random.randint(0,1000))
         return np.random.uniform(size=(x)).astype(np.float32)  
 
+    def generate_multiple_molecules(self, vector, condition,amount=64):
+        '''
+        Generate multiple molecules from randomly sampled vectors and conditions.
+        '''
+        images = []
+        for i in range(amount):
+            generated_molecule = self.generate_molecule(vector, condition)
+            images.append(generated_molecule)
+        return images
 
     def generate_molecule(self, vector, condition):
         '''
@@ -51,7 +60,6 @@ class Generator:
 
         # Create a PIL Image from the NumPy array
         pil_image = Image.fromarray(image, mode='L')
-
         return pil_image
     
     def save_image(self,image,path):

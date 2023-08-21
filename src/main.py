@@ -15,6 +15,8 @@ sys.path.insert(0, os.path.abspath('../training'))
 from training.vae import *
 from deployment import generation,deploy
 
+from visualisation import results
+
     
 def preprocess_data(name="CSD_EES_DB.csv"):
     '''
@@ -45,8 +47,11 @@ def train_model(model,name):
 
 def generate_molecule(model):
     app = deploy.App(fr"{file_constants.MODELS_FOLDER}\vae\model.h5")
-    mol = app.get_mols()
-    mol.show()
+    start_mol,new_mols = app.get_mols()
+    report = results.Report(start_mol,new_mols)
+    report.build_report()
+
+
 
 def main(model):
     '''
