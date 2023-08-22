@@ -10,7 +10,7 @@ from Constants import file_constants,ui_constants
 from ui.terminal_ui import *
 from utilities import file_utils
 from tqdm import tqdm
-
+import concurrent.futures
 import pandas as pd
 class Miner:
     '''
@@ -28,10 +28,10 @@ class Miner:
         return pcp.Compound.from_cid(cid)
     
 
-    def get_molecular_properties(self,mol):
+    def get_molecular_properties(self,mol,id=None):
         
         if mol is not None:
-            prop_dict = {"Molecule": mol.synonyms[0] if mol.synonyms else "Unknown"}  # Add label for molecule name or SMILES
+            prop_dict = {"Molecule": mol.synonyms[0] if mol.synonyms else "Unknown"} if id==None else id # Add label for molecule name or SMILES
             prop_dict['SMILES'] = mol.canonical_smiles
             mol = Chem.MolFromSmiles(mol.canonical_smiles)
 
@@ -85,8 +85,8 @@ class Miner:
         df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=True, index=False)
 
             
-    def add_entry(self,mol):
-        props = self.get_molecular_properties(mol)
+    def add_entry(self,mol,id=None):
+        props = self.get_molecular_properties(mol,id)
         df = pd.DataFrame(columns=keys)
         df.loc[len(df)] = props
         df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=False, index=False)
@@ -96,22 +96,35 @@ class Miner:
         smiles = df['SMILES'].tolist()
         return smiles
 
-    
+def process_molecule(mol):
+    try:
+        compound = miner.search_compound(mol)
+        props = miner.get_molecular_properties(compound)
+        return props
+    except Exception as e:
+        print("Error processing molecule:", mol, " -", e)
+        return None
+      
 keys = ['Molecule', 'SMILES', 'Molecular Weight', 'TPSA', 'H-bond Donor Count', 'H-bond Acceptor Count', 'Rotatable Bond Count', 'Charge', 'Atom Stereo Count', 'Bond Stereo Count', 'Conformer Count 3D', 'Feature Acceptor Count 3D', 'Feature Donor Count 3D', 'Feature Cation Count 3D', 'Feature Ring Count 3D', 'Feature Hydrophobe Count 3D']
 if __name__ == '__main__':
     miner = Miner()
-    file = file_constants.DATA_FOLDER+"/db2-pas/names_and_smiles.csv"
-    smiles = miner.get_smiles()
+    file = file_constants.DATA_FOLDER+"/CSD_EES_DB.csv"
+    smiles = miner.get_smiles(file)
     
     miner.create_database(keys)
-    for (i,mol) in tqdm(enumerate(smiles),total=len(smiles), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
-        try:
-            compound = miner.search_compound(mol)
-            miner.add_entry(compound)
-        except:
-            print("Error: ",mol)
 
+    
+        
 
+    fail_count = 0
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        results = list(tqdm(executor.map(process_molecule, smiles), total=len(smiles), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'))
+
+    fail_count = sum(result is None for result in results)
+    success_count = len(smiles) - fail_count
+
+    print("Failed:", fail_count)
+    print("Success:", success_count)
 
 '''
     Molecular Weight

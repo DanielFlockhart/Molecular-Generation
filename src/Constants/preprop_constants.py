@@ -5,5 +5,5 @@ MAX_CHARS = 250 # Maximum number of characters of smile used for file name
 BOUND_PERCENTILE = 98
 SUBSET_COUNT = 100
 EMBEDDING_MODEL = "seyonec/ChemBERTa-zinc-base-v1"
-keys = ["Molecular Weight","TPSA","H-bond Donor Count","H-bond Acceptor Count","Rotatable Bond Count","Feature Acceptor Count 3D","Feature Donor Count 3D","Feature Ring Count 3D","Feature Hydrophobe Count 3D"]
+keys = ["Molecular Weight","TPSA","H-bond Donor Count","H-bond Acceptor Count","Rotatable Bond Count","Atom Stereo Count","Feature Acceptor Count 3D","Feature Donor Count 3D","Feature Ring Count 3D","Feature Hydrophobe Count 3D"]
 

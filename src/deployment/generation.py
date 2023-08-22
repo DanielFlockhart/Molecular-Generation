@@ -39,6 +39,7 @@ class Generator:
         images = []
         for i in range(amount):
             generated_molecule = self.generate_molecule(vector, condition)
+            generated_molecule.save(f"{file_constants.GENERATED_FOLDER}/generated_molecule_{i}.png")
             images.append(generated_molecule)
         return images
 
