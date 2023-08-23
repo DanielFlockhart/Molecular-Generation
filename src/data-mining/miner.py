@@ -22,18 +22,95 @@ class Miner:
         pass
     
     def search_compound(self,canonical_smiles):
-        return pcp.get_compounds(canonical_smiles, 'smiles')[0]
+        compounds = pcp.get_compounds(canonical_smiles, 'smiles')
+        return compounds[0] if compounds[0].tpsa != None else None
+    
 
     def get_compound(self, cid):
         return pcp.Compound.from_cid(cid)
     
 
-    def get_molecular_properties(self,mol,id=None):
-        
-        if mol is not None:
-            prop_dict = {"Molecule": mol.synonyms[0] if mol.synonyms else "Unknown"} if id==None else id # Add label for molecule name or SMILES
-            prop_dict['SMILES'] = mol.canonical_smiles
-            mol = Chem.MolFromSmiles(mol.canonical_smiles)
+    def get_molecular_properties(self,mol,keys):
+        props_dict = {}
+        for (i,prop) in enumerate(keys[2:]):
+            try:
+                attr = getattr(mol,prop)
+                props_dict[prop] = attr
+            except Exception as e:
+                print(e)
+                props_dict[prop] = "Unknown"
+            
+        return props_dict
+
+    def create_database(self,keys):
+        '''
+        Generates Dataset
+        '''
+
+        print(format_title("Creating Dataset"))
+
+        # Clear Inputs Folder
+        file_utils.clear_csv(file_constants.INPUTS_FOLDER)
+
+        # Add Headers
+        df = pd.DataFrame(columns=keys)
+        df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=True, index=False)
+
+            
+    def add_entry(self,mol,keys,smile):
+        props = self.get_molecular_properties(mol,keys)
+
+        props['Synonym'] = mol.synonyms[0] if mol.synonyms else "Unknown"
+        props['SMILES'] = smile
+
+        df = pd.DataFrame(columns=keys)
+        df.loc[len(df)] = props
+        df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=False, index=False)
+
+    def get_smiles(self,file):
+        df = pd.read_csv(file)
+        smiles = df['smiles'].tolist()
+        return smiles
+
+keys =['Synonym', 'SMILES','atom_stereo_count', 'bond_stereo_count','charge','complexity','covalent_unit_count', 'defined_atom_stereo_count', 'defined_bond_stereo_count','exact_mass', 'h_bond_acceptor_count', 'h_bond_donor_count', 'heavy_atom_count','isotope_atom_count','molecular_weight', 'monoisotopic_mass', 'rotatable_bond_count', 'tpsa', 'undefined_atom_stereo_count', 'undefined_bond_stereo_count', 'volume_3d', 'xlogp']
+if __name__ == '__main__':
+    miner = Miner()
+    file = file_constants.DATA_FOLDER+file_constants.DATASET+"/smiles.csv"
+    smiles = miner.get_smiles(file)
+    
+    miner.create_database(keys)
+    
+    fail_count = 0
+    for (i,mol) in tqdm(enumerate(smiles),total=len(smiles), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
+        try:
+            compound = miner.search_compound(mol)
+            if compound != None:
+                miner.add_entry(compound,keys,mol)
+        except Exception as e:
+            fail_count += 1
+            print("Error: ",mol)
+            print(e)
+
+    # Write any remaining data in the batch
+
+    print("Failed: ",fail_count)
+    print("Success: ",len(smiles)-fail_count)
+
+
+
+
+
+
+
+
+
+
+
+'''
+keys = ['Molecule', 'SMILES', 'Molecular Weight', 'TPSA', 'H-bond Donor Count', 'H-bond Acceptor Count', 'Rotatable Bond Count', 'Charge', 'Atom Stereo Count', 'Bond Stereo Count', 'Conformer Count 3D', 'Feature Acceptor Count 3D', 'Feature Donor Count 3D', 'Feature Cation Count 3D', 'Feature Ring Count 3D', 'Feature Hydrophobe Count 3D']
+prop_dict = {"Molecule": mol.synonyms[0] if mol.synonyms else "Unknown"} if id==None else id # Add label for molecule name or SMILES
+            prop_dict['SMILES'] = smiles
+            mol = Chem.MolFromSmiles(smiles)
 
             # Calculate molecular weight
             prop_dict['Molecular Weight'] = Descriptors.MolWt(mol)
@@ -67,81 +144,6 @@ class Miner:
             prop_dict['Feature Ring Count 3D'] = Descriptors.RingCount(mol)
             prop_dict['Feature Hydrophobe Count 3D'] = Descriptors.NumAliphaticCarbocycles(mol) + Descriptors.NumAliphaticHeterocycles(mol) + Descriptors.NumAliphaticRings(mol)
             
-        return prop_dict
 
 
-    def create_database(self,keys):
-        '''
-        Generates Dataset
-        '''
-
-        print(format_title("Creating Dataset"))
-
-        # Clear Inputs Folder
-        file_utils.clear_csv(file_constants.INPUTS_FOLDER)
-
-        # Add Headers
-        df = pd.DataFrame(columns=keys)
-        df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=True, index=False)
-
-            
-    def add_entry(self,mol,id=None):
-        props = self.get_molecular_properties(mol,id)
-        df = pd.DataFrame(columns=keys)
-        df.loc[len(df)] = props
-        df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=False, index=False)
-
-    def get_smiles(self,file):
-        df = pd.read_csv(file)
-        smiles = df['SMILES'].tolist()
-        return smiles
-
-def process_molecule(mol):
-    try:
-        compound = miner.search_compound(mol)
-        props = miner.get_molecular_properties(compound)
-        return props
-    except Exception as e:
-        print("Error processing molecule:", mol, " -", e)
-        return None
-      
-keys = ['Molecule', 'SMILES', 'Molecular Weight', 'TPSA', 'H-bond Donor Count', 'H-bond Acceptor Count', 'Rotatable Bond Count', 'Charge', 'Atom Stereo Count', 'Bond Stereo Count', 'Conformer Count 3D', 'Feature Acceptor Count 3D', 'Feature Donor Count 3D', 'Feature Cation Count 3D', 'Feature Ring Count 3D', 'Feature Hydrophobe Count 3D']
-if __name__ == '__main__':
-    miner = Miner()
-    file = file_constants.DATA_FOLDER+"/CSD_EES_DB.csv"
-    smiles = miner.get_smiles(file)
-    
-    miner.create_database(keys)
-
-    
-        
-
-    fail_count = 0
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        results = list(tqdm(executor.map(process_molecule, smiles), total=len(smiles), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'))
-
-    fail_count = sum(result is None for result in results)
-    success_count = len(smiles) - fail_count
-
-    print("Failed:", fail_count)
-    print("Success:", success_count)
-
-'''
-    Molecular Weight
-
-    TPSA
-
-    H-bond Donor and Acceptor Count
-
-    Rotatable Bond Count
-
-    Charge
-
-    Stereochemistry
-
-    Conformer Count 3D
-
-    Feature Counts 3D
-
-    Covalent Unit Count
 '''
