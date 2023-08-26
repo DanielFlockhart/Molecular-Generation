@@ -55,7 +55,7 @@ class Preprocessor:
         df = pd.DataFrame(columns=['ID', 'SMILES', 'conditions', 'vector'])
         df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=True, index=False)
         print("Warning: This may take a while")
-        print("Dataset must be sorted by ID alphabetically, will make it more robust later")
+        print("Dataset must be sorted by ID alphabetically, will make it more robust later - I need to review if this is still the case")
 
         #target_vecs,labels = img_utils.load_images() # This line causes 30Gb of RAM to be used
         (mins,maxs) = self.preprocess_conditions()

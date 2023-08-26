@@ -77,7 +77,7 @@ class Generator:
             conditions.append(condition)
         
 
-        return utils.normalise_vector(conditions) # Test With Removing This
+        return conditions
     
     def normalise_condition(self,condition,mins,maxs):
         '''
