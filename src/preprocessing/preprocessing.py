@@ -36,9 +36,9 @@ class Preprocessor:
         
         
         '''
-        self.get_targets(preprop_constants.SUBSET_COUNT if subset else None)
-        self.normalise_targets()
-        self.target_generator.save_dataset_info()
+        #self.get_targets(preprop_constants.SUBSET_COUNT if subset else None)
+        #self.normalise_targets()
+        #self.target_generator.save_dataset_info()
         self.generate_data_file()
 
     def generate_data_file(self):
@@ -47,6 +47,7 @@ class Preprocessor:
         '''
         print(format_title("Getting Vector Representations of Smiles and Conditions"))
         self.smiles = self.database.get_smiles_from_ids()
+
         # Clear Inputs Folder
         file_utils.clear_csv(file_constants.INPUTS_FOLDER)
 
@@ -60,12 +61,12 @@ class Preprocessor:
         (mins,maxs) = self.preprocess_conditions()
         
         for (i,smile) in tqdm(enumerate(self.smiles),total=len(self.smiles), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
-            
             id = self.database.get_id(smile)
             #print("Warning, do not load target from inputs.csv as it is not the full image")
             
             (smiles_vec, condition_vec) = self.get_input(smile,mins,maxs)
             self.add_entry(id,smile,condition_vec,smiles_vec)
+            
             
     def add_entry(self,id,smile,conditions,smiles_vec):
         '''
@@ -86,7 +87,9 @@ class Preprocessor:
         '''
         Produces vector from concatenation of the smiles vector representation and its conditions for input to network
         '''
+        
         condition_vec = self.get_conditions(smile,mins,maxs)
+        
         smile_vec = smile_to_vector_ChemBERTa(self.embedding_model,smile)
         
         return (smile_vec,condition_vec)
@@ -97,27 +100,25 @@ class Preprocessor:
         '''
         
         conditions = []
-        row = self.database.file[self.database.file['SMILES'] == smile]
+        row = self.database.file[self.database.file['SMILES'].replace("\n", "") == smile]
         
         # Check if a matching row was found
         if not row.empty:
             # Access the values of other columns for the matching row
             # Making this iterable instead of manual later
             for key in preprop_constants.keys:
-                
                 condition = self.normalise_condition(row[key].values[0],mins[key],maxs[key])
                 conditions.append(condition)
         else:
             print("Error: No matching row found for smile: ", smile)
         
-        print(conditions)
-        return utils.normalise_vector(conditions) # Test With Removing This
-    
+        return conditions
     def normalise_condition(self,condition,mins,maxs):
         '''
         Normalise the conditions to be between 0 and 1
         '''
-        return  (condition - mins) / (maxs - mins)
+        res = (condition - mins) / (maxs - mins)
+        return res 
 
     def preprocess_conditions(self):
 

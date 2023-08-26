@@ -13,6 +13,7 @@ class Database:
             The path to the dataset file
         
         '''
+        print(file)
         self.file = pd.read_csv(file)
         self.load_smiles()
 
@@ -90,12 +91,16 @@ class Database:
         for (i,filename) in enumerate(os.listdir(file_constants.PROCESSED_DATA)):
             if filename.endswith('.png'):
                 ids.append(filename[:-4])
+        
         for id in ids:
-            row = self.file[self.file['ID'] == id]
+            row = self.file[self.file['ID'] == int(id)]
             # Check if a matching row was found
             if not row.empty:
-                smiles.append(row['SMILES'].values[0])
-
+                smile = row['SMILES'].values[0]
+                smiles.append(smile) # I Don't think the IDs match up with the images
+            else:
+                print("Row Empty for ", id)
+    
         return smiles
 
         

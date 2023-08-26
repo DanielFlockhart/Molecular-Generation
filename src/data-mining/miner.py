@@ -72,7 +72,7 @@ class Miner:
         smiles = df['smiles'].tolist()
         return smiles
 
-keys =['Synonym', 'SMILES','atom_stereo_count', 'bond_stereo_count','charge','complexity','covalent_unit_count', 'defined_atom_stereo_count', 'defined_bond_stereo_count','exact_mass', 'h_bond_acceptor_count', 'h_bond_donor_count', 'heavy_atom_count','isotope_atom_count','molecular_weight', 'monoisotopic_mass', 'rotatable_bond_count', 'tpsa', 'undefined_atom_stereo_count', 'undefined_bond_stereo_count', 'volume_3d', 'xlogp']
+keys =['Synonym', 'SMILES','atom_stereo_count','bond_stereo_count','charge','complexity','exact_mass','h_bond_acceptor_count','h_bond_donor_count','heavy_atom_count','molecular_weight','rotatable_bond_count','tpsa','xlogp']
 if __name__ == '__main__':
     miner = Miner()
     file = file_constants.DATA_FOLDER+file_constants.DATASET+"/smiles.csv"
@@ -95,12 +95,6 @@ if __name__ == '__main__':
 
     print("Failed: ",fail_count)
     print("Success: ",len(smiles)-fail_count)
-
-
-
-
-
-
 
 
 

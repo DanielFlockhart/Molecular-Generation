@@ -94,14 +94,6 @@ def get_distribution_upper_bound(array,std_dev):
     upper_bound = mean + (std * std_dev)
     return upper_bound
 
-def normalise_vector(vector):
-    '''
-    Normalises a vector
-    '''
-    vector = np.array(vector)
-    vector = vector / np.linalg.norm(vector)
-    return vector.tolist()
-
 
 def plot_distribution(sizes,xlabel,ylabel):
     '''

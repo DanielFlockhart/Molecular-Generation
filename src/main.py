@@ -3,16 +3,16 @@ from PIL import *
 import numpy as np
 import tensorflow as tf
 from preprocessing import preprocessing
-from training import train,vae
+from training import train
 from postprocessing import *
 from deployment import *
-from Constants import file_constants, ml_constants
+from Constants import file_constants, ml_constants,preprop_constants
 from ui.terminal_ui import *
 from ui.dialogue import *
 sys.path.insert(0, os.path.abspath('..'))
 
 sys.path.insert(0, os.path.abspath('../training'))
-from training.vae import *
+from architectures import vae_im_to_sm, vae_sm_to_im
 from deployment import generation,deploy
 
 from visualisation import results
@@ -77,11 +77,11 @@ def main(model):
 
 if __name__ == "__main__":
     
-    #preprocess_data(fr"{file_constants.DATASET}\dataset.csv")
+    preprocess_data(fr"{file_constants.DATASET}\dataset.csv")
     
 
 
-    vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
+    #vae_model = vae.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
 
-    main(vae_model)
+    #main(vae_model)
 

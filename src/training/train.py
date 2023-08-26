@@ -1,6 +1,5 @@
 import tensorflow as tf
 from tensorflow.keras import layers
-from training.vae import *
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -10,7 +9,6 @@ from Constants import ml_constants,ui_constants,file_constants
 from utilities import utils
 from visualisation import visualiser
 from ui.terminal_ui import *
-from training import get_inputs
 from tensorflow.keras.callbacks import Callback,ModelCheckpoint
 from PIL import Image
 import torch
@@ -18,6 +16,7 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 import matplotlib.pyplot as plt
+from training.get_inputs import get_training_data
 def train_model(model,optimizer,use_subset=False):
     ''' 
     Train a model

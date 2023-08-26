@@ -145,6 +145,7 @@ class TargetGenerator:
                     break
 
             except Exception as e:
+                print("Here")
                 print(e)
 
    

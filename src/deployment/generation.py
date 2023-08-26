@@ -7,7 +7,7 @@ import pandas as pd
 sys.path.insert(0, os.path.abspath('..'))
 
 sys.path.insert(0, os.path.abspath('../training'))
-from training.vae import *
+from architectures import vae_im_to_sm, vae_sm_to_im
 
 from Constants import ml_constants,file_constants,preprop_constants
 from utilities import img_utils,utils
@@ -18,19 +18,12 @@ class Generator:
         '''
         Generator class for generating images from a trained model
         '''
-        with tf.keras.utils.custom_object_scope({'VariationalAutoencoder': VariationalAutoencoder}):
+        with tf.keras.utils.custom_object_scope({'VariationalAutoencoder': vae_sm_to_im.VariationalAutoencoder}):
             self.model = tf.keras.models.load_model(model_path)
 
         self.model.training = False
         self.model.compile()
         self.database = pd.read_csv(f"{file_constants.DATA_FOLDER + file_constants.DATASET}/dataset.csv")
-
-    def generate_noise(self,x=ml_constants.LATENT_DIM):
-        '''
-        Generate a random noise vector for input to network.
-        '''
-        np.random.seed(random.randint(0,1000))
-        return np.random.uniform(size=(x)).astype(np.float32)  
 
     def generate_multiple_molecules(self, vector, condition,amount=64):
         '''
