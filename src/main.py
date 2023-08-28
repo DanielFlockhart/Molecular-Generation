@@ -78,7 +78,7 @@ def main(model):
 if __name__ == "__main__":
     
     #preprocess_data(fr"{file_constants.DATASET}\dataset.csv")
-    
+    # PubChem10M_SMILES_BPE_450k -> different models?
 
 
     vae_model = vae_sm_to_im.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
