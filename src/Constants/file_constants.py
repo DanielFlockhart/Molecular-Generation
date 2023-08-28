@@ -11,3 +11,6 @@ INPUTS_FOLDER = fr"{DATA_FOLDER}\{DATASET}\inputs.csv"
 VISUALISATIONS_FOLDER = fr"{file_utils.get_directory()}\data\visualisations"
 TEST_DATA_FOLDER =  fr"{file_utils.get_directory()}\data\test_data\test_inputs.csv"
 CHECKPOINTS_FOLDER = fr"{file_utils.get_directory()}\data\models\vae\checkpoints"
+
+# Post Processing
+PROFILES_FOLDER = fr"{file_utils.get_directory()}\data\generated\profiles"

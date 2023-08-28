@@ -1,9 +1,8 @@
 import sys,os
 from profile import Profile
-
 import tkinter as tk
-from tkinter import Label, StringVar
-from PIL import Image, ImageTk
+sys.path.insert(0, os.path.abspath('../..'))
+from Constants import file_constants
 
 counter = 16
 molecule_data = []
@@ -25,6 +24,6 @@ for file in os.listdir(r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Intern
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = Profile(root,molecule_data)
+    app = Profile(root,molecule_data,file_constants.PROFILES_FOLDER)
     root.mainloop()
 
