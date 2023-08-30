@@ -7,7 +7,6 @@ import os
 sys.path.insert(0, os.path.abspath('..'))
 from Constants import ml_constants,ui_constants,file_constants
 from utilities import utils
-from visualisation import visualiser
 from ui.terminal_ui import *
 from tensorflow.keras.callbacks import Callback,ModelCheckpoint
 from PIL import Image
@@ -16,7 +15,7 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-from training.get_inputs import get_training_data
+from ml.training.get_inputs import get_training_data
 def train_model(model,optimizer,use_subset=False):
     ''' 
     Train a model

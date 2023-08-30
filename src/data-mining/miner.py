@@ -86,6 +86,8 @@ if __name__ == '__main__':
             compound = miner.search_compound(mol)
             if compound != None:
                 miner.add_entry(compound,keys,mol)
+            else:
+                print("Error - No Molecule Found : ",mol)
         except Exception as e:
             fail_count += 1
             print("Error: ",mol)

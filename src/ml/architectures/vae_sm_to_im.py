@@ -4,7 +4,7 @@ import sys,os,random,time
 from tensorflow.keras import layers,Model,regularizers
 sys.path.insert(0, os.path.abspath('..'))
 from keras import backend as K
-from training.get_inputs import get_training_data
+from ml.training.get_inputs import get_training_data
 from Constants import preprop_constants,ml_constants
 from PIL import Image
 

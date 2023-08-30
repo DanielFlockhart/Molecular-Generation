@@ -3,7 +3,7 @@ from PIL import *
 import numpy as np
 import tensorflow as tf
 from preprocessing import preprocessing
-from training import train
+from ml.training import train
 from postprocessing import *
 from deployment import *
 from Constants import file_constants, ml_constants,preprop_constants
@@ -12,10 +12,10 @@ from ui.dialogue import *
 sys.path.insert(0, os.path.abspath('..'))
 
 sys.path.insert(0, os.path.abspath('../training'))
-from architectures import vae_im_to_sm, vae_sm_to_im
+from ml.architectures import vae_im_to_sm, vae_sm_to_im
 from deployment import generation,deploy
 
-from visualisation import results
+from analysis.visualisation import results
 
     
 def preprocess_data(name="CSD_EES_DB.csv"):
@@ -77,11 +77,11 @@ def main(model):
 
 if __name__ == "__main__":
     
-    #preprocess_data(fr"{file_constants.DATASET}\dataset.csv")
+    preprocess_data(fr"{file_constants.DATASET}\inputs.csv")
     # PubChem10M_SMILES_BPE_450k -> different models?
 
 
-    vae_model = vae_sm_to_im.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
+    #vae_model = vae_sm_to_im.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
 
-    main(vae_model)
+    #main(vae_model)
 

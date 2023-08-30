@@ -59,7 +59,6 @@ class Preprocessor:
 
         #target_vecs,labels = img_utils.load_images() # This line causes 30Gb of RAM to be used
         (mins,maxs) = self.preprocess_conditions()
-        
         for (i,smile) in tqdm(enumerate(self.smiles),total=len(self.smiles), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
             id = self.database.get_id(smile)
             #print("Warning, do not load target from inputs.csv as it is not the full image")

@@ -7,7 +7,7 @@ import pandas as pd
 sys.path.insert(0, os.path.abspath('..'))
 
 sys.path.insert(0, os.path.abspath('../training'))
-from architectures import vae_im_to_sm, vae_sm_to_im
+from ml.architectures import vae_im_to_sm, vae_sm_to_im
 
 from Constants import ml_constants,file_constants,preprop_constants
 from utilities import img_utils,utils
