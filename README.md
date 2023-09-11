@@ -79,7 +79,9 @@ The project acknowledges the following resources for their contributions:
 Thank you for using the Molecular Generation project! We hope it proves to be useful for your chemical analysis and research.
 
 
-## Future Project Ideas
-- Convert Generated Images to back to SMILEs representation. Using Machine Learning?
-- Docking/Simulation - Binding Affinity?
+## To Do
+- Reverse image to smiles - Molecular Profiles
+- Train a full Model
+- Write Paper 2
+- Under the other conditions version
 

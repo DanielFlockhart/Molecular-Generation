@@ -100,7 +100,7 @@ def save_model(model,name):
     Saves a trained model
     '''
     # Save the subclassed model's weights (this is required for HDF5 format)
-    model_path = fr'C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\models\{name}\weights.h5'
+    model_path = fr'C:\Users\0xdan\Documents\CS\Catergories\Healthcare_Medical\Computational Chemistry\Chemistry Internship\Project-Code\data\models\{name}\weights.h5'
     model.save_weights(model_path)
 
     # Convert the subclassed model to a functional model using the same input tensors

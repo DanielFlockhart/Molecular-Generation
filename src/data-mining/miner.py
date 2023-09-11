@@ -57,10 +57,9 @@ class Miner:
         df.to_csv(file_constants.INPUTS_FOLDER, mode='a', header=True, index=False)
 
             
-    def add_entry(self,mol,keys,smile):
+    def add_entry(self,mol,keys,smile,name):
         props = self.get_molecular_properties(mol,keys)
-
-        props['Synonym'] = mol.synonyms[0] if mol.synonyms else "Unknown"
+        props['ID'] = name
         props['SMILES'] = smile
 
         df = pd.DataFrame(columns=keys)
@@ -69,14 +68,15 @@ class Miner:
 
     def get_smiles(self,file):
         df = pd.read_csv(file)
-        smiles = df['smiles'].tolist()
-        return smiles
+        smiles = df['SMILE'].tolist()
+        names = df['MOLECULE'].tolist()
+        return smiles,names
 
-keys =['Synonym', 'SMILES','atom_stereo_count','bond_stereo_count','charge','complexity','exact_mass','h_bond_acceptor_count','h_bond_donor_count','heavy_atom_count','molecular_weight','rotatable_bond_count','tpsa','xlogp']
+keys =['ID','SMILES','atom_stereo_count','bond_stereo_count','charge','complexity','exact_mass','h_bond_acceptor_count','h_bond_donor_count','heavy_atom_count','molecular_weight','rotatable_bond_count','tpsa','xlogp']
 if __name__ == '__main__':
     miner = Miner()
-    file = file_constants.DATA_FOLDER+file_constants.DATASET+"/smiles.csv"
-    smiles = miner.get_smiles(file)
+    file = file_constants.DATA_FOLDER+file_constants.DATASET+"/data.csv"
+    smiles,names = miner.get_smiles(file)
     
     miner.create_database(keys)
     
@@ -85,7 +85,7 @@ if __name__ == '__main__':
         try:
             compound = miner.search_compound(mol)
             if compound != None:
-                miner.add_entry(compound,keys,mol)
+                miner.add_entry(compound,keys,mol,names[i])
             else:
                 print("Error - No Molecule Found : ",mol)
         except Exception as e:

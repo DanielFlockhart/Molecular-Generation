@@ -184,7 +184,7 @@ class Visualiser:
         pass
 
 if __name__ == "__main__":
-    dataset = r"C:\Users\0xdan\Documents\CS\WorkCareer\Chemistry Internship\Project-Code\data\datasets\db1\inputs.csv"
+    dataset = r"C:\Users\0xdan\Documents\CS\Catergories\Healthcare_Medical\Computational Chemistry\Mol-Generation\Project-Code\data\datasets\db1\inputs.csv"
 
     visualiser = Visualiser(dataset)
     perps = [35]#[5,15,25,35,45]

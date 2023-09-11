@@ -5,9 +5,7 @@ from PIL import Image
 
 import pubchempy as pcp
 
-smiles = ["CC(C)(C)c1ccc2occ(CC(=O)Nc3ccccc3F)c2c1",
-"Cc1ccc(CNC(=O)c2ccccc2NC(=O)[C@@H]2CC(=O)N(c3ccc(C)cc3)C2)cc1",
-"CCc1ccc(-c2nc(C(=O)N3CCO[C@H](CC)C3)cs2)cc1",]
+smiles = ["Cn1c(=O)c(=O)n(C)c2cc(Oc3ccccc3)c(NC(=O)c3ccccc3F)cc21"]
 print(smiles)
 
 def main(smile):

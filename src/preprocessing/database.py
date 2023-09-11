@@ -93,7 +93,7 @@ class Database:
                 ids.append(filename[:-4])
         
         for id in ids:
-            row = self.file[self.file['ID'] == int(id)]
+            row = self.file[self.file['ID'] == id]
             # Check if a matching row was found
             if not row.empty:
                 smile = row['SMILES'].values[0]
