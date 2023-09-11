@@ -46,7 +46,7 @@ def train_model(model,name):
     train.save_model(trained_model,name)
 
 def generate_molecule(model):
-    app = deploy.App(fr"{file_constants.MODELS_FOLDER}\vae\model.h5")
+    app = deploy.App(fr"{file_constants.MODELS_FOLDER}\vae\weights.h5")
     start_mol,new_mols = app.get_mols()
     report = results.Report(start_mol,new_mols)
     report.build_report()

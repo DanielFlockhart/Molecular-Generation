@@ -83,7 +83,6 @@ def train_model(model,optimizer,use_subset=False):
     return model
 
 def graph_loss(epoch_losses):
-    print(epoch_losses)
     plt.plot(range(1, len(epoch_losses) + 1), epoch_losses)
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
@@ -100,7 +99,8 @@ def save_model(model,name):
     Saves a trained model
     '''
     # Save the subclassed model's weights (this is required for HDF5 format)
-    model_path = fr'C:\Users\0xdan\Documents\CS\Catergories\Healthcare_Medical\Computational Chemistry\Chemistry Internship\Project-Code\data\models\{name}\weights.h5'
+    model_path = fr'C:\Users\0xdan\Documents\CS\Catergories\Healthcare_Medical\Computational Chemistry\Mol-Generation\Project-Code\data\models\{name}\weights.h5'
+
     model.save_weights(model_path)
 
     # Convert the subclassed model to a functional model using the same input tensors

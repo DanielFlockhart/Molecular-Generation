@@ -13,7 +13,7 @@ model = AutoModel.from_pretrained(model_name)
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 # Transform input tokens
-inputs = tokenizer("COc1ccc(OC)c2sc(NC(=O)c3cc4c(ccc5ccccc54)oc3=O)nc12", return_tensors="pt")
+inputs = tokenizer("CN1CCN(CC1)C(=O)OC2C3=NC=CN=C3C(=O)N2C4=NC=C(C=C4)Cl", return_tensors="pt")
 # Model apply
 outputs = model(**inputs)
 
