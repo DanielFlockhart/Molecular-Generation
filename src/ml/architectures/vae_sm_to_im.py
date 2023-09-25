@@ -47,15 +47,13 @@ class VariationalAutoencoder(tf.keras.Model):
         x = layers.Dense(units=output_dim[0]*output_dim[1]*output_dim[2], activation='relu')(latent_inputs)
         x = layers.Reshape(target_shape=(output_dim[0], output_dim[1], output_dim[2]))(x)
         x = layers.Conv2DTranspose(256, kernel_size=(4, 4), padding='same',activation="relu")(x)
-        x = layers.Conv2DTranspose(128, kernel_size=(4, 4), padding='same',activation="relu")(x)
         x = layers.Conv2DTranspose(64, kernel_size=(4, 4), padding='same',activation="relu")(x)
-        x = layers.Conv2DTranspose(32, kernel_size=(4, 4), padding='same',activation="relu")(x)
-        x = layers.Conv2DTranspose(16, kernel_size=(3, 3), padding='same', activation="relu")(x)
-        x = layers.Conv2DTranspose(8, kernel_size=(3, 3), padding='same', activation="relu")(x)
+        x = layers.Conv2DTranspose(16, kernel_size=(4, 4), padding='same',activation="relu")(x)
+        x = layers.Conv2DTranspose(4, kernel_size=(4, 4), padding='same', activation="relu")(x)
         # Output layer with tanh activation instead of relu
-        outputs = layers.Conv2DTranspose(filters=1, kernel_size=(3, 3), padding='same',activation="relu")(x)
+        outputs = layers.Conv2DTranspose(filters=1, kernel_size=(4,4), padding='same',activation="sigmoid")(x)
         outputs = layers.Flatten()(outputs)
-        outputs = layers.Dense(units=output_dim[0] * output_dim[1] * output_dim[2],activation="sigmoid")(outputs)
+        
         # Define the decoder model
         decoder = tf.keras.Model(latent_inputs, outputs, name='decoder')
         return decoder

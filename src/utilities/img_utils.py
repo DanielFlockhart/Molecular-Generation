@@ -113,7 +113,7 @@ def load_image(id):
     # Convert image variable to image
     # Convert image to grayscale
 
-    #image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
     # Convert the grayscale image to binary black and white
     # Apply binary thresholding
