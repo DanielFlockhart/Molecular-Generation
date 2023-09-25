@@ -106,6 +106,7 @@ def load_image(id):
     directory = file_constants.PROCESSED_DATA
     filename = f"{id}.png"
     img_path = os.path.join(directory, filename)
+    
     image = cv2.imread(img_path)
     # Resize image to desired dimensions
     #image = cv2.resize(image, (preprop_constants.IMG_SIZE, preprop_constants.IMG_SIZE))
@@ -119,5 +120,6 @@ def load_image(id):
     #ret, image = cv2.threshold(image, 225, 255, cv2.THRESH_BINARY)
     
     # Normalize pixel values between 0 and 1
+    
     image = image.astype(np.float32) / 255.0
     return image.reshape(-1),filename[:-4]

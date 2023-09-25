@@ -45,7 +45,7 @@ class Generator:
         # Call the decoder to generate the image
         image = self.model.predict([vector,condition])
 
-
+       
         image = tf.reshape(image, ml_constants.OUTPUT_DIM)
         image = np.squeeze(image)
 

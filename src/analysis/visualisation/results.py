@@ -41,12 +41,11 @@ class Report:
 
         # Display generated molecules in the rest of the subplots
         #axes[].set_title("Generated Molecules")
-        for img in self.generated_mols:
-            img.show()
+        self.generated_mols[0].show()
         
         for i in range(num_rows):
             for j in range(1,num_cols+1):
-                axes[j,i].imshow(self.generated_mols[(j-1)*num_rows+i], cmap='gray')
+                axes[j,i].imshow(self.generated_mols[(j-1)*num_rows+i])
                 
             
         axes = axes.flatten()
