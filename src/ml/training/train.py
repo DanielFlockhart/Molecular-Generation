@@ -73,11 +73,11 @@ def train_model(model,optimizer,use_subset=False):
             total_loss += loss
         average_loss = total_loss / num_batches
         epoch_losses.append(average_loss.numpy())
-        print(f" - Loss: {average_loss:.4f}")
+        print(f" - Loss: {average_loss:.8f}")
         if epoch % 10 == 0:
             model.save_weights(checkpoint_path)
 
-    graph_loss(epoch_losses)
+    graph_loss(epoch_losses[5:])
 
 
     return model

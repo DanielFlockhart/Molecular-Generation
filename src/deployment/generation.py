@@ -53,7 +53,7 @@ class Generator:
         image = (image * 255).astype(np.uint8)
 
         # Create a PIL Image from the NumPy array
-        pil_image = Image.fromarray(image, mode='L')
+        pil_image = Image.fromarray(image)
         return pil_image
     
     def save_image(self,image,path):
@@ -75,8 +75,6 @@ class Generator:
         for key in preprop_constants.keys:
             condition = self.normalise_condition(float(input("Enter a value for " + key + ": ")),mins[key],maxs[key])
             conditions.append(condition)
-        
-
         return conditions
     
     def normalise_condition(self,condition,mins,maxs):

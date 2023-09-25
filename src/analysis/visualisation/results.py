@@ -28,7 +28,7 @@ class Report:
         num_cols = int(math.sqrt(num_generated))
 
         # Create a subplot grid
-        fig, axes = plt.subplots(num_rows+1, num_cols, figsize=(12, 8))
+        fig, axes = plt.subplots(num_rows+1, num_cols, figsize=(24, 16))
         fig.set_facecolor("white")  # Set the figure background color to white
 
         axes[0, 0].imshow(self.starting_mol)
@@ -41,9 +41,13 @@ class Report:
 
         # Display generated molecules in the rest of the subplots
         #axes[].set_title("Generated Molecules")
+        for img in self.generated_mols:
+            img.show()
+        
         for i in range(num_rows):
             for j in range(1,num_cols+1):
                 axes[j,i].imshow(self.generated_mols[(j-1)*num_rows+i], cmap='gray')
+                
             
         axes = axes.flatten()
         for ax in axes:

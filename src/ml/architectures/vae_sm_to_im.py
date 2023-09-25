@@ -30,6 +30,8 @@ class VariationalAutoencoder(tf.keras.Model):
         x = layers.BatchNormalization()(x)  # Add batch normalization
         x = layers.Dense(256, activation="relu")(x)
         x = layers.BatchNormalization()(x)  # Add batch normalization
+        x = layers.Dense(128, activation="relu")(x)
+        x = layers.BatchNormalization()(x)  # Add batch normalization
         z_mean = layers.Dense(latent_dim, activation="relu")(encoder_inputs)
         z_log_var = layers.Dense(latent_dim, activation="relu")(encoder_inputs)
         return tf.keras.Model(encoder_inputs,[z_mean,z_log_var], name='encoder')#[z_mean, z_log_var], name='encoder')
@@ -44,11 +46,13 @@ class VariationalAutoencoder(tf.keras.Model):
         # Reshape the latent vector to match the input shape for the convolutional layers
         x = layers.Dense(units=output_dim[0]*output_dim[1]*output_dim[2], activation='relu')(latent_inputs)
         x = layers.Reshape(target_shape=(output_dim[0], output_dim[1], output_dim[2]))(x)
+        x = layers.Conv2DTranspose(256, kernel_size=(4, 4), padding='same',activation="relu")(x)
         x = layers.Conv2DTranspose(128, kernel_size=(4, 4), padding='same',activation="relu")(x)
         x = layers.Conv2DTranspose(64, kernel_size=(4, 4), padding='same',activation="relu")(x)
         x = layers.Conv2DTranspose(32, kernel_size=(4, 4), padding='same',activation="relu")(x)
         x = layers.UpSampling2D(size=(2, 2))(x)
         x = layers.Conv2DTranspose(16, kernel_size=(3, 3), padding='same', activation="relu")(x)
+        x = layers.Conv2DTranspose(8, kernel_size=(3, 3), padding='same', activation="relu")(x)
         # Output layer with tanh activation instead of relu
         outputs = layers.Conv2DTranspose(filters=1, kernel_size=(3, 3), padding='same',activation="relu")(x)
         outputs = layers.Flatten()(outputs)
@@ -79,7 +83,9 @@ class VariationalAutoencoder(tf.keras.Model):
         if self.training:
             z = self.sampling([z_mean, z_log_var])
         else:
-            z = self.sampling([z_mean, z_log_var])
+            z = z_mean
+        
+        z = z_mean
         
         z_condition = tf.concat([z, condition_vector], axis=1)
         reconstructed = self.decoder(z_condition)
@@ -89,30 +95,25 @@ class VariationalAutoencoder(tf.keras.Model):
         return reconstructed
 
     def compute_loss(self, inputs, targets, reconstructed, sample_weight=None, training=False):
-        '''
-        Calculates the loss of the model
-        '''
-
-        # Calculate the SSIM loss between the targets and the reconstructed images
-        #ssim_loss = tf.reduce_mean(1 - tf.image.ssim(targets, reconstructed, max_val=1.0))
-
         bce_loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy(targets, reconstructed))
-
         mse_loss = tf.reduce_mean(tf.keras.losses.mean_squared_error(targets, reconstructed))
-
         z_mean, z_log_var = self.encoder(inputs)
-
-        
         kl_loss = -0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
-
-        reconstruction_loss =  mse_loss+ kl_loss #BCE or MSE
-
-        # Changes 07/07/2023
-        # Re added VAE PART - changed loss to mse and kl
-
-
-        #tf.print(" - total_loss:", reconstruction_loss)
+        
+        # Adjust the weight for the reconstruction loss
+        reconstruction_weight = 0.9  # Experiment with this weight
+        reconstruction_loss = reconstruction_weight * mse_loss + kl_loss
+        
+        # Calculate perceptual loss using a pre-trained model (VGG, for example)
+        # You need to extract features from both targets and reconstructed images
+        # and compute the MSE loss between these features.
+        # perceptual_loss = tf.reduce_mean(tf.square(target_features - reconstructed_features))
+        
+        # Combine the perceptual loss with the reconstruction and KL loss
+        # total_loss = reconstruction_loss + perceptual_loss
+        
         return reconstruction_loss
+
     
     def show_image(self, tensor,name):
         """

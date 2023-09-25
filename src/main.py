@@ -24,7 +24,7 @@ def preprocess_data(name="CSD_EES_DB.csv"):
     '''
     print(format_title("Preprocessing Data"))
     processor = preprocessing.Preprocessor(preprop_constants.EMBEDDING_MODEL,name)
-    processor.process(subset=False)
+    processor.process(subset=True)
 
 def train_model(model,name):
     '''
@@ -36,9 +36,7 @@ def train_model(model,name):
     # Define the initial learning rate and decay rate
     initial_learning_rate = ml_constants.LRN_RATE
     
-    # Initialize the optimizer with the learning rate schedule
-    optimizer = tf.keras.optimizers.Adam(learning_rate=initial_learning_rate)
-    # Train Model
+    optimizer = tf.keras.optimizers.Nadam(learning_rate=initial_learning_rate)    # Train Model
     model.training = True  # Set training to True before training
     trained_model = train.train_model(model,optimizer,use_subset=False)
 
@@ -77,7 +75,7 @@ def main(model):
 
 if __name__ == "__main__":
     
-    #preprocess_data(fr"{file_constants.DATASET}\dataset.csv")
+    # preprocess_data(fr"{file_constants.DATASET}\dataset.csv")
     # PubChem10M_SMILES_BPE_450k -> different models?
 
 

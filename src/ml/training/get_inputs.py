@@ -25,7 +25,6 @@ def get_inputs(ID,df):
     vectors = []
     target = []
     if len(row) > 0:
-        # Retrieve the conditions value
         conditions = ast.literal_eval(row['conditions'].values[0])
         vectors = ast.literal_eval(row['vector'].values[0])
         target = img_utils.load_image(ID)
