@@ -36,7 +36,7 @@ def train_model(model,name):
     # Define the initial learning rate and decay rate
     initial_learning_rate = ml_constants.LRN_RATE
     
-    optimizer = tf.keras.optimizers.Adam(learning_rate=initial_learning_rate)    # Train Model
+    optimizer = tf.keras.optimizers.Nadam(learning_rate=initial_learning_rate)    # Train Model
     model.training = True  # Set training to True before training
     trained_model = train.train_model(model,optimizer,use_subset=False)
 

@@ -45,7 +45,7 @@ class Report:
         
         for i in range(num_rows):
             for j in range(1,num_cols+1):
-                axes[j,i].imshow(self.generated_mols[(j-1)*num_rows+i])
+                axes[j,i].imshow(self.generated_mols[(j-1)*num_rows+i],cmap='gray')
                 
             
         axes = axes.flatten()
