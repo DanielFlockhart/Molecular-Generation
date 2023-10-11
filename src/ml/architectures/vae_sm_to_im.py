@@ -46,11 +46,12 @@ class VariationalAutoencoder(tf.keras.Model):
         # Reshape the latent vector to match the input shape for the convolutional layers
         x = layers.Dense(units=output_dim[0]*output_dim[1]*output_dim[2], activation='relu')(latent_inputs)
         x = layers.Reshape(target_shape=(output_dim[0], output_dim[1], output_dim[2]))(x)
+        x = layers.Conv2DTranspose(128, kernel_size=(3, 3), padding='same',activation="relu")(x)
         x = layers.Conv2DTranspose(64, kernel_size=(3, 3), padding='same',activation="relu")(x)
         x = layers.Conv2DTranspose(32, kernel_size=(3, 3), padding='same',activation="relu")(x)
         x = layers.Conv2DTranspose(16, kernel_size=(3, 3), padding='same', activation="relu")(x)
         # Output layer with tanh activation instead of relu
-        outputs = layers.Conv2DTranspose(filters=1, kernel_size=(3,3), padding='same',activation="relu")(x)
+        outputs = layers.Conv2DTranspose(filters=1, kernel_size=(3,3), padding='same',activation="sigmoid")(x)
         outputs = layers.Flatten()(outputs)
         
         # Define the decoder model

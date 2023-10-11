@@ -16,7 +16,7 @@ from ml.architectures import vae_im_to_sm, vae_sm_to_im
 from deployment import generation,deploy
 
 from analysis.visualisation import results
-
+import logging
     
 def preprocess_data(name="CSD_EES_DB.csv"):
     '''
@@ -35,8 +35,13 @@ def train_model(model,name):
 
     # Define the initial learning rate and decay rate
     initial_learning_rate = ml_constants.LRN_RATE
+
     
-    optimizer = tf.keras.optimizers.Nadam(learning_rate=initial_learning_rate)    # Train Model
+    checkpoint_dir = file_constants.CHECKPOINTS_FOLDER
+    print(f"Checkpoint Directory: {checkpoint_dir}")
+    optimizer = tf.keras.optimizers.Nadam(learning_rate=initial_learning_rate) 
+    
+    # Train Model
     model.training = True  # Set training to True before training
     trained_model = train.train_model(model,optimizer,use_subset=False)
 
@@ -50,7 +55,26 @@ def generate_molecule(model):
     report.build_report()
 
 
+def load_model_from_checkpoint(model, optimizer, checkpoint_dir):
+    # # Define a Checkpoint for the model and optimizer
+    # model_checkpoint = tf.train.Checkpoint(model=model, optimizer=optimizer)
 
+    # # Define a checkpoint manager to manage checkpoints
+    # checkpoint_manager = tf.train.CheckpointManager(model_checkpoint, checkpoint_dir, max_to_keep=5)
+
+    # # Restore the latest checkpoint if available
+    # if checkpoint_manager.latest_checkpoint:
+    #     model_checkpoint.restore(checkpoint_manager.latest_checkpoint)
+    #     print("Model restored from checkpoint.")
+    #     optimizer_variables = optimizer.variables()
+    #     for var in optimizer_variables:
+    #         print(f"Optimizer Variable: {var.name}, Value: {var.numpy()}")
+    # else:
+    #     print("No checkpoint found. Training from scratch.")
+    # sys.exit()
+    pass
+    
+    
 def main(model):
     '''
     Main Entrance for the program
@@ -80,6 +104,9 @@ if __name__ == "__main__":
 
 
     vae_model = vae_sm_to_im.VariationalAutoencoder(ml_constants.INPUT_SIZE,ml_constants.LATENT_DIM,ml_constants.OUTPUT_DIM,ml_constants.CONDITIONS_SIZE)
-
+    encoder_weights_path = fr'C:\Users\0xdan\Documents\CS\Catergories\Healthcare_Medical\Computational Chemistry\Mol-Generation\Project-Code\data\models\vae\encoder_weights.h5'
+    decoder_weights_path = fr'C:\Users\0xdan\Documents\CS\Catergories\Healthcare_Medical\Computational Chemistry\Mol-Generation\Project-Code\data\models\vae\decoder_weights.h5'
+    vae_model.encoder.load_weights(encoder_weights_path)
+    vae_model.decoder.load_weights(decoder_weights_path)
     main(vae_model)
 

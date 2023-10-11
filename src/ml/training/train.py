@@ -35,7 +35,11 @@ def train_model(model,optimizer,use_subset=False):
     # Need to Make sure the x_train and y_train are the same length and a labelled correctly
     print(format_title("Compiling Model"))
     labels,vectors,conditions,targets = get_training_data(ml_constants.TRAIN_SUBSET_COUNT if use_subset else None)
+    file = r"C:\Users\0xdan\Documents\CS\Catergories\Healthcare_Medical\Computational Chemistry\Mol-Generation\Project-Code\data\models\vae\weights.h5"
+    
+    
     model.compile(optimizer=optimizer,loss=model.compute_loss)
+    
     
     print(format_title("Training Model"))
 
@@ -58,7 +62,8 @@ def train_model(model,optimizer,use_subset=False):
 
     # Training loop
     epoch_losses = []
-    for epoch in tqdm(range(ml_constants.EPOCHS), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'): 
+    
+    for epoch in tqdm(range(ml_constants.EPOCHS), bar_format=ui_constants.LOADING_BAR, ncols=80, colour='green'):
         total_loss = 0.0
         num_batches = len(vectors) // ml_constants.BATCH_SIZE
         
@@ -76,6 +81,7 @@ def train_model(model,optimizer,use_subset=False):
         print(f" - Loss: {average_loss:.8f}")
         if epoch % 10 == 0:
             model.save_weights(checkpoint_path)
+            save_model(model,"vae_model")
 
     graph_loss(epoch_losses[5:])
 
@@ -98,10 +104,12 @@ def save_model(model,name):
     '''
     Saves a trained model
     '''
-    # Save the subclassed model's weights (this is required for HDF5 format)
-    model_path = fr'C:\Users\0xdan\Documents\CS\Catergories\Healthcare_Medical\Computational Chemistry\Mol-Generation\Project-Code\data\models\{name}\weights.h5'
-
-    model.save_weights(model_path)
+    # Save the subclassed model's weights separately
+    encoder_weights_path = fr'C:\Users\0xdan\Documents\CS\Catergories\Healthcare_Medical\Computational Chemistry\Mol-Generation\Project-Code\data\models\vae\encoder_weights.h5'
+    decoder_weights_path = fr'C:\Users\0xdan\Documents\CS\Catergories\Healthcare_Medical\Computational Chemistry\Mol-Generation\Project-Code\data\models\vae\decoder_weights.h5'
+    
+    model.encoder.save_weights(encoder_weights_path)
+    model.decoder.save_weights(decoder_weights_path)
 
     # Convert the subclassed model to a functional model using the same input tensors
     inputs = model.encoder.inputs[0]
@@ -110,4 +118,5 @@ def save_model(model,name):
     vae_functional_model = tf.keras.Model(inputs=[inputs, condition_vector], outputs=outputs)
 
     # Save the functional model in the HDF5 format
+    model_path = fr'C:\Users\0xdan\Documents\CS\Catergories\Healthcare_Medical\Computational Chemistry\Mol-Generation\Project-Code\data\models\{name}\functional_model.h5'
     vae_functional_model.save(model_path)
