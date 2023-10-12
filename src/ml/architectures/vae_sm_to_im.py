@@ -42,94 +42,22 @@ class VariationalAutoencoder(tf.keras.Model):
         '''
         # Define the input layer for the latent vector
         latent_inputs = tf.keras.Input(shape=(latent_dim,), name='latent_inputs')
-        
+
         # Reshape the latent vector to match the input shape for the convolutional layers
         x = layers.Dense(units=output_dim[0]*output_dim[1]*output_dim[2], activation='relu')(latent_inputs)
         x = layers.Reshape(target_shape=(output_dim[0], output_dim[1], output_dim[2]))(x)
         x = layers.Conv2DTranspose(128, kernel_size=(3, 3), padding='same',activation="relu")(x)
+        x = layers.BatchNormalization()(x)  # Add batch normalization
         x = layers.Conv2DTranspose(64, kernel_size=(3, 3), padding='same',activation="relu")(x)
+        x = layers.BatchNormalization()(x)  # Add batch normalization
         x = layers.Conv2DTranspose(32, kernel_size=(3, 3), padding='same',activation="relu")(x)
+        x = layers.BatchNormalization()(x)  # Add batch normalization
         x = layers.Conv2DTranspose(16, kernel_size=(3, 3), padding='same', activation="relu")(x)
+        x = layers.BatchNormalization()(x)  # Add batch normalization
         # Output layer with tanh activation instead of relu
-        outputs = layers.Conv2DTranspose(filters=1, kernel_size=(3,3), padding='same',activation="sigmoid")(x)
+        outputs = layers.Conv2DTranspose(filters=output_dim[2], kernel_size=(3,3), padding='same',activation="sigmoid")(x)
         outputs = layers.Flatten()(outputs)
-        
+
         # Define the decoder model
         decoder = tf.keras.Model(latent_inputs, outputs, name='decoder')
         return decoder
-
-    
-    def sampling(self, args):
-        '''
-        Samples from the latent space using the reparameterisation
-        '''
-        z_mean, z_log_var = args
-        epsilon = tf.random.normal(shape=tf.shape(z_mean))
-        scaled_epsilon = epsilon * self.temperature
-        res = z_mean + tf.exp(0.5 * z_log_var) * scaled_epsilon
-        return res
-
-    def call(self, inputs,condition_vector):
-        '''
-        Runs the model
-
-        if it is converging on just averaging the output then the inputs are having no effect.
-        '''
-        
-        z_mean, z_log_var = self.encoder(inputs)
-        if self.training:
-            z = self.sampling([z_mean, z_log_var])
-        else:
-            z = z_mean
-        
-        z = z_mean
-        
-        z_condition = tf.concat([z, condition_vector], axis=1)
-        reconstructed = self.decoder(z_condition)
-
-
-
-        return reconstructed
-
-    def compute_loss(self, inputs, targets, reconstructed, sample_weight=None, training=False):
-        bce_loss = tf.reduce_mean(tf.keras.losses.binary_crossentropy(targets, reconstructed))
-        mse_loss = tf.reduce_mean(tf.keras.losses.mean_squared_error(targets, reconstructed))
-        z_mean, z_log_var = self.encoder(inputs)
-        kl_loss = -0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
-        
-        # Adjust the weight for the reconstruction loss
-        reconstruction_weight = 0.9  # Experiment with this weight
-        reconstruction_loss = reconstruction_weight * mse_loss + kl_loss
-        
-        # Calculate perceptual loss using a pre-trained model (VGG, for example)
-        # You need to extract features from both targets and reconstructed images
-        # and compute the MSE loss between these features.
-        # perceptual_loss = tf.reduce_mean(tf.square(target_features - reconstructed_features))
-        
-        # Combine the perceptual loss with the reconstruction and KL loss
-        # total_loss = reconstruction_loss + perceptual_loss
-        
-        return reconstruction_loss
-
-    
-    def show_image(self, tensor,name):
-        """
-        Displays an image from the given tensor.
-        """
-        # Assuming the tensor shape is (batch_size, height, width, channels)
-        if len(tensor.shape) == 4:
-            tensor = tensor[0]  # Take the first image from the batch
-        elif len(tensor.shape) == 3:
-            tensor = tensor  # Use the tensor as is
-
-        def show_image_from_np(tensor_np):
-            tensor_reshaped = tf.reshape(tensor_np, (preprop_constants.IMG_SIZE, (preprop_constants.IMG_SIZE)))
-            # Convert the tensor to a NumPy array
-            tensor_rescaled = tf.cast(tensor_reshaped * 255, tf.uint8)
-
-            # Create and display the image using PIL
-            image = Image.fromarray(tensor_rescaled.numpy())
-            image.save(f"{name}.png")
-
-        # Use tf.py_function to call the Python function within the graph function
-        tf.py_function(show_image_from_np, [tensor], [])
